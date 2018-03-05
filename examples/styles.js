@@ -33,7 +33,7 @@ promises.push(itowns.Fetcher.json('./layers/JSONLayers/Ortho.json').then(addLaye
 promises.push(itowns.Fetcher.json('./layers/JSONLayers/WORLD_DTM.json').then(addLayerCb));
 promises.push(itowns.Fetcher.json('./layers/JSONLayers/IGN_MNT_HIGHRES.json').then(addLayerCb));
 
-function altitudeLine(properties, contour) {
+/*function altitudeLine(properties, contour) {
     var altitudes = [];
     var i = 0;
     var result;
@@ -51,21 +51,21 @@ function altitudeLine(properties, contour) {
         return altitudes;
     }
     return 0;
-}
+}*/
 
-function colorLine(properties) {
+/*function colorLine(properties) {
     var rgb = properties.couleur.split(' ');
     return new itowns.THREE.Color(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
-}
+}*/
 
-function acceptFeatureBus(properties) {
+/*function acceptFeatureBus(properties) {
     var line = properties.ligne + properties.sens;
     if (linesBus.indexOf(line) === -1) {
         linesBus.push(line);
         return true;
     }
     return false;
-}
+}*/
 
 /*globeView.addLayer({
     type: 'geometry',
@@ -168,10 +168,12 @@ function configPointMaterial(result) {
     }
 }
 
-function colorPoint(/* properties */) {
+/*
+function colorPoint() {
     return new itowns.THREE.Color(0x7F180D);
-}
+}*/
 
+/*
 function selectRoad(properties) {
     return properties.gestion === 'CEREMA';
 }
