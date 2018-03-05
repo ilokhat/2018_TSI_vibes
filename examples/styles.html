@@ -46,7 +46,6 @@
         </script>
         <script src="styles.js"></script>
         <script type="text/javascript">
-
             /* global itowns, document, GuiTools, globeView, promises */
             var menuGlobe = new GuiTools('menuDiv');
             menuGlobe.view = globeView;
@@ -65,11 +64,22 @@
             debug.createTileDebugUI(menuGlobe.gui, globeView, globeView.wgs84TileLayer, d);
 
             for (const layer of globeView.getLayers()) {
-
+                if (layer.id === 'WFS Bus lines') {
+                    layer.whenReady.then( function _(layer) {
+                        var gui = debug.GeometryDebug.createGeometryDebugUI(menuGlobe.gui, globeView, layer);
+                        debug.GeometryDebug.addMaterialLineWidth(gui, globeView, layer, 1, 10);
+                    });
+                }
                 if (layer.id === 'WFS Buildings') {
                     layer.whenReady.then( function _(layer) {
                         var gui = debug.GeometryDebug.createGeometryDebugUI(menuGlobe.gui, globeView, layer);
                         debug.GeometryDebug.addWireFrameCheckbox(gui, globeView, layer);
+                    });
+                }
+                if (layer.id === 'WFS Route points') {
+                    layer.whenReady.then( function _(layer) {
+                        var gui = debug.GeometryDebug.createGeometryDebugUI(menuGlobe.gui, globeView, layer);
+                        debug.GeometryDebug.addMaterialSize(gui, globeView, layer, 1, 50);
                     });
                 }
             }
