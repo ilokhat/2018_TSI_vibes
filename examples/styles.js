@@ -67,7 +67,7 @@ function acceptFeatureBus(properties) {
     return false;
 }
 
-globeView.addLayer({
+/*globeView.addLayer({
     type: 'geometry',
     update: itowns.FeatureProcessing.update,
     convert: itowns.Feature2Mesh.convert({
@@ -92,7 +92,7 @@ globeView.addLayer({
         mimetype: 'geojson',
     },
 }, globeView.tileLayer);
-
+*/
 function colorBuildings(properties) {
     if (properties.id.indexOf('bati_remarquable') === 0) {
         return new itowns.THREE.Color(0x5555ff);
@@ -135,7 +135,7 @@ globeView.addFrameRequester(itowns.MAIN_LOOP_EVENTS.BEFORE_RENDER, scaler);
 globeView.addLayer({
     type: 'geometry',
     update: itowns.FeatureProcessing.update,
-    convert: itowns.Feature2Mesh.convert({
+    convert: itowns.Feature2MeshStyle.convert({
         color: colorBuildings,
         altitude: altitudeBuildings,
         extrude: extrudeBuildings }),
@@ -182,7 +182,7 @@ function altitudePoint(properties, contour) {
     }
     return 0;
 }
-
+/*
 globeView.addLayer({
     type: 'geometry',
     update: itowns.FeatureProcessing.update,
@@ -205,6 +205,6 @@ globeView.addLayer({
         mimetype: 'json',
     },
 }, globeView.tileLayer);
-
+*/
 exports.view = globeView;
 exports.initialPosition = positionOnGlobe;
