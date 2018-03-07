@@ -73,6 +73,56 @@ exports.loadCollada = function loadCollada(url) {
     });
 };
 
+exports.loadOBJ =function loadOBJ(url) {
+    var model;
+
+    // obj loader
+    var loader = new itowns.THREE.OBJLoader();
+
+    loader.load(
+        url,
+        //callback
+        function (model) {
+            console.log(model);
+            // building coordinate
+            var coord = new itowns.Coordinates('EPSG:4326', 4.2165, 44.844, 1417);
+
+            var objID = globeView.mainLoop.gfxEngine.getUniqueThreejsLayer();
+
+            model.position.copy(coord.as(globeView.referenceCrs).xyz());
+            // align up vector with geodesic normal
+            model.lookAt(model.position.clone().add(coord.geodesicNormal));
+            // user rotate building to align with ortho image
+            model.rotateZ(-Math.PI * 0.2);
+            model.rotateX(Math.PI/2);
+            model.scale.set(120, 120, 120);
+
+            // set camera's layer to do not disturb the picking
+            model.traverse(function _(obj) { obj.layers.set(objID); });
+            globeView.camera.camera3D.layers.enable(objID);
+
+            // update coordinate of the mesh
+            model.updateMatrixWorld();
+
+            globeView.scene.add(model);
+            globeView.notifyChange(true);
+        },
+        // called when loading is in progresses
+        function ( xhr ) {
+
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+        // called when loading has errors
+        function ( error ) {
+
+            console.log( 'An error happened' );
+            console.log(error);
+
+        });
+
+}
+
 // Listen for globe full initialisation event
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
     globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
