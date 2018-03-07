@@ -20,6 +20,9 @@ var promiseElevation = [];
 
 menuGlobe.view = globeView;
 
+
+var model;
+
 function addLayerCb(layer) {
     return globeView.addLayer(layer).then(function addGui(la) {
         if (la.type === 'color') {
@@ -42,10 +45,10 @@ exports.view = globeView;
 exports.initialPosition = positionOnGlobe;
 
 exports.loadCollada = function loadCollada(url) {
-    var model;
+    var mesh;
     // loading manager
     var loadingManager = new itowns.THREE.LoadingManager(function _addModel() {
-        globeView.scene.add(model);
+        globeView.scene.add(mesh);
         globeView.notifyChange(true);
     });
     // collada loader
@@ -56,25 +59,25 @@ exports.loadCollada = function loadCollada(url) {
 
     loader.load(url, function col(collada) {
         var colladaID = globeView.mainLoop.gfxEngine.getUniqueThreejsLayer();
-        model = collada.scene;
-        model.position.copy(coord.as(globeView.referenceCrs).xyz());
+        mesh = collada.scene;
+        mesh.position.copy(coord.as(globeView.referenceCrs).xyz());
         // align up vector with geodesic normal
-        model.lookAt(model.position.clone().add(coord.geodesicNormal));
+        mesh.lookAt(mesh.position.clone().add(coord.geodesicNormal));
         // user rotate building to align with ortho image
-        model.rotateZ(-Math.PI * 0.2);
-        model.scale.set(1.2, 1.2, 1.2);
+        mesh.rotateZ(-Math.PI * 0.2);
+        mesh.scale.set(1.2, 1.2, 1.2);
 
         // set camera's layer to do not disturb the picking
-        model.traverse(function _(obj) { obj.layers.set(colladaID); });
+        mesh.traverse(function _(obj) { obj.layers.set(colladaID); });
         globeView.camera.camera3D.layers.enable(colladaID);
 
         // update coordinate of the mesh
-        model.updateMatrixWorld();
+        mesh.updateMatrixWorld();
     });
 };
 
 exports.loadOBJ =function loadOBJ(url) {
-    var model;
+
 
     // obj loader
     var loader = new itowns.THREE.OBJLoader();
@@ -82,30 +85,41 @@ exports.loadOBJ =function loadOBJ(url) {
     loader.load(
         url,
         //callback
-        function (model) {
-            console.log(model);
+        function (mesh) {
+
             // building coordinate
             var coord = new itowns.Coordinates('EPSG:4326', 4.2165, 44.844, 1417);
 
             var objID = globeView.mainLoop.gfxEngine.getUniqueThreejsLayer();
 
-            model.position.copy(coord.as(globeView.referenceCrs).xyz());
+            mesh.position.copy(coord.as(globeView.referenceCrs).xyz());
             // align up vector with geodesic normal
-            model.lookAt(model.position.clone().add(coord.geodesicNormal));
+            mesh.lookAt(mesh.position.clone().add(coord.geodesicNormal));
             // user rotate building to align with ortho image
-            model.rotateZ(-Math.PI * 0.2);
-            model.rotateX(Math.PI/2);
-            model.scale.set(120, 120, 120);
+            mesh.rotateZ(-Math.PI * 0.2);
+            mesh.rotateX(Math.PI/2);
+            mesh.scale.set(120, 120, 120);
 
             // set camera's layer to do not disturb the picking
-            model.traverse(function _(obj) { obj.layers.set(objID); });
+            mesh.traverse(function _(obj) { obj.layers.set(objID); });
             globeView.camera.camera3D.layers.enable(objID);
+
+            let material = new THREE.MeshLambertMaterial( { color: 0x9424b6} );
+            for (var i = 0; i < mesh.children.length; i++) {
+                mesh.children[i].material = material;
+            }
+            
+            
+            model = mesh;
 
             // update coordinate of the mesh
             model.updateMatrixWorld();
+            console.log(model);    
 
             globeView.scene.add(model);
             globeView.notifyChange(true);
+
+            
         },
         // called when loading is in progresses
         function ( xhr ) {
@@ -122,6 +136,27 @@ exports.loadOBJ =function loadOBJ(url) {
         });
 
 }
+
+menuGlobe.gui.addColor({color : "#ffae23" }, 'color').name("color").onChange(
+        function changeColor(value) {
+            /*
+            let couleur = "0x";
+            for (var i = 1; i < value.length; i++) {
+                couleur += value[i];
+            }
+            */
+            console.log(model);
+
+
+            for (var i = 0; i < model.children.length; i++) {
+                model.children[i].material.color = new THREE.Color( value );
+                model.children[i].material.needsUpdate = true;
+            }
+
+            globeView.notifyChange(true);
+        }
+    );
+
 
 // Listen for globe full initialisation event
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {

@@ -50,12 +50,11 @@
             var THREE = itowns.THREE;
 
             var script    = document.createElement('script');
-            //var scriptOBJ = document.createElement('script');
 
             script.type    = 'text/javascript';
-            //scriptOBJ.type = 'text/javascript';
 
             script.src    = 'https://cdn.rawgit.com/mrdoob/three.js/r' + THREE.REVISION + '/examples/js/loaders/OBJLoader.js';
+
 
             //scriptOBJ.src = 'https://cdn.rawgit.com/mrdoob/three.js/r' + THREE.REVISION + '/examples/js/loaders/OBJLoader.js';
 
@@ -64,10 +63,11 @@
             };*/
 
             script.onload = function () {
-                exports.loadOBJ('https://raw.githubusercontent.com/azarz/EAGL/master/model/Croutitower/croutitower.obj');
+                exports.loadOBJ('Croutitower/croutitower.obj');
             }
 
             document.body.appendChild(script);
+
         </script>
     </body>
 </html>
