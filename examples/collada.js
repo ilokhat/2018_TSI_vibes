@@ -21,6 +21,7 @@ var promiseElevation = [];
 menuGlobe.view = globeView;
 
 
+
 var model;
 
 function addLayerCb(layer) {
@@ -222,6 +223,19 @@ menuGlobe.gui.add({shininess : 30 }, 'shininess',0 , 100).name("shininess").onCh
         globeView.notifyChange(true);
     }
 );
+
+menuGlobe.addGUI("save", save);
+
+function save(){
+
+    var blob = new Blob([JSON.stringify(model.children[0].material)], {type: "text/plain;charset=utf-8"});
+    itowns.FILE.saveAs(blob, "style.vibes");
+}
+
+
+console.log(itowns.FILE);
+
+
 
 
 // Listen for globe full initialisation event
