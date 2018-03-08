@@ -20,9 +20,9 @@ var promiseElevation = [];
 
 menuGlobe.view = globeView;
 
-
-
 var model;
+
+
 
 function addLayerCb(layer) {
     return globeView.addLayer(layer).then(function addGui(la) {
@@ -79,7 +79,6 @@ exports.loadCollada = function loadCollada(url) {
 
 exports.loadOBJ =function loadOBJ(url) {
 
-
     // obj loader
     var loader = new itowns.THREE.OBJLoader();
 
@@ -97,8 +96,9 @@ exports.loadOBJ =function loadOBJ(url) {
             // align up vector with geodesic normal
             mesh.lookAt(mesh.position.clone().add(coord.geodesicNormal));
             // user rotate building to align with ortho image
-            mesh.rotateZ(-Math.PI * 0.2);
+            //mesh.rotateZ(-Math.PI * 0.2);
             mesh.rotateX(Math.PI/2);
+            mesh.rotateY(Math.PI/2);
             mesh.scale.set(120, 120, 120);
 
             // set camera's layer to do not disturb the picking
@@ -110,6 +110,7 @@ exports.loadOBJ =function loadOBJ(url) {
                 let material = new THREE.MeshPhongMaterial( { color: getRandomColor()} );
                 mesh.children[i].material = material;
                 mesh.children[i].material.transparent = true;
+                mesh.children[i].castShadow = true;
             }
             
             
@@ -118,10 +119,11 @@ exports.loadOBJ =function loadOBJ(url) {
             // update coordinate of the mesh
             model.updateMatrixWorld();
             console.log(model);    
-
+            
             globeView.scene.add(model);
             globeView.notifyChange(true);
 
+            addGUI();
             
         },
         // called when loading is in progresses
@@ -149,80 +151,71 @@ function getRandomColor() {
   return color;
 }
 
-menuGlobe.gui.add({opacity : 1 }, 'opacity',0 , 1).name("opacity").onChange(
+
+function addGUI() {
+    for (var i = 0; i < model.children.length; i++) {
+       let folder = menuGlobe.gui.addFolder(model.children[i].name);
+       addOpacity(folder,i); 
+       addColor(folder,i);
+       addEmissive(folder,i);
+       addSpecular(folder,i);
+       addShininess(folder,i);
+    }
+}
+
+
+function addOpacity(folder,index) {
+    folder.add({opacity : 1 }, 'opacity',0 , 1).name("opacity").onChange(
+        function changeOpacity(value) {
+            model.children[index].material.opacity = value;
+            model.children[index].material.needsUpdate = true;
+            globeView.notifyChange(true);
+        }
+    );
+}
+
+function addColor(folder,index) {
+    folder.addColor({color : "#ffae23" }, 'color').name("color").onChange(
+        function changeColor(value) {
+            model.children[index].material.color = new THREE.Color( value );
+            model.children[index].material.needsUpdate = true;
+            globeView.notifyChange(true);
+        }
+    );
+}
+
+function addEmissive(folder,index) {
+    folder.addColor({emissive : "#ffae23" }, 'emissive').name("emissive").onChange(
+        function changeColor(value) {
+            model.children[index].material.emissive = new THREE.Color( value );
+            model.children[index].material.needsUpdate = true;
+            globeView.notifyChange(true);
+        }
+    );
+}
+
+
+function addSpecular(folder,index) {
+    folder.addColor({specular : "#ffae23" }, 'specular').name("specular").onChange(
+        function changeColor(value) {
+            model.children[index].material.specular = new THREE.Color( value );
+            model.children[index].material.needsUpdate = true;
+            globeView.notifyChange(true);
+        }
+    );
+}
+
+function addShininess(folder,index) {
+    folder.add({shininess : 30 }, 'shininess',0 , 100).name("shininess").onChange(
     function changeOpacity(value) {
-
-        console.log(model);
-
-
-        for (var i = 0; i < model.children.length; i++) {
-            model.children[i].material.opacity = value;
-            model.children[i].material.needsUpdate = true;
-        }
-
+        model.children[index].material.shininess = value;
+        model.children[index].material.needsUpdate = true;
         globeView.notifyChange(true);
     }
 );
-
-menuGlobe.gui.addColor({color : "#ffae23" }, 'color').name("color").onChange(
-    function changeColor(value) {
-
-        console.log(model);
+}
 
 
-        for (var i = 0; i < model.children.length; i++) {
-            model.children[i].material.color = new THREE.Color( value );
-            model.children[i].material.needsUpdate = true;
-        }
-
-        globeView.notifyChange(true);
-    }
-);
-
-menuGlobe.gui.addColor({emissive : "#ffae23" }, 'emissive').name("emissive").onChange(
-    function changeColor(value) {
-
-        console.log(model);
-
-
-        for (var i = 0; i < model.children.length; i++) {
-            model.children[i].material.emissive = new THREE.Color( value );
-            model.children[i].material.needsUpdate = true;
-        }
-
-        globeView.notifyChange(true);
-    }
-);
-
-menuGlobe.gui.addColor({specular : "#ffae23" }, 'specular').name("specular").onChange(
-    function changeColor(value) {
-
-        console.log(model);
-
-
-        for (var i = 0; i < model.children.length; i++) {
-            model.children[i].material.specular = new THREE.Color( value );
-            model.children[i].material.needsUpdate = true;
-        }
-
-        globeView.notifyChange(true);
-    }
-);
-
-menuGlobe.gui.add({shininess : 30 }, 'shininess',0 , 100).name("shininess").onChange(
-    function changeOpacity(value) {
-
-        console.log(model);
-
-
-        for (var i = 0; i < model.children.length; i++) {
-            model.children[i].material.shininess = value;
-            model.children[i].material.needsUpdate = true;
-        }
-
-        globeView.notifyChange(true);
-    }
-);
 
 menuGlobe.addGUI("save", save);
 
