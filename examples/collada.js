@@ -104,9 +104,11 @@ exports.loadOBJ =function loadOBJ(url) {
             mesh.traverse(function _(obj) { obj.layers.set(objID); });
             globeView.camera.camera3D.layers.enable(objID);
 
-            let material = new THREE.MeshLambertMaterial( { color: 0x9424b6} );
+            
             for (var i = 0; i < mesh.children.length; i++) {
+                let material = new THREE.MeshPhongMaterial( { color: getRandomColor()} );
                 mesh.children[i].material = material;
+                mesh.children[i].material.transparent = true;
             }
             
             
@@ -137,25 +139,89 @@ exports.loadOBJ =function loadOBJ(url) {
 
 }
 
-menuGlobe.gui.addColor({color : "#ffae23" }, 'color').name("color").onChange(
-        function changeColor(value) {
-            /*
-            let couleur = "0x";
-            for (var i = 1; i < value.length; i++) {
-                couleur += value[i];
-            }
-            */
-            console.log(model);
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+menuGlobe.gui.add({opacity : 1 }, 'opacity',0 , 1).name("opacity").onChange(
+    function changeOpacity(value) {
+
+        console.log(model);
 
 
-            for (var i = 0; i < model.children.length; i++) {
-                model.children[i].material.color = new THREE.Color( value );
-                model.children[i].material.needsUpdate = true;
-            }
-
-            globeView.notifyChange(true);
+        for (var i = 0; i < model.children.length; i++) {
+            model.children[i].material.opacity = value;
+            model.children[i].material.needsUpdate = true;
         }
-    );
+
+        globeView.notifyChange(true);
+    }
+);
+
+menuGlobe.gui.addColor({color : "#ffae23" }, 'color').name("color").onChange(
+    function changeColor(value) {
+
+        console.log(model);
+
+
+        for (var i = 0; i < model.children.length; i++) {
+            model.children[i].material.color = new THREE.Color( value );
+            model.children[i].material.needsUpdate = true;
+        }
+
+        globeView.notifyChange(true);
+    }
+);
+
+menuGlobe.gui.addColor({emissive : "#ffae23" }, 'emissive').name("emissive").onChange(
+    function changeColor(value) {
+
+        console.log(model);
+
+
+        for (var i = 0; i < model.children.length; i++) {
+            model.children[i].material.emissive = new THREE.Color( value );
+            model.children[i].material.needsUpdate = true;
+        }
+
+        globeView.notifyChange(true);
+    }
+);
+
+menuGlobe.gui.addColor({specular : "#ffae23" }, 'specular').name("specular").onChange(
+    function changeColor(value) {
+
+        console.log(model);
+
+
+        for (var i = 0; i < model.children.length; i++) {
+            model.children[i].material.specular = new THREE.Color( value );
+            model.children[i].material.needsUpdate = true;
+        }
+
+        globeView.notifyChange(true);
+    }
+);
+
+menuGlobe.gui.add({shininess : 30 }, 'shininess',0 , 100).name("shininess").onChange(
+    function changeOpacity(value) {
+
+        console.log(model);
+
+
+        for (var i = 0; i < model.children.length; i++) {
+            model.children[i].material.shininess = value;
+            model.children[i].material.needsUpdate = true;
+        }
+
+        globeView.notifyChange(true);
+    }
+);
 
 
 // Listen for globe full initialisation event
