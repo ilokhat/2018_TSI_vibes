@@ -1,6 +1,6 @@
 # style sheet .vibes
 
-Simple style:
+Mesh style:
 
 ```json
 {
@@ -13,71 +13,32 @@ Simple style:
     }
 }
 ```
-Mesh style:
+Group style:
 
 ```json
 {
-    "styles": [ {
-        "Opacity": 1,
-        "Color": "#ffffff",
-        "Emissive": "#ffffff",
-        "Specular": "#ffffff",
-        "Shininess": 30
-    },{
-        "Opacity": 1,
-        "Color": "#ffffff",
-        "Emissive": "#ffffff",
-        "Specular": "#ffffff",
-        "Shininess": 30
-    },{
-        "Opacity": 1,
-        "Color": "#ffffff",
-        "Emissive": "#ffffff",
-        "Specular": "#ffffff",
-        "Shininess": 30
-    }],
-    "application": {
-        "nom_element1": 1,
-        "nom_element2": 2,
-        "nom_element3": 3
-    }
+    "styles": [ 
+        {
+            "nom": "nom_elemen1",
+            "Opacity": 1,
+            "Color": "#ffffff",
+            "Emissive": "#ffffff",
+            "Specular": "#ffffff",
+            "Shininess": 30
+        },{
+            "nom": "nom_elemen2",
+            "Opacity": 1,
+            "Color": "#ffffff",
+            "Emissive": "#ffffff",
+            "Specular": "#ffffff",
+            "Shininess": 30
+        },{
+            "nom": "nom_elemen3",
+            "Opacity": 1,
+            "Color": "#ffffff",
+            "Emissive": "#ffffff",
+            "Specular": "#ffffff",
+            "Shininess": 30
+        }]
 }
 ```
-
-Scene style:
-
-```json
-{
-    "styles": [ {
-        "Opacity": 1,
-        "Color": "#ffffff",
-        "Emissive": "#ffffff",
-        "Specular": "#ffffff",
-        "Shininess": 30
-    },{
-        "Opacity": 1,
-        "Color": "#ffffff",
-        "Emissive": "#ffffff",
-        "Specular": "#ffffff",
-        "Shininess": 30
-    },{
-        "Opacity": 1,
-        "Color": "#ffffff",
-        "Emissive": "#ffffff",
-        "Specular": "#ffffff",
-        "Shininess": 30
-    }],
-    "applications": {
-      "nom_groupe1": {
-          "nom_element1": 1,
-          "nom_element2": 2
-      },
-      "nom_groupe2": {
-          "nom_element1": 3,
-          "nom_element2": 3,
-          "nom_element3": 3
-      }
-    }
-}
-```
-

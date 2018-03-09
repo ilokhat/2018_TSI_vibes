@@ -216,7 +216,7 @@ function addShininess(mesh,folder,index) {
 menuGlobe.addGUI("save", save);
 
 function save(){
-
+    console.log(menuGlobe.gui);
     var blob = new Blob([JSON.stringify(menuGlobe.gui)], {type: "text/plain;charset=utf-8"});
     itowns.FILE.saveAs(blob, "style.vibes");
 }
@@ -225,6 +225,35 @@ function save(){
 console.log(itowns.FILE);
 
 
+function initListener() {
+    document.addEventListener('drop', documentDrop, false);
+        let prevDefault = e => e.preventDefault();
+        document.addEventListener('dragenter', prevDefault, false);
+        document.addEventListener('dragover', prevDefault, false);
+        document.addEventListener('dragleave', prevDefault, false);
+  }
+
+
+function documentDrop(e) {
+    e.preventDefault();
+    var file = e.dataTransfer.files[0];
+    //console.log(file);
+    readFile(file);
+  }
+
+
+function readFile(file) {
+    let reader = new FileReader();
+    reader.addEventListener('load', () => {
+        //console.log(reader.result);
+        exports.loadOBJ(reader.result);
+    }, false);
+
+    reader.readAsDataURL(file);
+  }
+
+
+window.onload = () => initListener();
 
 
 // Listen for globe full initialisation event
