@@ -109,6 +109,21 @@ exports.loadOBJ =function loadOBJ(url) {
                 mesh.children[i].material = material;
                 mesh.children[i].material.transparent = true;
                 mesh.children[i].castShadow = true;
+
+                var edges = new THREE.EdgesGeometry(mesh.children[i].geometry);
+                var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff }));
+                line.position.copy(coord.as(globeView.referenceCrs).xyz());
+                // align up vector with geodesic normal
+                line.lookAt(mesh.position.clone().add(coord.geodesicNormal));
+                // user rotate building to align with ortho image
+                //mesh.rotateZ(-Math.PI * 0.2);
+                line.rotateX(Math.PI/2);
+                line.rotateY(Math.PI/2);
+                line.scale.set(120, 120, 120);
+                line.updateMatrixWorld();
+
+                globeView.scene.add(line);
+                globeView.notifyChange(true);
             }
 
             // update coordinate of the mesh
