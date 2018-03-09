@@ -1,7 +1,5 @@
 
-<p align="center"> 
-<img src="https://travis-ci.org/arnaudgregoire/itowns-style.svg?branch=master" /> 
-</p>
+<img src="Vibes.png"/>
 
 [![Build Status](https://travis-ci.org/arnaudgregoire/itowns-style.svg?branch=master)](https://travis-ci.org/arnaudgregoire/itowns-style)
 
