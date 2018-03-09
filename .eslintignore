@@ -2,3 +2,4 @@ examples/GUI/dat.gui
 src/OBJLoader.js
 src/utils/FileSaver.js
 examples/collada.js
+examples/vibesObj.js
