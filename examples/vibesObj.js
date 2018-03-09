@@ -6,7 +6,7 @@
 // setting is "coordonnée geographiques en degres decimaux"
 
 // Position near Gerbier mountain.
-var positionOnGlobe = { longitude: 4.21655, latitude: 44.84415, altitude: 2000 };
+var positionOnGlobe = { longitude: 2.294485, latitude: 48.85828, altitude: 2000 };
 
 // `viewerDiv` will contain iTowns' rendering area (`<canvas>`)
 var viewerDiv = document.getElementById('viewerDiv');
@@ -54,7 +54,7 @@ exports.loadCollada = function loadCollada(url) {
     var loader = new itowns.THREE.ColladaLoader(loadingManager);
 
     // building coordinate
-    var coord = new itowns.Coordinates('EPSG:4326', 4.2165, 44.844, 1417);
+    var coord = new itowns.Coordinates('EPSG:4326', 2.294485, 48.85828, 1417);
 
     loader.load(url, function col(collada) {
         var colladaID = globeView.mainLoop.gfxEngine.getUniqueThreejsLayer();
@@ -86,7 +86,7 @@ exports.loadOBJ =function loadOBJ(url) {
         function (mesh) {
 
             // building coordinate
-            var coord = new itowns.Coordinates('EPSG:4326', 4.2165, 44.844, 1417);
+            var coord = new itowns.Coordinates('EPSG:4326', 2.294485, 48.85828, 35);
 
             var objID = globeView.mainLoop.gfxEngine.getUniqueThreejsLayer();
 
@@ -96,8 +96,8 @@ exports.loadOBJ =function loadOBJ(url) {
             // user rotate building to align with ortho image
             //mesh.rotateZ(-Math.PI * 0.2);
             mesh.rotateX(Math.PI/2);
-            mesh.rotateY(Math.PI/2);
-            mesh.scale.set(120, 120, 120);
+            mesh.rotateY(Math.PI/4);
+            mesh.scale.set(300, 300, 300);
 
             // set camera's layer to do not disturb the picking
             mesh.traverse(function _(obj) { obj.layers.set(objID); });
@@ -288,3 +288,11 @@ window.onload = () => initListener();
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
     globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
 });
+
+
+function rotato(mesh) {
+    mesh.rotateZ(Math.PI/10000);
+    mesh.updateMatrixWorld();
+    mesh.needsUpdate = true;
+    setInterval(rotato(mesh), 1000);
+}
