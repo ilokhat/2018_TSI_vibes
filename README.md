@@ -1,10 +1,9 @@
 
 <img src="Vibes.png"/>
 
-[![Build Status](https://travis-ci.org/arnaudgregoire/itowns-style.svg?branch=master)](https://travis-ci.org/arnaudgregoire/itowns-style)
 # VIBES - Visualization in iTowns of Buildings Elegantly Stylized
 
-![logo](itowns_logo.png)
+[![Build Status](https://travis-ci.org/arnaudgregoire/itowns-style.svg?branch=master)](https://travis-ci.org/arnaudgregoire/itowns-style)
 
 ## Summary
 
@@ -32,15 +31,17 @@ The user should be able to :
 ## Project management
 
 This project will be carried out in March and April 2018 by a group of seven students in ENSG TSI, using SCRUM methodology. It will be divided into seven sprints, each one during a week. 
+  
 
-### Previsional backlog
-The previsional planning is the following
+### Previsional backlog 
+  
+The previsional planning is the following :
 * **Sprint 1** : analysis, conception, first version of the tool.
-* **Sprint 2** : 
-* **Sprint 3** : 
-* **Sprint 4** : 
-* **Sprint 5** : 
-* **Sprint 6** : 
+* **Sprint 2** : architecture set-up, definition of the 3D style, saving and loading.
+* **Sprint 3** : implementation of new parameters including textures on faces and edges.
+* **Sprint 4** : diversification of input formats, geolocation.
+* **Sprint 5** : advanced parameters including light, shadows, cameras.
+* **Sprint 6** : experimentation of existing and new render techniques (default styles, typical, sketchy...)
 * **Sprint 7** : finalization, reports, presentation.  
   
 ### Management tools
@@ -109,8 +110,6 @@ Although the PLU++ project successes in creating an easy-to-use interface to dyn
 * The tool seems to works only with the one set of buildings used as an example. It is not clear whether other datasets can be used as input. However, it would be more interesting to create a more generic stylization tool, to be applied on any 3D objects.
 * The tool does not define a clear structure for a stylesheet (only a JSON file to initialize the GUI parameters).
 * Finally, the code is not documented, hardly commented, and not well indented. This makes it difficult to read and to re-use.
-
-A more important problem is the fact that this code does not seem to be the last version of the project, as the demonstration on the presentation page display a different interface and more functionalities. 
 
 However, it provides a helpful set of functions that can be re-use in our project, particularly for edges extraction and texture application.
 
@@ -185,20 +184,25 @@ Group style:
 
 ## First version of the tool
 
-The first version of our tool is based on the iTowns example "collada". To try it, simply this example on our fork of iTowns, available at [this adress](https://github.com/arnaudgregoire/itowns-style).
+The first version of our tool, based on the iTowns example "collada", is located on a new example  called "VibesObj". To try it, simply run this example on our fork of iTowns, available at [this adress](https://github.com/arnaudgregoire/itowns-style).
   
 This first version provides the following functionalities :
-* Loading an OBJ model, create a mesh and display it on the globe.
+* Loading an OBJ model, create a mesh, display it on the globe and display its edges.
 * Modifying the style of the mesh thanks to a user interface (made with dat.gui).
-* Saving a style.
 
 Currently, the implemented parameters are : color, opacity, emissive color, specular color, and shininess. 
+
+We implemented a drag and drop functionality to easily load the 3D object (on .obj format), with a fixed geolocation for now. The example model are located in examples/model. We have been using croutitower.obj, test.obj and destroyer.obj for our tests.
+
+A tool for saving the current style is currently being implemented, and should be functional when the json architecture for the style is definitively defined.
 
 **[Back to the top](#summary)** 
 
 ## Next work
 
-(next work)
+The next step of the work will consist in generalizing our tool by setting up the architecture described above (right now, our tests are only located into one example). We also plan on implementing more parameters, similar to those in PLU++, and finalize the saving and loading functionalities.  
+  
+Another issue concerns the geolocation of .obj files and how that would work : this will be discussed next week.
 
 **[Back to the top](#summary)** 
 
