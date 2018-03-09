@@ -60,14 +60,14 @@ The previsional planning is the following :
 
 The main challenge of this project is that it has to be included into the architecture of the existing [iTowns](http://www.itowns-project.org/) project. Therefore, a necessary step is to get to know this architecture and to analyze it in order to know where our new functionalities could be located.
 
-![archi_itowns](itowns_archi.png)
+![archi_itowns](VIBES/itowns_archi.png)
 
 
 ### PLU++
 
 The PLU++ project, developed in 2016 using ThreeJS, will be used as proof of concept to help start our project. To that end, we analyzed the code from the latest version available on github : [IGN/PLU2PLUS](https://github.com/IGNF/PLU2PLUS)
 
-![archi_itowns](plu2plus.png)
+![archi_itowns](VIBES/plu2plus.png)
 
 The goal of this analysis is to find out how the following things can be done :
 
@@ -122,7 +122,7 @@ However, it provides a helpful set of functions that can be re-use in our projec
 
 The architecture of our project must be included in iTowns. The following schema shows the different functionalities of iTowns, with the ones that interest us in red :  
   
-![archi_itowns](itowns_archi2.png)
+![archi_itowns](VIBES/itowns_archi2.png)
   
 The goal is to make this tool as general as possible, which means it must not depend on just one example (the main flaw with PLU++). On the contrary, it should be usable on any example containing a 3D object on an instance of the globe, as a full-fledged functionality of iTowns. Therefore, we will create a new class Symbolizer, which will manage the menu and the 3D render. We will also extend the loading functionalities of iTowns in order to handle .obj files and other formats.
   
@@ -131,8 +131,8 @@ The goal is to make this tool as general as possible, which means it must not de
 
 The 3D stylization will be done according to the following activity diagram :
   
-![ActivityDiagram](3DStylizationProcess.png)
-  
+![ActivityDiagram](VIBES/3DStylizationProcess.png)
+ 
 
 ### Style format
 
