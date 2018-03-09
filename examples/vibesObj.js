@@ -148,8 +148,9 @@ function getRandomColor() {
 
 
 function addToGUI(mesh) {
+    let parentFolder = menuGlobe.gui.addFolder(mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length - 4));
     for (var i = 0; i < mesh.children.length; i++) {
-       let folder = menuGlobe.gui.addFolder(mesh.children[i].name);
+       let folder = parentFolder.addFolder(mesh.children[i].name);
        addOpacity(mesh,folder,i); 
        addColor(mesh,folder,i);
        addEmissive(mesh,folder,i);
