@@ -1,8 +1,9 @@
 
 <p align="center"> 
 <img src="https://travis-ci.org/arnaudgregoire/itowns-style.svg?branch=master" /> 
-<img src="https://raw.githubusercontent.com/iTowns/itowns.github.io/master/images/itowns_logo_300x134.png" />
 </p>
+
+[![Build Status](https://travis-ci.org/arnaudgregoire/itowns-style.svg?branch=master)](https://travis-ci.org/arnaudgregoire/itowns-style)
 
 ## What is it?
 
