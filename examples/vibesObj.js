@@ -109,6 +109,7 @@ exports.loadOBJ =function loadOBJ(url) {
                 mesh.children[i].material = material;
                 mesh.children[i].material.transparent = true;
                 mesh.children[i].castShadow = true;
+                mesh.children[i].side = THREE.DoubleSide;
 
                 var edges = new THREE.EdgesGeometry(mesh.children[i].geometry);
                 var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff }));
@@ -118,8 +119,8 @@ exports.loadOBJ =function loadOBJ(url) {
                 // user rotate building to align with ortho image
                 //mesh.rotateZ(-Math.PI * 0.2);
                 line.rotateX(Math.PI/2);
-                line.rotateY(Math.PI/2);
-                line.scale.set(120, 120, 120);
+                line.rotateY(Math.PI/4);
+                line.scale.set(300, 300, 300);
                 line.updateMatrixWorld();
 
                 globeView.scene.add(line);
@@ -164,6 +165,7 @@ function getRandomColor() {
 
 function addToGUI(mesh) {
     let parentFolder = menuGlobe.gui.addFolder(mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length - 4));
+    parentFolder.add({save : function(){saveVibes(mesh)}}, "save");
     for (var i = 0; i < mesh.children.length; i++) {
        let folder = parentFolder.addFolder(mesh.children[i].name);
        addOpacity(mesh,folder,i); 
@@ -227,42 +229,26 @@ function addShininess(mesh,folder,index) {
 }
 
 
+function saveVibes(mesh){
+    console.log(mesh);
+    let vibes = { "styles" : [] };
+    for (var i = 0; i < mesh.children.length; i++) {
+        vibes.styles.push({
+            "name"     : mesh.children[i].name,
+            "opacity"  : mesh.children[i].material.opacity,
+            "color"    : mesh.children[i].material.color.getHexString(),
+            "emissive" : mesh.children[i].material.emissive.getHexString(),
+            "specular" : mesh.children[i].material.specular.getHexString(),
+            "shininess": mesh.children[i].material.shininess  
+        })
+    }
+    console.log(vibes);
 
-menuGlobe.addGUI("save", save);
+    let blob = new Blob([JSON.stringify(vibes)], {type: "text/plain;charset=utf-8"});
+        itowns.FILE.saveAs(blob, mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length -4) + ".vibes");
+    }
 
-function save(){
-    console.log(menuGlobe.gui);
-    var blob = new Blob([JSON.stringify(
 
-        {
-    "styles": [ 
-        {
-            "nom": "nom_elemen1",
-            "Opacity": 1,
-            "Color": "#ffffff",
-            "Emissive": "#ffffff",
-            "Specular": "#ffffff",
-            "Shininess": 30
-        },{
-            "nom": "nom_elemen2",
-            "Opacity": 1,
-            "Color": "#ffffff",
-            "Emissive": "#ffffff",
-            "Specular": "#ffffff",
-            "Shininess": 30
-        },{
-            "nom": "nom_elemen3",
-            "Opacity": 1,
-            "Color": "#ffffff",
-            "Emissive": "#ffffff",
-            "Specular": "#ffffff",
-            "Shininess": 30
-        }]
-}
-
-        )], {type: "text/plain;charset=utf-8"});
-    itowns.FILE.saveAs(blob, "style.vibes");
-}
 
 
 console.log(itowns.FILE);
@@ -304,10 +290,3 @@ globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function 
     globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
 });
 
-
-function rotato(mesh) {
-    mesh.rotateZ(Math.PI/10000);
-    mesh.updateMatrixWorld();
-    mesh.needsUpdate = true;
-    setInterval(rotato(mesh), 1000);
-}
