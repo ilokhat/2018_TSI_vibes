@@ -6,10 +6,8 @@
 // setting is "coordonnée geographiques en degres decimaux"
 
 // Position near Gerbier mountain.
-//Tour Eiffel
-//var positionOnGlobe = { longitude: 2.294485, latitude: 48.85828, altitude: 2000 };
-//Blain
 var positionOnGlobe = { longitude: -1.760930, latitude: 47.487623, altitude: 2000 };
+
 // `viewerDiv` will contain iTowns' rendering area (`<canvas>`)
 var viewerDiv = document.getElementById('viewerDiv');
 
@@ -95,11 +93,6 @@ exports.loadOBJ =function loadOBJ(url) {
             mesh.position.copy(coord.as(globeView.referenceCrs).xyz());
             // align up vector with geodesic normal
             mesh.lookAt(mesh.position.clone().add(coord.geodesicNormal));
-            // user rotate building to align with ortho image
-            //mesh.rotateZ(-Math.PI * 0.2);
-            //mesh.rotateX(Math.PI/2);
-            //mesh.rotateY(Math.PI/4);
-            //mesh.scale.set(300, 300, 300);
 
             // set camera's layer to do not disturb the picking
             mesh.traverse(function _(obj) { obj.layers.set(objID); });
@@ -116,21 +109,6 @@ exports.loadOBJ =function loadOBJ(url) {
                     });
                 mesh.children[i].material = material;
                 mesh.children[i].castShadow = true;
-
-                /*
-                var edges = new THREE.EdgesGeometry(mesh.children[i].geometry);
-                var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff }));
-                line.position.copy(coord.as(globeView.referenceCrs).xyz());
-                // align up vector with geodesic normal
-                line.lookAt(mesh.position.clone().add(coord.geodesicNormal));
-                line.rotateX(Math.PI/2);
-                line.rotateY(Math.PI/4);
-                line.scale.set(300, 300, 300);
-                line.updateMatrixWorld();
-
-                globeView.scene.add(line);
-                globeView.notifyChange(true);
-                */
             }
 
             // update coordinate of the mesh
@@ -171,13 +149,7 @@ function getRandomColor() {
 
 function addToGUI(mesh) {
     let parentFolder = menuGlobe.gui.addFolder(mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length - 4));
-    
     parentFolder.add({save : function(){saveVibes(mesh)}}, "save");
-    addAllOpacity(mesh,parentFolder);
-    addAllColor(mesh,parentFolder);
-    addAllEmissive(mesh,parentFolder);
-
-
     for (var i = 0; i < mesh.children.length; i++) {
        let folder = parentFolder.addFolder(mesh.children[i].name);
        addOpacity(mesh,folder,i); 
@@ -188,44 +160,12 @@ function addToGUI(mesh) {
     }
 }
 
-function addAllOpacity(mesh,folder) {
-    folder.add({opacity : 1 }, 'opacity',0 , 1).name("opacity").onChange(
-        function changeOpacity(value) {
-            for (var i = 0; i < mesh.children.length; i++) {
-                mesh.children[i].material.opacity = value;
-            }
-            globeView.notifyChange(true);
-        }
-    );
-}
-
-function addAllColor(mesh,folder) {
-    folder.addColor({color : "#ffae23" }, 'color').name("color").onChange(
-        function changeColor(value) {
-            for (var i = 0; i < mesh.children.length; i++) {
-                mesh.children[i].material.color = new THREE.Color( value );
-            }
-            globeView.notifyChange(true);
-        }
-    );
-}
-
-function addAllEmissive(mesh,folder) {
-    folder.addColor({emissive : "#ffae23" }, 'emissive').name("emissive").onChange(
-        function changeColor(value) {
-            for (var i = 0; i < mesh.children.length; i++) {
-                mesh.children[i].material.emissive = new THREE.Color( value );
-            }
-            globeView.notifyChange(true);
-        }
-    );
-}
-
 
 function addOpacity(mesh,folder,index) {
     folder.add({opacity : 1 }, 'opacity',0 , 1).name("opacity").onChange(
         function changeOpacity(value) {
             mesh.children[index].material.opacity = value;
+            mesh.children[index].material.needsUpdate = true;
             globeView.notifyChange(true);
         }
     );
@@ -235,6 +175,7 @@ function addColor(mesh,folder,index) {
     folder.addColor({color : "#ffae23" }, 'color').name("color").onChange(
         function changeColor(value) {
             mesh.children[index].material.color = new THREE.Color( value );
+            mesh.children[index].material.needsUpdate = true;
             globeView.notifyChange(true);
         }
     );
@@ -244,6 +185,7 @@ function addEmissive(mesh,folder,index) {
     folder.addColor({emissive : "#ffae23" }, 'emissive').name("emissive").onChange(
         function changeColor(value) {
             mesh.children[index].material.emissive = new THREE.Color( value );
+            mesh.children[index].material.needsUpdate = true;
             globeView.notifyChange(true);
         }
     );
@@ -254,6 +196,7 @@ function addSpecular(mesh,folder,index) {
     folder.addColor({specular : "#ffae23" }, 'specular').name("specular").onChange(
         function changeColor(value) {
             mesh.children[index].material.specular = new THREE.Color( value );
+            mesh.children[index].material.needsUpdate = true;
             globeView.notifyChange(true);
         }
     );
@@ -263,6 +206,7 @@ function addShininess(mesh,folder,index) {
     folder.add({shininess : 30 }, 'shininess',0 , 100).name("shininess").onChange(
     function changeOpacity(value) {
         mesh.children[index].material.shininess = value;
+        mesh.children[index].material.needsUpdate = true;
         globeView.notifyChange(true);
     }
 );
