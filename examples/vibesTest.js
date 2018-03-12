@@ -43,38 +43,6 @@ promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/IGN_MNT_HIGHRES.j
 exports.view = globeView;
 exports.initialPosition = positionOnGlobe;
 
-exports.loadCollada = function loadCollada(url) {
-    var mesh;
-    // loading manager
-    var loadingManager = new itowns.THREE.LoadingManager(function _addModel() {
-        globeView.scene.add(mesh);
-        globeView.notifyChange(true);
-    });
-    // collada loader
-    var loader = new itowns.THREE.ColladaLoader(loadingManager);
-
-    // building coordinate
-    var coord = new itowns.Coordinates('EPSG:4326', 2.294485, 48.85828, 1417);
-
-    loader.load(url, function col(collada) {
-        var colladaID = globeView.mainLoop.gfxEngine.getUniqueThreejsLayer();
-        mesh = collada.scene;
-        mesh.position.copy(coord.as(globeView.referenceCrs).xyz());
-        // align up vector with geodesic normal
-        mesh.lookAt(mesh.position.clone().add(coord.geodesicNormal));
-        // user rotate building to align with ortho image
-        mesh.rotateZ(-Math.PI * 0.2);
-        mesh.scale.set(1.2, 1.2, 1.2);
-
-        // set camera's layer to do not disturb the picking
-        mesh.traverse(function _(obj) { obj.layers.set(colladaID); });
-        globeView.camera.camera3D.layers.enable(colladaID);
-
-        // update coordinate of the mesh
-        mesh.updateMatrixWorld();
-    });
-};
-
 exports.loadOBJ = function loadOBJ(url) {
 
     // obj loader
@@ -133,7 +101,11 @@ exports.loadOBJ = function loadOBJ(url) {
             globeView.scene.add(mesh);
             globeView.notifyChange(true);
 
-            addToGUI(mesh);
+            // addToGUI(mesh);
+
+            var symbolizer = new itowns.Symbolizer(globeView, mesh, menuGlobe);
+            symbolizer.initGuiAll();
+            console.log(symbolizer.sayHello());
             
         },
         // called when loading is in progresses
@@ -160,113 +132,6 @@ function getRandomColor() {
   }
   return color;
 }
-
-
-function addToGUI(mesh) {
-    let parentFolder = menuGlobe.gui.addFolder(mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length - 4));
-    for (var i = 0; i < mesh.children.length; i++) {
-       let folder = parentFolder.addFolder(mesh.children[i].name);
-       addOpacity(mesh,folder,i); 
-       addColor(mesh,folder,i);
-       addEmissive(mesh,folder,i);
-       addSpecular(mesh,folder,i);
-       addShininess(mesh,folder,i);
-    }
-}
-
-
-function addOpacity(mesh,folder,index) {
-    folder.add({opacity : 1 }, 'opacity',0 , 1).name("opacity").onChange(
-        function changeOpacity(value) {
-            mesh.children[index].material.opacity = value;
-            mesh.children[index].material.needsUpdate = true;
-            globeView.notifyChange(true);
-        }
-    );
-}
-
-function addColor(mesh,folder,index) {
-    folder.addColor({color : "#ffae23" }, 'color').name("color").onChange(
-        function changeColor(value) {
-            mesh.children[index].material.color = new THREE.Color( value );
-            mesh.children[index].material.needsUpdate = true;
-            globeView.notifyChange(true);
-        }
-    );
-}
-
-function addEmissive(mesh,folder,index) {
-    folder.addColor({emissive : "#ffae23" }, 'emissive').name("emissive").onChange(
-        function changeColor(value) {
-            mesh.children[index].material.emissive = new THREE.Color( value );
-            mesh.children[index].material.needsUpdate = true;
-            globeView.notifyChange(true);
-        }
-    );
-}
-
-
-function addSpecular(mesh,folder,index) {
-    folder.addColor({specular : "#ffae23" }, 'specular').name("specular").onChange(
-        function changeColor(value) {
-            mesh.children[index].material.specular = new THREE.Color( value );
-            mesh.children[index].material.needsUpdate = true;
-            globeView.notifyChange(true);
-        }
-    );
-}
-
-function addShininess(mesh,folder,index) {
-    folder.add({shininess : 30 }, 'shininess',0 , 100).name("shininess").onChange(
-    function changeOpacity(value) {
-        mesh.children[index].material.shininess = value;
-        mesh.children[index].material.needsUpdate = true;
-        globeView.notifyChange(true);
-    }
-);
-}
-
-
-
-menuGlobe.addGUI("save", save);
-
-function save(){
-    console.log(menuGlobe.gui);
-    var blob = new Blob([JSON.stringify(
-
-        {
-    "styles": [ 
-        {
-            "nom": "nom_elemen1",
-            "Opacity": 1,
-            "Color": "#ffffff",
-            "Emissive": "#ffffff",
-            "Specular": "#ffffff",
-            "Shininess": 30
-        },{
-            "nom": "nom_elemen2",
-            "Opacity": 1,
-            "Color": "#ffffff",
-            "Emissive": "#ffffff",
-            "Specular": "#ffffff",
-            "Shininess": 30
-        },{
-            "nom": "nom_elemen3",
-            "Opacity": 1,
-            "Color": "#ffffff",
-            "Emissive": "#ffffff",
-            "Specular": "#ffffff",
-            "Shininess": 30
-        }]
-}
-
-        )], {type: "text/plain;charset=utf-8"});
-    itowns.FILE.saveAs(blob, "style.vibes");
-}
-
-
-console.log(itowns.FILE);
-
 
 function initListener() {
     document.addEventListener('drop', documentDrop, false);
