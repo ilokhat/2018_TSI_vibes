@@ -26,3 +26,4 @@ export { default as FeaturesUtils } from './Renderer/ThreeExtended/FeaturesUtils
 export { CONTROL_EVENTS } from './Renderer/ThreeExtended/GlobeControls';
 export { default as DEMUtils } from './utils/DEMUtils';
 export { default as Symbolizer } from './Renderer/Symbolizer';
+export { default as ModelLoader } from './Renderer/ThreeExtended/ModelLoader';
