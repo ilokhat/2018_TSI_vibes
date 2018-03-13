@@ -173,6 +173,7 @@ function addToGUI(mesh) {
     let parentFolder = menuGlobe.gui.addFolder(mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length - 4));
     
     parentFolder.add({save : function(){saveVibes(mesh)}}, "save");
+    addVibes(mesh,parentFolder);
     addAllOpacity(mesh,parentFolder);
     addAllColor(mesh,parentFolder);
     addAllEmissive(mesh,parentFolder);
@@ -194,6 +195,47 @@ function addToGUI(mesh) {
     //}, false);
     }
 }
+function addVibes(mesh,folder) {
+    folder.add({load : function(){
+    var button = document.createElement("input");
+    button.setAttribute('type','file');
+    button.addEventListener("change", function () {
+        readVibes(button.files[0],mesh);
+    } , false);
+    button.click();
+    }}, "load");
+}
+
+
+function readVibes(file,mesh) {
+    console.log(file);
+    let reader = new FileReader();
+    reader.addEventListener('load', () => {
+        loadVibes(reader.result,mesh);
+    }, false);
+    reader.readAsText(file);
+}
+
+
+function loadVibes(file,mesh) {
+    let json = JSON.parse(file);
+    console.log(json);
+    for (var i = 0; i < json.styles.length; i++) {
+        for (var j = 0; j < mesh.children.length; j++) {
+
+            if (mesh.children[j].name == json.styles[i].name) {
+                    mesh.children[i].material.opacity   = json.styles[i].opacity;
+                    mesh.children[i].material.color     = new THREE.Color(json.styles[i].color);
+                    mesh.children[i].material.emissive  = new THREE.Color(json.styles[i].emissive);
+                    mesh.children[i].material.specular  = new THREE.Color(json.styles[i].specular);
+                    mesh.children[i].material.shininess = json.styles[i].shininess;
+            }
+
+        }            
+    }
+    globeView.notifyChange(true);
+}
+
 
 function addAllOpacity(mesh,folder) {
     folder.add({opacity : 1 }, 'opacity',0 , 1).name("opacity").onChange(
@@ -230,7 +272,6 @@ function addAllEmissive(mesh,folder) {
 
 function addTexture(mesh,folder,index) {
     folder.add({loadTexture : function(){
-    console.log("bonjour");
     var button = document.createElement("input");
     button.setAttribute('type','file');
 
@@ -317,9 +358,9 @@ function saveVibes(mesh){
         vibes.styles.push({
             "name"     : mesh.children[i].name,
             "opacity"  : mesh.children[i].material.opacity,
-            "color"    : mesh.children[i].material.color.getHexString(),
-            "emissive" : mesh.children[i].material.emissive.getHexString(),
-            "specular" : mesh.children[i].material.specular.getHexString(),
+            "color"    : mesh.children[i].material.color.getHex(),
+            "emissive" : mesh.children[i].material.emissive.getHex(),
+            "specular" : mesh.children[i].material.specular.getHex(),
             "shininess": mesh.children[i].material.shininess  
         })
     }
@@ -328,7 +369,6 @@ function saveVibes(mesh){
     let blob = new Blob([JSON.stringify(vibes)], {type: "text/plain;charset=utf-8"});
         itowns.FILE.saveAs(blob, mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length -4) + ".vibes");
     }
-
 
 
 
