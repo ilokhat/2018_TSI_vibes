@@ -105,26 +105,26 @@ exports.loadOBJ =function loadOBJ(url) {
             mesh.traverse(function _(obj) { obj.layers.set(objID); });
             globeView.camera.camera3D.layers.enable(objID);
 
-            
+
             for (var i = 0; i < mesh.children.length; i++) {
                 let material = new THREE.MeshPhongMaterial( { color: getRandomColor()} );
                 mesh.children[i].material = material;
                 mesh.children[i].material.transparent = true;
                 mesh.children[i].castShadow = true;
             }
-            
-            
+
+
             model = mesh;
 
             // update coordinate of the mesh
             model.updateMatrixWorld();
-            console.log(model);    
-            
+            console.log(model);
+
             globeView.scene.add(model);
             globeView.notifyChange(true);
 
             addGUI();
-            
+
         },
         // called when loading is in progresses
         function ( xhr ) {
@@ -155,12 +155,49 @@ function getRandomColor() {
 function addGUI() {
     for (var i = 0; i < model.children.length; i++) {
        let folder = menuGlobe.gui.addFolder(model.children[i].name);
-       addOpacity(folder,i); 
+       addOpacity(folder,i);
        addColor(folder,i);
        addEmissive(folder,i);
        addSpecular(folder,i);
        addShininess(folder,i);
+       addTexture(folder,i);
+
     }
+}
+
+
+
+function changeTexture(value, array){
+  var textureMaterial = new THREE.MeshBasicMaterial( {
+					map: null,
+					color: 0xffffff,
+					shading: THREE.SmoothShading
+				} );
+
+  var textureLoader = new THREE.TextureLoader();
+    textureLoader.load( "./textures/"+value+".jpg", function( map ) {
+        map.wrapS = THREE.RepeatWrapping;
+        map.wrapT = THREE.ReaddTexturepeatWrapping;
+        map.anisotropy = 4;
+        map.repeat.set( 0.1, 0.1 );
+        textureMaterial.side = THREE.DoubleSide;
+        textureMaterial.map = map;
+        textureMaterial.needsUpdate = true;
+    } );
+
+      array.material = textureMaterial;
+      array.material.needsUpdate = true;
+      globeView.notifyChange(true);
+    }
+
+
+function addTexture(folder, index){
+  params = {
+    texture: '',
+  }
+  //folder.remember(params);
+  var texture = folder.add(params, 'texture', [ "", "bricks", "wall", "stone-wall", "roof", "water"]).name("texture").onChange(
+    function(value) { changeTexture(value, model.children[index]); });
 }
 
 
