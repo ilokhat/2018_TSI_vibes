@@ -17,11 +17,6 @@ function Symbolizer(view, obj, edges, menu) {
     this.applyStyle();
 }
 
-Symbolizer.prototype.readVIBES = function readVIBES() {
-    var materials = [];
-    return materials;
-};
-
 Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
     var i;
     if (style && style.styles) {
@@ -37,9 +32,9 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
             this._changeEmissive(style.styles[j].emissive, i);
             this._changeSpecular(style.styles[j].specular, i);
             this._changeShininess(style.styles[j].shininess, i);
-            this._changeColorEdge(style.styles[j].color, i);
-            this._changeOpacityEdge(style.style[j].opacity, i);
-      }
+            this._changeColorEdge(style.styles[j].colorEdges, i);
+            this._changeOpacityEdge(style.styles[j].opacityEdges, i);
+        }
     }
     else if (style && style.style) {
         // Apply given style to all children
@@ -49,9 +44,9 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
             this._changeEmissive(style.style.emissive, i);
             this._changeSpecular(style.style.specular, i);
             this._changeShininess(style.style.shininess, i);
-            this._changeColorEdge(style.styles.color, i);
-            this._changeOpacityEdge(style.style.opacity, i);
-      }
+            this._changeColorEdge(style.styles.colorEdges, i);
+            this._changeOpacityEdge(style.style.opacityEdges, i);
+        }
     }
     else {
         // Apply default style
@@ -64,7 +59,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
             this._changeShininess(30, i);
             this._changeColorEdge('#000000', i);
             this._changeOpacityEdge(1, i);
-      }
+        }
     }
 };
 
@@ -112,6 +107,13 @@ Symbolizer.prototype._changeShininess = function changeShininess(value, index) {
     this.view.notifyChange(true);
 };
 
+Symbolizer.prototype._changeTexture = function changeTexture(data, index) {
+    var texture = new THREE.TextureLoader().load(data);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    this.obj.children[index].material = new THREE.MeshPhongMaterial({ map: texture });
+    this.view.notifyChange(true);
+};
 // More parameters...
 
 Symbolizer.prototype._saveVibes = function saveVibes() {
@@ -120,16 +122,28 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
         vibes.styles.push({
             name: this.obj.children[i].name,
             opacity: this.obj.children[i].material.opacity,
-            color: '#'.concat(this.obj.children[i].material.color.getHexString()),
-            emissive: '#'.concat(this.obj.children[i].material.emissive.getHexString()),
-            specular: '#'.concat(this.obj.children[i].material.specular.getHexString()),
+            color: this.obj.children[i].material.color.getHex(),
+            emissive: this.obj.children[i].material.emissive.getHex(),
+            specular: this.obj.children[i].material.specular.getHex(),
             shininess: this.obj.children[i].material.shininess,
-            colorEdges: this.edges.children[i].material.edges,
-            opacityEdges: this.edges.children[i].material.edges,
+            colorEdges: this.edges.children[i].material.color,
+            opacityEdges: this.edges.children[i].material.opacity,
         });
     }
     var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
     FILE.saveAs(blob, this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4).concat('.vibes'));
+};
+
+Symbolizer.prototype._readVibes = function readVibes(file) {
+    var reader = new FileReader();
+    reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result)), false);
+    reader.readAsText(file);
+};
+
+Symbolizer.prototype._readTexture = function readTexture(file, index) {
+    var reader = new FileReader();
+    reader.addEventListener('load', () => this._changeTexture(reader.result, index), false);
+    reader.readAsDataURL(file);
 };
 
 // Menu management
@@ -160,15 +174,34 @@ Symbolizer.prototype._addShininess = function addShininess(folder, index) {
     folder.add({ shininess: initialShininess }, 'shininess', 0, 100).name('shininess').onChange(value => this._changeShininess(value, index));
 };
 
+Symbolizer.prototype._addTexture = function addTexture(folder, index) {
+    folder.add({ loadTexture: () => {
+        var button = document.createElement('input');
+        button.setAttribute('type', 'file');
+        button.addEventListener('change', () => this._readTexture(button.files[0], index), false);
+        button.click();
+    } }, 'loadTexture');
+};
+
 // More parameters...
 
 Symbolizer.prototype._addSave = function addSave(folder) {
     folder.add({ save: () => this._saveVibes() }, 'save');
 };
 
+Symbolizer.prototype._addLoad = function addLoad(folder) {
+    folder.add({ load: () => {
+        var button = document.createElement('input');
+        button.setAttribute('type', 'file');
+        button.addEventListener('change', () => this._readVibes(button.files[0]), false);
+        button.click();
+    } }, 'load');
+};
+
 Symbolizer.prototype.initGui = function addToGUI() {
     var parentFolder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     this._addSave(parentFolder);
+    this._addLoad(parentFolder);
     this._addColorEdgeAll(parentFolder);
     this._addOpacityEdgeAll(parentFolder);
     for (var i = 0; i < this.obj.children.length; i++) {
@@ -178,6 +211,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
         this._addEmissive(folder, i);
         this._addSpecular(folder, i);
         this._addShininess(folder, i);
+        this._addTexture(folder, i);
     }
 };
 
@@ -245,9 +279,30 @@ Symbolizer.prototype._addShininessAll = function addShininessAll(folder) {
     });
 };
 
+Symbolizer.prototype._readTextureAll = function readTexture(file, index) {
+    var reader = new FileReader();
+    reader.addEventListener('load', () => {
+        for (var i = 0; i < this.obj.length; i++) {
+            this._changeTexture(reader.result, i);
+        }
+    }, false);
+    reader.readAsDataURL(file);
+};
+
+Symbolizer.prototype._addTextureAll = function addTexture(folder) {
+    folder.add({ loadTexture: () => {
+        var button = document.createElement('input');
+        button.setAttribute('type', 'file');
+        button.addEventListener('change', () => this._readTextureAll(button.files[0]), false);
+        button.click();
+    } }, 'loadTexture');
+};
+
 Symbolizer.prototype.initGuiAll = function addToGUI() {
     var folder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     this._addSave(folder);
+    this._addLoad(folder);
+    this._addTextureAll(folder);
     this._addOpacityAll(folder);
     this._addColorAll(folder);
     this._addEmissiveAll(folder);
