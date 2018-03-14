@@ -17,11 +17,6 @@ function Symbolizer(view, obj, edges, menu) {
     this.applyStyle();
 }
 
-Symbolizer.prototype.readVIBES = function readVIBES() {
-    var materials = [];
-    return materials;
-};
-
 Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
     var i;
     if (style && style.styles) {
@@ -94,6 +89,14 @@ Symbolizer.prototype._changeShininess = function changeShininess(value, index) {
     this.view.notifyChange(true);
 };
 
+Symbolizer.prototype._changeTexture = function changeTexture(data, index) {
+    var texture = new THREE.TextureLoader().load(data);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    this.obj.children[index].material = new THREE.MeshPhongMaterial({ map: texture });
+    this.view.notifyChange(true);
+};
+
 // More parameters...
 
 Symbolizer.prototype._saveVibes = function saveVibes() {
@@ -102,15 +105,28 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
         vibes.styles.push({
             name: this.obj.children[i].name,
             opacity: this.obj.children[i].material.opacity,
-            color: '#'.concat(this.obj.children[i].material.color.getHexString()),
-            emissive: '#'.concat(this.obj.children[i].material.emissive.getHexString()),
-            specular: '#'.concat(this.obj.children[i].material.specular.getHexString()),
+            color: this.obj.children[i].material.color.getHex(),
+            emissive: this.obj.children[i].material.emissive.getHex(),
+            specular: this.obj.children[i].material.specular.getHex(),
             shininess: this.obj.children[i].material.shininess,
         });
     }
     var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
     FILE.saveAs(blob, this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4).concat('.vibes'));
 };
+
+Symbolizer.prototype._readVibes = function readVibes(file) {
+    var reader = new FileReader();
+    reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result)), false);
+    reader.readAsText(file);
+};
+
+Symbolizer.prototype._readTexture = function readTexture(file, index) {
+    var reader = new FileReader();
+    reader.addEventListener('load', () => this._changeTexture(reader.result, index), false);
+    reader.readAsDataURL(file);
+};
+
 
 // Menu management
 
@@ -140,15 +156,34 @@ Symbolizer.prototype._addShininess = function addShininess(folder, index) {
     folder.add({ shininess: initialShininess }, 'shininess', 0, 100).name('shininess').onChange(value => this._changeShininess(value, index));
 };
 
+Symbolizer.prototype._addTexture = function addTexture(folder, index) {
+    folder.add({ loadTexture: () => {
+        var button = document.createElement('input');
+        button.setAttribute('type', 'file');
+        button.addEventListener('change', () => this._readTexture(button.files[0], index), false);
+        button.click();
+    } }, 'loadTexture');
+};
+
 // More parameters...
 
 Symbolizer.prototype._addSave = function addSave(folder) {
     folder.add({ save: () => this._saveVibes() }, 'save');
 };
 
+Symbolizer.prototype._addLoad = function addLoad(folder) {
+    folder.add({ load: () => {
+        var button = document.createElement('input');
+        button.setAttribute('type', 'file');
+        button.addEventListener('change', () => this._readVibes(button.files[0]), false);
+        button.click();
+    } }, 'load');
+};
+
 Symbolizer.prototype.initGui = function addToGUI() {
     var parentFolder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     this._addSave(parentFolder);
+    this._addLoad(parentFolder);
     for (var i = 0; i < this.obj.children.length; i++) {
         var folder = parentFolder.addFolder(this.obj.children[i].name);
         this._addOpacity(folder, i);
@@ -156,6 +191,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
         this._addEmissive(folder, i);
         this._addSpecular(folder, i);
         this._addShininess(folder, i);
+        this._addTexture(folder, i);
     }
 };
 
@@ -208,6 +244,7 @@ Symbolizer.prototype._addShininessAll = function addShininessAll(folder) {
 Symbolizer.prototype.initGuiAll = function addToGUI() {
     var folder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     this._addSave(folder);
+    this._addLoad(folder);
     this._addOpacityAll(folder);
     this._addColorAll(folder);
     this._addEmissiveAll(folder);
