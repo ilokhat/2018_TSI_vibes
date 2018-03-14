@@ -7,9 +7,9 @@
 
 // Position near Gerbier mountain.
 //Tour Eiffel
-//var positionOnGlobe = { longitude: 2.294485, latitude: 48.85828, altitude: 2000 };
+var positionOnGlobe = { longitude: 2.294485, latitude: 48.85828, altitude: 2000 };
 //Blain
-var positionOnGlobe = { longitude: -1.760930, latitude: 47.487623, altitude: 2000 };
+//var positionOnGlobe = { longitude: -1.760930, latitude: 47.487623, altitude: 2000 };
 // `viewerDiv` will contain iTowns' rendering area (`<canvas>`)
 var viewerDiv = document.getElementById('viewerDiv');
 
@@ -88,7 +88,7 @@ exports.loadOBJ = function loadOBJ(url) {
         function (mesh) {
 
             // building coordinate
-            var coord = new itowns.Coordinates('EPSG:4326', -1.760930, 47.487623, 53);
+            var coord = new itowns.Coordinates('EPSG:4326', 2.294485, 48.85828, 35);
 
             var objID = globeView.mainLoop.gfxEngine.getUniqueThreejsLayer();
 
@@ -97,15 +97,15 @@ exports.loadOBJ = function loadOBJ(url) {
             mesh.lookAt(mesh.position.clone().add(coord.geodesicNormal));
             // user rotate building to align with ortho image
             //mesh.rotateZ(-Math.PI * 0.2);
-            //mesh.rotateX(Math.PI/2);
-            //mesh.rotateY(Math.PI/4);
-            //mesh.scale.set(300, 300, 300);
+            mesh.rotateX(Math.PI/2);
+            mesh.rotateY(Math.PI/4);
+            mesh.scale.set(300, 300, 300);
 
             // set camera's layer to do not disturb the picking
             mesh.traverse(function _(obj) { obj.layers.set(objID); });
             globeView.camera.camera3D.layers.enable(objID);
 
-            
+
             for (var i = 0; i < mesh.children.length; i++) {
                 let material = new THREE.MeshPhongMaterial(
                     { 
@@ -173,20 +173,69 @@ function addToGUI(mesh) {
     let parentFolder = menuGlobe.gui.addFolder(mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length - 4));
     
     parentFolder.add({save : function(){saveVibes(mesh)}}, "save");
+    addVibes(mesh,parentFolder);
     addAllOpacity(mesh,parentFolder);
     addAllColor(mesh,parentFolder);
     addAllEmissive(mesh,parentFolder);
 
 
-    for (var i = 0; i < mesh.children.length; i++) {
+    for (let i = 0; i < mesh.children.length; i++) {
        let folder = parentFolder.addFolder(mesh.children[i].name);
        addOpacity(mesh,folder,i); 
        addColor(mesh,folder,i);
        addEmissive(mesh,folder,i);
        addSpecular(mesh,folder,i);
        addShininess(mesh,folder,i);
+       addTexture(mesh,folder,i);
+
+       //folder.domElement.lastChild.children[folder.domElement.lastChild.children.length-1].addEventListener("click", function(){
+
+
+        //textureLoader(mesh,folder)
+    //}, false);
     }
 }
+function addVibes(mesh,folder) {
+    folder.add({load : function(){
+    var button = document.createElement("input");
+    button.setAttribute('type','file');
+    button.addEventListener("change", function () {
+        readVibes(button.files[0],mesh);
+    } , false);
+    button.click();
+    }}, "load");
+}
+
+
+function readVibes(file,mesh) {
+    console.log(file);
+    let reader = new FileReader();
+    reader.addEventListener('load', () => {
+        loadVibes(reader.result,mesh);
+    }, false);
+    reader.readAsText(file);
+}
+
+
+function loadVibes(file,mesh) {
+    let json = JSON.parse(file);
+    console.log(json);
+    for (var i = 0; i < json.styles.length; i++) {
+        for (var j = 0; j < mesh.children.length; j++) {
+
+            if (mesh.children[j].name == json.styles[i].name) {
+                    mesh.children[i].material.opacity   = json.styles[i].opacity;
+                    mesh.children[i].material.color     = new THREE.Color(json.styles[i].color);
+                    mesh.children[i].material.emissive  = new THREE.Color(json.styles[i].emissive);
+                    mesh.children[i].material.specular  = new THREE.Color(json.styles[i].specular);
+                    mesh.children[i].material.shininess = json.styles[i].shininess;
+            }
+
+        }            
+    }
+    globeView.notifyChange(true);
+}
+
 
 function addAllOpacity(mesh,folder) {
     folder.add({opacity : 1 }, 'opacity',0 , 1).name("opacity").onChange(
@@ -219,6 +268,39 @@ function addAllEmissive(mesh,folder) {
             globeView.notifyChange(true);
         }
     );
+}
+
+function addTexture(mesh,folder,index) {
+    folder.add({loadTexture : function(){
+    var button = document.createElement("input");
+    button.setAttribute('type','file');
+
+    button.addEventListener("change", function () {
+        readTexture(button.files[0],mesh,index);
+    } , false);
+    button.click();
+    }}, "loadTexture");
+}
+
+
+function readTexture(file,mesh,index) {
+    console.log(file);
+    let reader = new FileReader();
+    reader.addEventListener('load', () => {
+        loadTexture(reader.result,mesh,index);
+    }, false);
+    reader.readAsDataURL(file);
+}
+
+
+function loadTexture(data,mesh,index) {
+    var texture = new THREE.TextureLoader().load( data );
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    console.log(index);
+    console.log(mesh);
+    mesh.children[index].material = new THREE.MeshPhongMaterial({map : texture});
+    globeView.notifyChange(true);
 }
 
 
@@ -276,9 +358,9 @@ function saveVibes(mesh){
         vibes.styles.push({
             "name"     : mesh.children[i].name,
             "opacity"  : mesh.children[i].material.opacity,
-            "color"    : mesh.children[i].material.color.getHexString(),
-            "emissive" : mesh.children[i].material.emissive.getHexString(),
-            "specular" : mesh.children[i].material.specular.getHexString(),
+            "color"    : mesh.children[i].material.color.getHex(),
+            "emissive" : mesh.children[i].material.emissive.getHex(),
+            "specular" : mesh.children[i].material.specular.getHex(),
             "shininess": mesh.children[i].material.shininess  
         })
     }
@@ -290,16 +372,15 @@ function saveVibes(mesh){
 
 
 
-
 console.log(itowns.FILE);
 
 
 function initListener() {
     document.addEventListener('drop', documentDrop, false);
-        let prevDefault = e => e.preventDefault();
-        document.addEventListener('dragenter', prevDefault, false);
-        document.addEventListener('dragover', prevDefault, false);
-        document.addEventListener('dragleave', prevDefault, false);
+    let prevDefault = e => e.preventDefault();
+    document.addEventListener('dragenter', prevDefault, false);
+    document.addEventListener('dragover', prevDefault, false);
+    document.addEventListener('dragleave', prevDefault, false);
   }
 
 
