@@ -62,7 +62,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
             this._changeEmissive(color, i);
             this._changeSpecular(color, i);
             this._changeShininess(30, i);
-            this._changeColorEdge(color, i);
+            this._changeColorEdge('#000000', i);
             this._changeOpacityEdge(1, i);
       }
     }
@@ -169,6 +169,8 @@ Symbolizer.prototype._addSave = function addSave(folder) {
 Symbolizer.prototype.initGui = function addToGUI() {
     var parentFolder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     this._addSave(parentFolder);
+    this._addColorEdgeAll(parentFolder);
+    this._addOpacityEdgeAll(parentFolder);
     for (var i = 0; i < this.obj.children.length; i++) {
         var folder = parentFolder.addFolder(this.obj.children[i].name);
         this._addOpacity(folder, i);
@@ -254,6 +256,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addColorEdgeAll(folder);
     this._addOpacityEdgeAll(folder);
 };
+
 
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
