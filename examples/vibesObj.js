@@ -218,7 +218,16 @@ function readVibes(file,mesh) {
 
 
 function loadVibes(file,mesh) {
-    let json = JSON.parse(file);
+console.log(file);
+
+ //if(file.name.endsWith(".vibes")){
+    let json ;
+    try {
+         json = JSON.parse(file);    }
+          catch (e) {
+            throw new loadFileException("fichier de type .vibes attendu");
+    }
+   
     console.log(json);
     for (var i = 0; i < json.styles.length; i++) {
         for (var j = 0; j < mesh.children.length; j++) {
@@ -234,6 +243,11 @@ function loadVibes(file,mesh) {
         }            
     }
     globeView.notifyChange(true);
+ //}else {
+ //   throw new loadFileException("fichier de type .vibes attendu");
+
+// }
+
 }
 
 
@@ -303,7 +317,7 @@ function loadTexture(data,mesh,index) {
     globeView.notifyChange(true);
 }
 
-
+false
 function addOpacity(mesh,folder,index) {
     folder.add({opacity : 1 }, 'opacity',0 , 1).name("opacity").onChange(
         function changeOpacity(value) {
@@ -387,19 +401,28 @@ function initListener() {
 function documentDrop(e) {
     e.preventDefault();
     var file = e.dataTransfer.files[0];
-    //console.log(file);
+   
     readFile(file);
   }
 
 
 function readFile(file) {
-    let reader = new FileReader();
-    reader.addEventListener('load', () => {
-        //console.log(reader.result);
-        exports.loadOBJ(reader.result);
-    }, false);
 
-    reader.readAsDataURL(file);
+    if(file.name.endsWith(".obj")){
+        let reader = new FileReader();
+        reader.addEventListener('load', () => {
+            //console.log(reader.result);
+            exports.loadOBJ(reader.result);
+        }, false);
+    
+        reader.readAsDataURL(file);
+     return 0;
+     
+        
+    }else{
+        throw new loadFileException("fichier de type .obj attendu");
+    }
+   
   }
 
 
@@ -410,4 +433,13 @@ window.onload = () => initListener();
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
     globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
 });
+
+function ajout(a , b){
+    return a+b;
+}
+
+function loadFileException(message) {
+    this.message = message;
+    this.name = "loadFileException";
+ }
 
