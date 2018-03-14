@@ -21,6 +21,7 @@ var promiseElevation = [];
 menuGlobe.view = globeView;
 
 var model;
+var line;
 
 
 
@@ -111,6 +112,19 @@ exports.loadOBJ =function loadOBJ(url) {
                 mesh.children[i].material = material;
                 mesh.children[i].material.transparent = true;
                 mesh.children[i].castShadow = true;
+
+                var edges = new THREE.EdgesGeometry(mesh.children[i].geometry);
+                line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff }));
+                line.position.copy(coord.as(globeView.referenceCrs).xyz());
+                // align up vector with geodesic normal
+                line.lookAt(mesh.position.clone().add(coord.geodesicNormal));
+                line.rotateX(Math.PI/2);
+                line.rotateY(Math.PI/2);
+                line.scale.set(120, 120, 120);
+                line.updateMatrixWorld();
+
+                globeView.scene.add(line);
+                globeView.notifyChange(true);
             }
 
 
@@ -153,6 +167,14 @@ function getRandomColor() {
 
 
 function addGUI() {
+  let parentFolder = menuGlobe.gui.addFolder(line.materialLibraries[0].substring(0,line.materialLibraries[0].length - 4));
+  params = {
+    trait: '',
+  }
+  menuGlobe.gui.add(params, 'trait', ["glass", "brush", "paint-brush", "two", "scribble", "light", "wavy", "dotted", "thick", "fast"]).name("edges").onChange(
+    function(value) { createMaterial(value, line);
+  });
+  addColorEdge();
     for (var i = 0; i < model.children.length; i++) {
        let folder = menuGlobe.gui.addFolder(model.children[i].name);
        addOpacity(folder,i);
@@ -161,11 +183,20 @@ function addGUI() {
        addSpecular(folder,i);
        addShininess(folder,i);
        addTexture(folder,i);
-
     }
 }
 
-
+function addColorEdge() {
+    menuGlobe.gui.addColor({color : "#ffae23" }, 'color').name("color").onChange(
+        function changeColor(value) {
+          for(var i = 0; i < line.children.length; i++){
+            line[i].material.color = new THREE.Color( value );
+            line[i].material.needsUpdate = true;
+          }
+            globeView.notifyChange(true);
+        }
+    );
+}
 
 function changeTexture(value, array){
   var textureMaterial = new THREE.MeshBasicMaterial( {
@@ -196,7 +227,7 @@ function addTexture(folder, index){
     texture: '',
   }
   //folder.remember(params);
-  var texture = folder.add(params, 'texture', [ "", "bricks", "wall", "stone-wall", "roof", "water"]).name("texture").onChange(
+  folder.add(params, 'texture', [ "", "bricks", "wall", "stone-wall", "roof", "water"]).name("texture").onChange(
     function(value) { changeTexture(value, model.children[index]); });
 }
 
@@ -252,6 +283,74 @@ function addShininess(folder,index) {
 );
 }
 
+function getSourceSynch(url) {
+  var req = new XMLHttpRequest();
+    req.open("GET", url, false);
+    req.send();
+    return req.responseText;
+}
+
+function getMethod(shader){
+
+  var text = getSourceSynch('./methods/'+shader+'.json');
+  var method = JSON.parse(text);
+  return method;
+}
+
+//crée le material texturé associé aux arêtes sketchy
+function createMaterial(value, array){
+    var color = new THREE.Color();
+    var vertex = getSourceSynch("./shaders/sketchy_strokes_vert.glsl");
+    var headVertex = getSourceSynch("./shaders/sketchy_strokes_pars_vert.glsl");
+    var fragment = getSourceSynch("./shaders/sketchy_strokes_frag.glsl");
+    var method = getMethod("sketchy_strokes");
+    var uniforms = {};
+    // for (param in method.uniforms){
+		// 			uniforms[param] = method.uniforms[param];
+		// 			uniforms[param].value = eval(method.uniforms[param].value);
+		// 		}
+
+  	//Materiel appliqué à toutes les géométries de la couche
+  	var materialEdge = new THREE.ShaderMaterial( {
+    uniforms: uniforms,
+    vertexShader:   [
+            "attribute vec3  position2;",
+            "uniform   vec2  resolution;"
+
+            +headVertex+
+
+            "void main()",
+            "{",
+            "gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);",
+            "vec4 Position2 = projectionMatrix *modelViewMatrix *vec4(position2,1.0);",
+
+              "vec2 normal = normalize((gl_Position.xy/gl_Position.w - Position2.xy/Position2.w) * resolution); // * 0.5",
+              "normal = uv.x * uv.y * vec2(-normal.y, normal.x);",
+
+              "if (length((gl_Position.xyz+Position2.xyz)/2.0)>25.0){gl_Position.xy += 25.0*(width/length((gl_Position.xyz+Position2.xyz)/2.0)) * gl_Position.w * normal * 2.0 / resolution;}",
+              "else {gl_Position.xy += width * gl_Position.w * normal * 2.0 / resolution;}"
+              + vertex +
+            "}"
+      ].join("\n"),
+    fragmentShader: fragment
+
+  });
+
+  var texture = new THREE.TextureLoader();
+    texture.load( "./strokes/"+value+".png", function( map ) {
+        map.wrapS = THREE.RepeatWrapping;
+        map.wrapT = THREE.ReaddTexturepeatWrapping;
+        map.anisotropy = 4;
+        map.repeat.set( 0.1, 0.1 );
+        materialEdge.side = THREE.DoubleSide;
+        materialEdge.map = map;
+        materialEdge.needsUpdate = true;
+    } );
+
+    array.material = materialEdge;
+    array.material.needsUpdate = true;
+    globeView.notifyChange(true);
+}
 
 
 menuGlobe.addGUI("save", save);

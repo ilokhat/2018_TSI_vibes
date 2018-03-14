@@ -37,7 +37,9 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
             this._changeEmissive(style.styles[j].emissive, i);
             this._changeSpecular(style.styles[j].specular, i);
             this._changeShininess(style.styles[j].shininess, i);
-        }
+            this._changeColorEdge(style.styles[j].color, i);
+            this._changeOpacityEdge(style.style[j].opacity, i);
+      }
     }
     else if (style && style.style) {
         // Apply given style to all children
@@ -47,7 +49,9 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
             this._changeEmissive(style.style.emissive, i);
             this._changeSpecular(style.style.specular, i);
             this._changeShininess(style.style.shininess, i);
-        }
+            this._changeColorEdge(style.styles.color, i);
+            this._changeOpacityEdge(style.style.opacity, i);
+      }
     }
     else {
         // Apply default style
@@ -58,7 +62,9 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
             this._changeEmissive(color, i);
             this._changeSpecular(color, i);
             this._changeShininess(30, i);
-        }
+            this._changeColorEdge(color, i);
+            this._changeOpacityEdge(1, i);
+      }
     }
 };
 
@@ -70,9 +76,21 @@ Symbolizer.prototype._changeOpacity = function changeOpacity(value, index) {
     this.view.notifyChange(true);
 };
 
+Symbolizer.prototype._changeOpacityEdge = function changeOpacityEdge(value, index) {
+    this.edges.children[index].material.opacity = value;
+    this.edges.children[index].material.needsUpdate = true;
+    this.view.notifyChange(true);
+};
+
 Symbolizer.prototype._changeColor = function changeColor(value, index) {
     this.obj.children[index].material.color = new THREE.Color(value);
     this.obj.children[index].material.needsUpdate = true;
+    this.view.notifyChange(true);
+};
+
+Symbolizer.prototype._changeColorEdge = function changeColorEdge(value, index) {
+    this.edges.children[index].material.color = new THREE.Color(value);
+    this.edges.children[index].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
 
@@ -106,6 +124,8 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
             emissive: '#'.concat(this.obj.children[i].material.emissive.getHexString()),
             specular: '#'.concat(this.obj.children[i].material.specular.getHexString()),
             shininess: this.obj.children[i].material.shininess,
+            colorEdges: this.edges.children[i].material.edges,
+            opacityEdges: this.edges.children[i].material.edges,
         });
     }
     var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
@@ -168,11 +188,29 @@ Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
     });
 };
 
+Symbolizer.prototype._addOpacityEdgeAll = function addOpacityEdgeAll(folder) {
+    var initialOpacity = this.edges.children[0].material.opacity;
+    folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Edges opacity').onChange((value) => {
+        for (var index = 0; index < this.edges.children.length; index++) {
+            this._changeOpacityEdge(value, index);
+        }
+    });
+};
+
 Symbolizer.prototype._addColorAll = function addColorAll(folder) {
     var initialColor = '#'.concat(this.obj.children[0].material.color.getHexString());
     folder.addColor({ color: initialColor }, 'color').name('color').onChange((value) => {
         for (var index = 0; index < this.obj.children.length; index++) {
             this._changeColor(value, index);
+        }
+    });
+};
+
+Symbolizer.prototype._addColorEdgeAll = function addColorEdgeAll(folder) {
+    var initialColor = '#'.concat(this.edges.children[0].material.color.getHexString());
+    folder.addColor({ color: initialColor }, 'color').name('Edges color').onChange((value) => {
+        for (var index = 0; index < this.edges.children.length; index++) {
+            this._changeColorEdge(value, index);
         }
     });
 };
@@ -213,6 +251,8 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addEmissiveAll(folder);
     this._addSpecularAll(folder);
     this._addShininessAll(folder);
+    this._addColorEdgeAll(folder);
+    this._addOpacityEdgeAll(folder);
 };
 
 function getRandomColor() {

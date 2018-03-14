@@ -85,7 +85,7 @@ exports.loadOBJ = function loadOBJ(url) {
     loader.load(
         url,
         //callback
-        function (mesh) {
+        function (mesh, line) {
 
             // building coordinate
             var coord = new itowns.Coordinates('EPSG:4326', 2.294485, 48.85828, 35);
@@ -108,7 +108,7 @@ exports.loadOBJ = function loadOBJ(url) {
 
             for (var i = 0; i < mesh.children.length; i++) {
                 let material = new THREE.MeshPhongMaterial(
-                    { 
+                    {
                         transparent : true,
                         color       : new THREE.Color(getRandomColor()),
                         side        : THREE.DoubleSide
@@ -117,9 +117,8 @@ exports.loadOBJ = function loadOBJ(url) {
                 mesh.children[i].material = material;
                 mesh.children[i].castShadow = true;
 
-                /*
                 var edges = new THREE.EdgesGeometry(mesh.children[i].geometry);
-                var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff }));
+                line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff }));
                 line.position.copy(coord.as(globeView.referenceCrs).xyz());
                 // align up vector with geodesic normal
                 line.lookAt(mesh.position.clone().add(coord.geodesicNormal));
@@ -130,18 +129,19 @@ exports.loadOBJ = function loadOBJ(url) {
 
                 globeView.scene.add(line);
                 globeView.notifyChange(true);
-                */
+
             }
 
             // update coordinate of the mesh
             mesh.updateMatrixWorld();
-            console.log(mesh);    
-            
+            console.log(mesh);
+            console.log(line);
+
             globeView.scene.add(mesh);
             globeView.notifyChange(true);
 
-            addToGUI(mesh);
-            
+            addToGUI(mesh, line);
+
         },
         // called when loading is in progresses
         function ( xhr ) {
@@ -169,19 +169,20 @@ function getRandomColor() {
 }
 
 
-function addToGUI(mesh) {
+function addToGUI(mesh, line) {
     let parentFolder = menuGlobe.gui.addFolder(mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length - 4));
-    
+
     parentFolder.add({save : function(){saveVibes(mesh)}}, "save");
     addVibes(mesh,parentFolder);
     addAllOpacity(mesh,parentFolder);
     addAllColor(mesh,parentFolder);
     addAllEmissive(mesh,parentFolder);
+    addAllColorEdge(line, parentFolder);
 
 
     for (let i = 0; i < mesh.children.length; i++) {
        let folder = parentFolder.addFolder(mesh.children[i].name);
-       addOpacity(mesh,folder,i); 
+       addOpacity(mesh,folder,i);
        addColor(mesh,folder,i);
        addEmissive(mesh,folder,i);
        addSpecular(mesh,folder,i);
@@ -231,11 +232,21 @@ function loadVibes(file,mesh) {
                     mesh.children[i].material.shininess = json.styles[i].shininess;
             }
 
-        }            
+        }
     }
     globeView.notifyChange(true);
 }
 
+function addAllColorEdge(line, folder) {
+    folder.addColor({color : "#ffae23" }, 'color').name("color edge").onChange(
+      function changeColorEdge(value) {
+          for (var i = 0; i < line.children.length; i++) {
+              line.children[i].material.color = new THREE.Color( value );
+          }
+          globeView.notifyChange(true);
+      }
+    );
+}
 
 function addAllOpacity(mesh,folder) {
     folder.add({opacity : 1 }, 'opacity',0 , 1).name("opacity").onChange(
@@ -361,7 +372,7 @@ function saveVibes(mesh){
             "color"    : mesh.children[i].material.color.getHex(),
             "emissive" : mesh.children[i].material.emissive.getHex(),
             "specular" : mesh.children[i].material.specular.getHex(),
-            "shininess": mesh.children[i].material.shininess  
+            "shininess": mesh.children[i].material.shininess
         })
     }
     console.log(vibes);
@@ -410,4 +421,3 @@ window.onload = () => initListener();
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
     globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
 });
-
