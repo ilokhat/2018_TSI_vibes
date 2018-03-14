@@ -45,9 +45,28 @@ var rotateY = Math.PI/4;
 var rotateZ = 0;
 var scale = 300;
 
+// Symbolizer
+var initSymbolizer = function initSymbolizer(model, menuGlobe) {
+    var object = model[0];
+    var edges = model[1];
+    var symbolizer = new itowns.Symbolizer(globeView, object, edges, menuGlobe);
+    symbolizer.initGuiAll();
+}
+
 // Loader initialization
 var loader = new itowns.ModelLoader(globeView);
 
+// Read the file dropped and actually load the object
+function readFile(file) {
+    let reader = new FileReader();
+    reader.addEventListener('load', () => {
+        // Load object
+        loader.loadOBJ(reader.result, coord, rotateX, rotateY, rotateZ, scale, initSymbolizer, menuGlobe);
+    }, false);
+    reader.readAsDataURL(file);
+}
+
+// Drag and drop
 function initListener() {
     document.addEventListener('drop', documentDrop, false);
         let prevDefault = e => e.preventDefault();
@@ -56,31 +75,13 @@ function initListener() {
         document.addEventListener('dragleave', prevDefault, false);
   }
 
-
 function documentDrop(e) {
     e.preventDefault();
     var file = e.dataTransfer.files[0];
-    //console.log(file);
     readFile(file);
   }
 
-
-function readFile(file) {
-    let reader = new FileReader();
-    reader.addEventListener('load', () => {
-        loader.loadOBJ(reader.result, coord, rotateX, rotateY, rotateZ, scale);
-        var object = loader.model[0];
-        var edges = loader.model[1];
-        var symbolizer = new itowns.Symbolizer(globeView, object, edges, menuGlobe);
-        symbolizer.initGuiAll();
-    }, false);
-
-    reader.readAsDataURL(file);
-  }
-
-
 window.onload = () => initListener();
-
 
 // Listen for globe full initialisation event
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {

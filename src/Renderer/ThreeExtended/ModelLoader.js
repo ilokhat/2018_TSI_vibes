@@ -5,23 +5,24 @@
 import * as THREE from 'three';
 import * as OBJLoader from 'three-obj-loader';
 
+OBJLoader(THREE);
+
 function ModelLoader(view) {
     // Constructor
     this.view = view;
     this.model = null;
 }
 
-ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale) {
+ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale, callback, menu) {
     // OBJ loader
     var loader = new THREE.OBJLoader();
-    var promise = new Promise();
-    loader.load(url, obj => {
-        this._loadModel(obj, coord, rotateX, rotateY, rotateZ, scale);
-        promise.resolve();
+    var promise = new Promise((resolve) => {
+        loader.load(url, (obj) => {
+            this._loadModel(obj, coord, rotateX, rotateY, rotateZ, scale);
+            resolve();
+        });
     });
-    promise.then({
-        return this.model;
-    })
+    promise.then(() => callback(this.model, menu));
 };
 
 ModelLoader.prototype._loadModel = function loadModel(obj, coord, rotateX, rotateY, rotateZ, scale) {
