@@ -279,17 +279,17 @@ Symbolizer.prototype._addShininessAll = function addShininessAll(folder) {
     });
 };
 
-Symbolizer.prototype._readTextureAll = function readTexture(file, index) {
+Symbolizer.prototype._readTextureAll = function readTextureAll(file, index) {
     var reader = new FileReader();
     reader.addEventListener('load', () => {
-        for (var i = 0; i < this.obj.length; i++) {
+        for (var i = 0; i < this.obj.children.length; i++) {
             this._changeTexture(reader.result, i);
         }
     }, false);
     reader.readAsDataURL(file);
 };
 
-Symbolizer.prototype._addTextureAll = function addTexture(folder) {
+Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
     folder.add({ loadTexture: () => {
         var button = document.createElement('input');
         button.setAttribute('type', 'file');
