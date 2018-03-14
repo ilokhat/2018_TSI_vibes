@@ -3,7 +3,7 @@
 
 # VIBES - Visualization in iTowns of Buildings Elegantly Stylized
 
-[![Build Status](https://travis-ci.org/arnaudgregoire/itowns-style.svg?branch=master)](https://travis-ci.org/arnaudgregoire/itowns-style)
+[![Build Status](https://travis-ci.org/arnaudgregoire/vibes.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)
 
 ## Summary
 
