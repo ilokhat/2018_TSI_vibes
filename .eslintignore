@@ -3,3 +3,5 @@ src/Renderer/ThreeExtended/OBJLoader.js
 src/utils/FileSaver.js
 examples/collada.js
 examples/vibesObj.js
+examples/vibesTest.js
+examples/vibesplu2plus.js

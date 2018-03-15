@@ -4,6 +4,7 @@
 
 import * as THREE from 'three';
 import * as FILE from 'file-saver';
+import * as GLOB from 'glob';
 
 // Class Symbolizer
 
@@ -181,6 +182,7 @@ Symbolizer.prototype._addTexture = function addTexture(folder, index) {
         button.addEventListener('change', () => this._readTexture(button.files[0], index), false);
         button.click();
     } }, 'loadTexture');
+    GLOB('examples/textures/*.png', (err, files) => console.log(files));
 };
 
 // More parameters...
