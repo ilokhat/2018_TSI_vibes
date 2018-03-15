@@ -114,6 +114,13 @@ Symbolizer.prototype._changeTexture = function changeTexture(data, index) {
     this.obj.children[index].material = new THREE.MeshPhongMaterial({ map: texture });
     this.view.notifyChange(true);
 };
+
+Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, index) {
+    this.edges.children[index].material.linewidth = value;
+    this.edges.children[index].material.needsUpdate = true;
+    this.view.notifyChange(true);
+};
+
 // More parameters...
 
 Symbolizer.prototype._saveVibes = function saveVibes() {
@@ -204,6 +211,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
     this._addLoad(parentFolder);
     this._addColorEdgeAll(parentFolder);
     this._addOpacityEdgeAll(parentFolder);
+    this._addWidthEdgeAll(parentFolder);
     for (var i = 0; i < this.obj.children.length; i++) {
         var folder = parentFolder.addFolder(this.obj.children[i].name);
         this._addOpacity(folder, i);
@@ -279,7 +287,16 @@ Symbolizer.prototype._addShininessAll = function addShininessAll(folder) {
     });
 };
 
-Symbolizer.prototype._readTextureAll = function readTextureAll(file, index) {
+Symbolizer.prototype._addWidthEdgeAll = function addWidthEdgeAll(folder) {
+    var initialWidth = this.edges.children[0].material.linewidth;
+    folder.add({ width: initialWidth }, 'width', 0, 5).name('Edge width').onChange((value) => {
+        for (var index = 0; index < this.obj.children.length; index++) {
+            this._changeWidthEdge(value, index);
+        }
+    });
+};
+
+Symbolizer.prototype._readTextureAll = function readTextureAll(file) {
     var reader = new FileReader();
     reader.addEventListener('load', () => {
         for (var i = 0; i < this.obj.children.length; i++) {
@@ -310,6 +327,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addShininessAll(folder);
     this._addColorEdgeAll(folder);
     this._addOpacityEdgeAll(folder);
+    this._addWidthEdgeAll(folder);
 };
 
 
