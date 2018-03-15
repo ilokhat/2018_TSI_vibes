@@ -4,7 +4,7 @@
 
 import * as THREE from 'three';
 import * as FILE from 'file-saver';
-import * as GLOB from 'glob';
+import Fetcher from '../Core/Scheduler/Providers/Fetcher';
 
 // Class Symbolizer
 
@@ -108,13 +108,28 @@ Symbolizer.prototype._changeShininess = function changeShininess(value, index) {
     this.view.notifyChange(true);
 };
 
-Symbolizer.prototype._changeTexture = function changeTexture(data, index) {
-    var texture = new THREE.TextureLoader().load(data);
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.RepeatWrapping;
-    this.obj.children[index].material = new THREE.MeshPhongMaterial({ map: texture });
+Symbolizer.prototype._changeTexture = function changeTexture(chemin, index) {
+    if (chemin != './textures/') {
+        var texture = new THREE.TextureLoader().load(chemin);
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        this.obj.children[index].material = new THREE.MeshPhongMaterial({ map: texture });
+        this.obj.children[index].material.needsUpdate = true;
+        this.view.notifyChange(true);
+    } else {
+        this.obj.children[index].material = new THREE.MeshPhongMaterial();
+        this.obj.children[index].material.needsUpdate = true;
+        this.obj.children[index].material.map.needsUpdate = true;
+        this.view.notifyChange(true);
+    }
+};
+
+Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, index) {
+    this.edges.children[index].material.linewidth = value;
+    this.edges.children[index].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
+
 // More parameters...
 
 Symbolizer.prototype._saveVibes = function saveVibes() {
@@ -139,12 +154,6 @@ Symbolizer.prototype._readVibes = function readVibes(file) {
     var reader = new FileReader();
     reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result)), false);
     reader.readAsText(file);
-};
-
-Symbolizer.prototype._readTexture = function readTexture(file, index) {
-    var reader = new FileReader();
-    reader.addEventListener('load', () => this._changeTexture(reader.result, index), false);
-    reader.readAsDataURL(file);
 };
 
 // Menu management
@@ -176,13 +185,12 @@ Symbolizer.prototype._addShininess = function addShininess(folder, index) {
 };
 
 Symbolizer.prototype._addTexture = function addTexture(folder, index) {
-    folder.add({ loadTexture: () => {
-        var button = document.createElement('input');
-        button.setAttribute('type', 'file');
-        button.addEventListener('change', () => this._readTexture(button.files[0], index), false);
-        button.click();
-    } }, 'loadTexture');
-    GLOB('examples/textures/*.png', (err, files) => console.log(files));
+    Fetcher.json('./textures/listeTexture.json').then((listTextures) => {
+        if (listTextures) {
+            listTextures[''] = '';
+            folder.add({ texture: '' }, 'texture', listTextures).onChange(value => this._changeTexture('./textures/'.concat(value), index));
+        }
+    });
 };
 
 // More parameters...
@@ -206,6 +214,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
     this._addLoad(parentFolder);
     this._addColorEdgeAll(parentFolder);
     this._addOpacityEdgeAll(parentFolder);
+    this._addWidthEdgeAll(parentFolder);
     for (var i = 0; i < this.obj.children.length; i++) {
         var folder = parentFolder.addFolder(this.obj.children[i].name);
         this._addOpacity(folder, i);
@@ -281,23 +290,26 @@ Symbolizer.prototype._addShininessAll = function addShininessAll(folder) {
     });
 };
 
-Symbolizer.prototype._readTextureAll = function readTextureAll(file, index) {
-    var reader = new FileReader();
-    reader.addEventListener('load', () => {
-        for (var i = 0; i < this.obj.children.length; i++) {
-            this._changeTexture(reader.result, i);
+Symbolizer.prototype._addWidthEdgeAll = function addWidthEdgeAll(folder) {
+    var initialWidth = this.edges.children[0].material.linewidth;
+    folder.add({ width: initialWidth }, 'width', 0, 5).name('Edge width').onChange((value) => {
+        for (var index = 0; index < this.obj.children.length; index++) {
+            this._changeWidthEdge(value, index);
         }
-    }, false);
-    reader.readAsDataURL(file);
+    });
 };
 
 Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
-    folder.add({ loadTexture: () => {
-        var button = document.createElement('input');
-        button.setAttribute('type', 'file');
-        button.addEventListener('change', () => this._readTextureAll(button.files[0]), false);
-        button.click();
-    } }, 'loadTexture');
+    Fetcher.json('./textures/listeTexture.json').then((listTextures) => {
+        if (listTextures) {
+            listTextures[''] = '';
+            folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
+                for (var index = 0; index < this.obj.children.length; index++) {
+                    this._changeTexture('./textures/'.concat(value), index);
+                }
+            });
+        }
+    });
 };
 
 Symbolizer.prototype.initGuiAll = function addToGUI() {
@@ -312,6 +324,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addShininessAll(folder);
     this._addColorEdgeAll(folder);
     this._addOpacityEdgeAll(folder);
+    this._addWidthEdgeAll(folder);
 };
 
 
