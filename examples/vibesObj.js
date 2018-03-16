@@ -225,7 +225,6 @@ function loadVibes(file,mesh) {
           catch (e) {
             throw new loadFileException("fichier de type .vibes attendu");
     }
-    console.log(json);
     for (var i = 0; i < json.styles.length; i++) {
         for (var j = 0; j < mesh.children.length; j++) {
 
@@ -240,6 +239,9 @@ function loadVibes(file,mesh) {
         }
     }
     globeView.notifyChange(true);
+ 
+    
+    return 0;
 }
 
 function addAllColorEdge(line, folder) {
@@ -310,6 +312,7 @@ function readTexture(file,mesh,index) {
 
 
 function loadTexture(data,mesh,index) {
+    
     var texture = new THREE.TextureLoader().load( data );
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
@@ -368,7 +371,7 @@ function addShininess(mesh,folder,index) {
 
 
 function saveVibes(mesh){
-    console.log(mesh);
+    console.log("sauvegarde");
     let vibes = { "styles" : [] };
     for (var i = 0; i < mesh.children.length; i++) {
         vibes.styles.push({
@@ -409,6 +412,7 @@ function documentDrop(e) {
 
 
 function readFile(file) {
+    console.log("reaaaddddd fiilleeee");
     
     if(file.name.endsWith(".obj")){
         let reader = new FileReader();
