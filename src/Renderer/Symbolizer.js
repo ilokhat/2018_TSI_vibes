@@ -153,8 +153,7 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
         edges: {
             opacity: this.edges.children[0].material.opacity,
             color: this.edges.children[0].material.color,
-            width: this.edges.children[0].material.width,
-            // texture: this.edges.children[0].material.map.path,
+            width: this.edges.children[0].material.linewidth,
         },
         faces: [] };
     for (var i = 0; i < this.obj.children.length; i++) {
