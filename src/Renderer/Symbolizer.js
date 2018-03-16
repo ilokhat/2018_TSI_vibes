@@ -19,10 +19,27 @@ function Symbolizer(view, obj, edges, menu) {
     this.applyStyle();
 }
 
-Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
+Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = null) {
     var i;
     var j;
-    if (style && style.faces.length > 1) {
+    var k;
+    if (style && style.faces[0].name) {
+        // Update GUI
+        var count = 0;
+        folder.__controllers[2].setValue(style.edges.color);
+        folder.__controllers[3].setValue(style.edges.opacity);
+        folder.__controllers[4].setValue(style.edges.width);
+        for (k in folder.__folders) {
+            if (Object.prototype.hasOwnProperty.call(folder.__folders, k)) {
+                folder.__folders[k].__controllers[0].setValue(style.faces[count].opacity);
+                folder.__folders[k].__controllers[1].setValue(style.faces[count].color);
+                folder.__folders[k].__controllers[2].setValue(style.faces[count].emmissive);
+                folder.__folders[k].__controllers[3].setValue(style.faces[count].specular);
+                folder.__folders[k].__controllers[4].setValue(style.faces[count].shininess);
+                folder.__folders[k].__controllers[5].setValue(style.faces[count].texture == null ? '' : style.faces[count].texture);
+            }
+            count++;
+        }
         // Apply given style to each child
         for (i = 0; i < this.edges.children.length; i++) {
             this._changeOpacityEdge(style.edges.opacity, i);
@@ -44,6 +61,16 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
         }
     }
     else if (style && style.faces.length == 1) {
+        // Update GUI
+        folder.__controllers[2].setValue(style.edges.color);
+        folder.__controllers[3].setValue(style.edges.opacity);
+        folder.__controllers[4].setValue(style.edges.width);
+        folder.__controllers[5].setValue(style.faces[0].opacity);
+        folder.__controllers[6].setValue(style.faces[0].color);
+        folder.__controllers[7].setValue(style.faces[0].emmissive);
+        folder.__controllers[8].setValue(style.faces[0].specular);
+        folder.__controllers[9].setValue(style.faces[0].shininess);
+        folder.__controllers[10].setValue(style.faces[0].texture == null ? '' : style.faces[0].texture);
         // Apply given style to all children
         for (i = 0; i < this.edges.children.length; i++) {
             this._changeOpacityEdge(style.edges.opacity, i);
@@ -51,11 +78,11 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
             this._changeWidthEdge(style.edges.width, i);
         }
         for (j = 0; j < this.obj.children.length; j++) {
-            this._changeOpacity(style.faces.opacity, j);
-            this._changeColor(style.faces.color, j);
-            this._changeEmissive(style.faces.emissive, j);
-            this._changeSpecular(style.faces.specular, j);
-            this._changeShininess(style.faces.shininess, j);
+            this._changeOpacity(style.faces[0].opacity, j);
+            this._changeColor(style.faces[0].color, j);
+            this._changeEmissive(style.faces[0].emissive, j);
+            this._changeSpecular(style.faces[0].specular, j);
+            this._changeShininess(style.faces[0].shininess, j);
             if (style.faces.texture != null) this._changeTexture(style.faces.texture, j);
         }
     }
@@ -199,8 +226,7 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
         edges: {
             opacity: this.edges.children[0].material.opacity,
             color: this.edges.children[0].material.color,
-            width: this.edges.children[0].material.width,
-            // texture: this.edges.children[0].material.map.path,
+            width: this.edges.children[0].material.linewidth,
         },
         faces: [] };
     for (var i = 0; i < this.obj.children.length; i++) {
@@ -231,9 +257,9 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
     FILE.saveAs(blob, this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4).concat('.vibes'));
 };
 
-Symbolizer.prototype._readVibes = function readVibes(file) {
+Symbolizer.prototype._readVibes = function readVibes(file, folder) {
     var reader = new FileReader();
-    reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result)), false);
+    reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
     reader.readAsText(file);
 };
 
@@ -286,7 +312,7 @@ Symbolizer.prototype._addLoad = function addLoad(folder) {
     folder.add({ load: () => {
         var button = document.createElement('input');
         button.setAttribute('type', 'file');
-        button.addEventListener('change', () => this._readVibes(button.files[0]), false);
+        button.addEventListener('change', () => this._readVibes(button.files[0], folder), false);
         button.click();
     } }, 'load');
 };
