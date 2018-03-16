@@ -130,20 +130,24 @@ Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, index) {
     this.view.notifyChange(true);
 };
 
-// More parameters...
-
 Symbolizer.prototype._saveVibes = function saveVibes() {
-    var vibes = { styles: [] };
+    var vibes = { 
+        edges: {
+            opacity: this.edges.children[0].material.opacity,
+            color: this.edges.children[0].material.color,
+            width: this.edges.children[0].material.width,
+            texture: this.edges.children[0].material.map.path,
+        }, 
+        faces: [] };
     for (var i = 0; i < this.obj.children.length; i++) {
-        vibes.styles.push({
+        vibes.faces.push({
             name: this.obj.children[i].name,
             opacity: this.obj.children[i].material.opacity,
             color: this.obj.children[i].material.color.getHex(),
             emissive: this.obj.children[i].material.emissive.getHex(),
             specular: this.obj.children[i].material.specular.getHex(),
             shininess: this.obj.children[i].material.shininess,
-            colorEdges: this.edges.children[i].material.color,
-            opacityEdges: this.edges.children[i].material.opacity,
+            texture: this.obj.children[i].material.map.path,
         });
     }
     var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
