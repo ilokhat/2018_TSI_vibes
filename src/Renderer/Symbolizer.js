@@ -1,3 +1,4 @@
+/* eslint no-eval: 0 */
 /**
  * Tool to apply 3D stylization on a mesh
  */
@@ -141,6 +142,51 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, index) {
     }
 };
 
+
+Symbolizer.prototype._changeEdgeTexture = function _changeTextureSketchy(chemin) {
+    var vertex = 
+    `attribute vec3  position2;
+    uniform   vec2  resolution;`
+    .concat(getSourceSynch('shaders/sketchy_strokes_pars_vert.glsl'))
+    .concat(`
+    void main()
+    {
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+    vec4 Position2 = projectionMatrix *modelViewMatrix *vec4(position2,1.0);
+    vec2 normal = normalize((gl_Position.xy/gl_Position.w - Position2.xy/Position2.w) * resolution);
+    normal = uv.x * uv.y * vec2(-normal.y, normal.x);
+    if (length((gl_Position.xyz+Position2.xyz)/2.0)>25.0){gl_Position.xy += 25.0*(width/length((gl_Position.xyz+Position2.xyz)/2.0)) * gl_Position.w * normal * 2.0 / resolution;}
+    else {gl_Position.xy += width * gl_Position.w * normal * 2.0 / resolution;}
+    `)
+    .concat(getSourceSynch('shaders/sketchy_strokes_vert.glsl'))
+    .concat('}');
+
+    var fragment = getSourceSynch('shaders/sketchy_strokes_frag.glsl');
+    var shader = 'sketchy_strokes';
+    var color = new THREE.Color(getRandomColor());
+    var width = 5;
+    var texture1 = new THREE.TextureLoader().load('strokes/'.concat('brush').concat('_small.png'));
+    var texture2 = new THREE.TextureLoader().load('strokes/'.concat('brush').concat('.png'));
+
+    var material = new THREE.ShaderMaterial({
+        vertexShader: vertex,
+        fragmentShader: fragment,
+        uniforms:
+        {
+            width: { type: 'f', value: width },
+            resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            texture1: { type: 't', value: texture1 },
+            image: { type: 't', value: texture2 },
+            color: { type: 'v3', value: [color.r, color.g, color.b] },
+        },
+    });
+    material.side = THREE.DoubleSide;
+
+    for (var i = 0; i < this.edges.children.length; i++) {
+        this.edges.children[i].material = material;
+    }
+};
+
 Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, index) {
     this.edges.children[index].material.linewidth = value;
     this.edges.children[index].material.needsUpdate = true;
@@ -223,7 +269,9 @@ Symbolizer.prototype._addTexture = function addTexture(folder, index) {
     Fetcher.json('./textures/listeTexture.json').then((listTextures) => {
         if (listTextures) {
             listTextures[''] = '';
-            folder.add({ texture: '' }, 'texture', listTextures).onChange(value => this._changeTexture('./textures/'.concat(value), index));
+            folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
+                this._changeTexture('./textures/'.concat(value), index);
+            });
         }
     });
 };
@@ -250,6 +298,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
     this._addColorEdgeAll(parentFolder);
     this._addOpacityEdgeAll(parentFolder);
     this._addWidthEdgeAll(parentFolder);
+    this._addEdgeTextureAll(parentFolder);
     for (var i = 0; i < this.obj.children.length; i++) {
         var folder = parentFolder.addFolder(this.obj.children[i].name);
         this._addOpacity(folder, i);
@@ -347,6 +396,17 @@ Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
     });
 };
 
+Symbolizer.prototype._addEdgeTextureAll = function addEdgeTextureAll(folder, index) {
+    Fetcher.json('./textures/listeEdgeTexture.json').then((listTextures) => {
+        if (listTextures) {
+            listTextures[''] = '';
+            folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
+                this._changeEdgeTexture('./textures/'.concat(value), index);
+            });
+        }
+    });
+};
+
 Symbolizer.prototype.initGuiAll = function addToGUI() {
     var folder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     this._addSave(folder);
@@ -360,6 +420,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addColorEdgeAll(folder);
     this._addOpacityEdgeAll(folder);
     this._addWidthEdgeAll(folder);
+    this.addEdgeTextureAll(folder);
 };
 
 
@@ -370,6 +431,19 @@ function getRandomColor() {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+}
+
+function getSourceSynch(url) {
+    var req = new XMLHttpRequest();
+    req.open('GET', url, false);
+    req.send();
+    return req.responseText;
+}
+
+function getMethod(shader) {
+    var text = getSourceSynch('./methods/'.concat(shader).concat('.json'));
+    var method = JSON.parse(text);
+    return method;
 }
 
 export default Symbolizer;
