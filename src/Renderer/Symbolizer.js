@@ -20,49 +20,59 @@ function Symbolizer(view, obj, edges, menu) {
 
 Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
     var i;
-    if (style && style.styles) {
+    var j;
+    if (style && style.faces.length > 1) {
         // Apply given style to each child
-        for (i = 0; i < this.obj.children.length; i++) {
-            var name = this.obj.children[i].name;
-            var j = 0;
-            while (j < style.styles.length && style.styles[j].name != name) {
-                j++;
+        for (i = 0; i < this.edges.children.length; i++) {
+            this._changeOpacityEdge(style.edges.opacity, i);
+            this._changeColorEdge(style.edges.color, i);
+            this._changeWidthEdge(style.edges.width, i);
+        }
+        for (j = 0; j < this.obj.children.length; j++) {
+            var name = this.obj.children[j].name;
+            var h = 0;
+            while (h < style.faces.length && style.faces[h].name != name) {
+                h++;
             }
-            this._changeOpacity(style.styles[j].opacity, i);
-            this._changeColor(style.styles[j].color, i);
-            this._changeEmissive(style.styles[j].emissive, i);
-            this._changeSpecular(style.styles[j].specular, i);
-            this._changeShininess(style.styles[j].shininess, i);
-            this._changeColorEdge(style.styles[j].colorEdges, i);
-            this._changeOpacityEdge(style.styles[j].opacityEdges, i);
-            if (style.styles[j].texture != null) this._changeTexture(style.styles[j].texture);
+            this._changeOpacity(style.faces[h].opacity, j);
+            this._changeColor(style.faces[h].color, j);
+            this._changeEmissive(style.faces[h].emissive, j);
+            this._changeSpecular(style.faces[h].specular, j);
+            this._changeShininess(style.faces[h].shininess, j);
+            if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, j);
         }
     }
-    else if (style && style.style) {
+    else if (style && style.faces.length == 1) {
         // Apply given style to all children
-        for (i = 0; i < this.obj.children.length; i++) {
-            this._changeOpacity(style.style.opacity, i);
-            this._changeColor(style.style.color, i);
-            this._changeEmissive(style.style.emissive, i);
-            this._changeSpecular(style.style.specular, i);
-            this._changeShininess(style.style.shininess, i);
-            this._changeColorEdge(style.styles.colorEdges, i);
-            this._changeOpacityEdge(style.style.opacityEdges, i);
-            if (style.style.texture != null) this._changeTexture(style.style.texture);
+        for (i = 0; i < this.edges.children.length; i++) {
+            this._changeOpacityEdge(style.edges.opacity, i);
+            this._changeColorEdge(style.edges.color, i);
+            this._changeWidthEdge(style.edges.width, i);
+        }
+        for (j = 0; j < this.obj.children.length; j++) {
+            this._changeOpacity(style.faces.opacity, j);
+            this._changeColor(style.faces.color, j);
+            this._changeEmissive(style.faces.emissive, j);
+            this._changeSpecular(style.faces.specular, j);
+            this._changeShininess(style.faces.shininess, j);
+            if (style.faces.texture != null) this._changeTexture(style.faces.texture, j);
         }
     }
     else {
         // Apply default style
-        for (i = 0; i < this.obj.children.length; i++) {
-            var color = getRandomColor();
-            this._changeOpacity(1, i);
-            this._changeColor(color, i);
-            this._changeEmissive(color, i);
-            this._changeSpecular(color, i);
-            this._changeShininess(30, i);
-            this._changeColorEdge('#000000', i);
+        for (i = 0; i < this.edges.children.length; i++) {
             this._changeOpacityEdge(1, i);
-            // no texture
+            this._changeColorEdge('#000000', i);
+            this._changeWidthEdge(1, i);
+        }
+        for (j = 0; j < this.obj.children.length; j++) {
+            var color = getRandomColor();
+            this._changeOpacity(1, j);
+            this._changeColor(color, j);
+            this._changeEmissive(color, j);
+            this._changeSpecular(color, j);
+            this._changeShininess(30, j);
+            // No texture
         }
     }
 };
@@ -127,7 +137,6 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, index) {
     } else {
         this.obj.children[index].material.map = null;
         this.obj.children[index].material.needsUpdate = true;
-        this.obj.children[index].material.map.needsUpdate = true;
         this.view.notifyChange(true);
     }
 };
@@ -138,30 +147,37 @@ Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, index) {
     this.view.notifyChange(true);
 };
 
-// More parameters...
-
 Symbolizer.prototype._saveVibes = function saveVibes() {
-    var vibes = { styles: [] };
+    // Initiate stylesheet with edge style and an empty list for face style
+    var vibes = {
+        edges: {
+            opacity: this.edges.children[0].material.opacity,
+            color: this.edges.children[0].material.color,
+            width: this.edges.children[0].material.width,
+            // texture: this.edges.children[0].material.map.path,
+        },
+        faces: [] };
     for (var i = 0; i < this.obj.children.length; i++) {
+        // Get the texture path
         var textureUse = null;
         if (this.obj.children[i].material.map != null) {
             var textureUsetab = this.obj.children[i].material.map.image.src.split('/');
             var j = 0;
-            while (i < textureUsetab.length && textureUsetab[j] != 'textures') i++;
+            while (j < textureUsetab.length && textureUsetab[j] != 'textures') j++;
             textureUse = '.';
             while (j < textureUsetab.length) {
-                textureUse.concat('/', textureUsetab[j]);
+                textureUse = textureUse.concat('/', textureUsetab[j]);
+                j++;
             }
         }
-        vibes.styles.push({
+        // Push each face style in the list
+        vibes.faces.push({
             name: this.obj.children[i].name,
             opacity: this.obj.children[i].material.opacity,
             color: this.obj.children[i].material.color.getHex(),
             emissive: this.obj.children[i].material.emissive.getHex(),
             specular: this.obj.children[i].material.specular.getHex(),
             shininess: this.obj.children[i].material.shininess,
-            colorEdges: this.edges.children[i].material.color,
-            opacityEdges: this.edges.children[i].material.opacity,
             texture: textureUse,
         });
     }
