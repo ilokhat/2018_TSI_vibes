@@ -35,6 +35,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
             this._changeShininess(style.styles[j].shininess, i);
             this._changeColorEdge(style.styles[j].colorEdges, i);
             this._changeOpacityEdge(style.styles[j].opacityEdges, i);
+            if (style.styles[j].texture != null) this._changeTexture(style.styles[j].texture);
         }
     }
     else if (style && style.style) {
@@ -47,6 +48,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
             this._changeShininess(style.style.shininess, i);
             this._changeColorEdge(style.styles.colorEdges, i);
             this._changeOpacityEdge(style.style.opacityEdges, i);
+            if (style.style.texture != null) this._changeTexture(style.style.texture);
         }
     }
     else {
@@ -60,6 +62,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
             this._changeShininess(30, i);
             this._changeColorEdge('#000000', i);
             this._changeOpacityEdge(1, i);
+            // no texture
         }
     }
 };
@@ -117,7 +120,7 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, index) {
         this.obj.children[index].material.needsUpdate = true;
         this.view.notifyChange(true);
     } else {
-        this.obj.children[index].material = new THREE.MeshPhongMaterial();
+        this.obj.children[index].material.map = null;
         this.obj.children[index].material.needsUpdate = true;
         this.obj.children[index].material.map.needsUpdate = true;
         this.view.notifyChange(true);
@@ -135,6 +138,16 @@ Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, index) {
 Symbolizer.prototype._saveVibes = function saveVibes() {
     var vibes = { styles: [] };
     for (var i = 0; i < this.obj.children.length; i++) {
+        var textureUse = null;
+        if (this.obj.children[i].material.map != null) {
+            var textureUsetab = this.obj.children[i].material.map.image.src.split('/');
+            var j = 0;
+            while (i < textureUsetab.length && textureUsetab[j] != 'textures') i++;
+            textureUse = '.';
+            while (j < textureUsetab.length) {
+                textureUse.concat('/', textureUsetab[j]);
+            }
+        }
         vibes.styles.push({
             name: this.obj.children[i].name,
             opacity: this.obj.children[i].material.opacity,
@@ -144,6 +157,7 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
             shininess: this.obj.children[i].material.shininess,
             colorEdges: this.edges.children[i].material.color,
             opacityEdges: this.edges.children[i].material.opacity,
+            texture: textureUse,
         });
     }
     var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
