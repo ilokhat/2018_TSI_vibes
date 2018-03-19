@@ -60,12 +60,17 @@ var loader = new itowns.ModelLoader(globeView);
 
 // Read the file dropped and actually load the object
 function readFile(file) {
-    let reader = new FileReader();
-    reader.addEventListener('load', () => {
-        // Load object
-        loader.loadOBJ(reader.result, coord, rotateX, rotateY, rotateZ, scale, initSymbolizer, menuGlobe);
-    }, false);
-    reader.readAsDataURL(file);
+    if(file.name.endsWith(".obj")){
+        let reader = new FileReader();
+        reader.addEventListener('load', () => {
+            // Load object
+            loader.loadOBJ(reader.result, coord, rotateX, rotateY, rotateZ, scale, initSymbolizer, menuGlobe);
+        }, false);
+        reader.readAsDataURL(file);
+        return 0 ;
+    }else{
+        throw new loadFileException("fichier de type .obj attendu");
+    }
 }
 
 // Drag and drop
@@ -89,3 +94,7 @@ window.onload = () => initListener();
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
     globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
 });
+function loadFileException(message) {
+    this.message = message;
+    this.name = "loadFileException";
+ }

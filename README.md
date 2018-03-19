@@ -26,15 +26,15 @@ The user should be able to :
 * Load an existing style to re-apply it, including predefined styles (transparent, typical, sketchy).
   
 **[Back to the top](#summary)** 
-  
+
 
 ## Project management
 
 This project will be carried out in March and April 2018 by a group of seven students in ENSG TSI, using SCRUM methodology. It will be divided into seven sprints, each one during a week. 
-  
+
 
 ### Previsional backlog 
-  
+
 The previsional planning is the following :
 * **Sprint 1** : analysis, conception, first version of the tool.
 * **Sprint 2** : architecture set-up, definition of the 3D style, saving and loading.
@@ -52,8 +52,8 @@ The previsional planning is the following :
 * **Trello** - for task assignment and file sharing.
   
 **[Back to the top](#summary)** 
-  
-  
+
+
 ## Analysis of the existing situation
 
 ### The iTowns environment
@@ -79,7 +79,7 @@ The goal of this analysis is to find out how the following things can be done :
 #### Description of the project
 
 The project consists in a webpage which display a 3D scene that contains a plane geometry with building on it, and a user menu made with dat.gui to change the visual aspect of the buildings (color, opacity, style...) and do some other actions, such as recenter the camera, save the current style, etc.  
-  
+
 There are two sorts of buildings :
 * **Focus** : the main buildings the user wants to work on, loaded from an OBJ model.
 * **Context** : the surrounding buildings, loaded from BDTOPO or BATI3D (also OBJ models).  
@@ -121,18 +121,18 @@ However, it provides a helpful set of functions that can be re-use in our projec
 ### Architecture
 
 The architecture of our project must be included in iTowns. The following schema shows the different functionalities of iTowns, with the ones that interest us in red :  
-  
+
 ![archi_itowns](VIBES/itowns_archi2.png)
-  
+
 The goal is to make this tool as general as possible, which means it must not depend on just one example (the main flaw with PLU++). On the contrary, it should be usable on any example containing a 3D object on an instance of the globe, as a full-fledged functionality of iTowns. Therefore, we will create a new class Symbolizer, which will manage the menu and the 3D render. We will also extend the loading functionalities of iTowns in order to handle .obj files and other formats.
-  
+
 
 ### 3D stylization process
 
 The 3D stylization will be done according to the following activity diagram :
-  
+
 ![ActivityDiagram](VIBES/3DStylizationProcess.png)
- 
+
 
 ### Style format
 
@@ -140,12 +140,18 @@ Mesh style:
 
 ```json
 {
-    "style": {
+    "faces": [{
         "Opacity": 1,
-        "Color": "#ffffff",
-        "Emissive": "#ffffff",
-        "Specular": "#ffffff",
-        "Shininess": 30
+        "Color": "ffffff",
+        "Emissive": "ffffff",
+        "Specular": "ffffff",
+        "Shininess": 30,
+        "texture": "./textures/texture.png"
+    }],
+    "edges" : {
+        "opacity": 1,
+        "color": "#ffffff",
+        "width": 1
     }
 }
 ```
@@ -153,39 +159,46 @@ Group style:
 
 ```json
 {
-    "styles": [ 
+    "faces": [ 
         {
-            "nom": "nom_elemen1",
-            "Opacity": 1,
-            "Color": "#ffffff",
-            "Emissive": "#ffffff",
-            "Specular": "#ffffff",
-            "Shininess": 30
+            "name": "nom_elemen1",
+            "opacity": 1,
+            "color": "#ffffff",
+            "emissive": "#ffffff",
+            "specular": "#ffffff",
+            "shininess": 30,
+            "texture": "./textures/texture.png"
         },{
-            "nom": "nom_elemen2",
-            "Opacity": 1,
-            "Color": "#ffffff",
-            "Emissive": "#ffffff",
-            "Specular": "#ffffff",
-            "Shininess": 30
+            "name": "nom_elemen2",
+            "opacity": 1,
+            "color": "#ffffff",
+            "emissive": "#ffffff",
+            "specular": "#ffffff",
+            "shininess": 30,
+            "texture": "./textures/texture.png"
         },{
-            "nom": "nom_elemen3",
-            "Opacity": 1,
-            "Color": "#ffffff",
-            "Emissive": "#ffffff",
-            "Specular": "#ffffff",
-            "Shininess": 30
-        }]
+            "name": "nom_elemen3",
+            "opacity": 1,
+            "color": "#ffffff",
+            "emissive": "#ffffff",
+            "specular": "#ffffff",
+            "shininess": 30,
+            "texture": "./textures/texture.png"
+        }
+    ],
+    "edges" : {
+        "opacity": 1,
+        "color": "#ffffff",
+        "width": 1
+    }
 }
 ```
-
-
 **[Back to the top](#summary)** 
 
 ## First version of the tool
 
 The first version of our tool, based on the iTowns example "collada", is located on a new example  called "VibesObj". To try it, simply run this example on our fork of iTowns, available at [this adress](https://github.com/arnaudgregoire/itowns-style).
-  
+
 This first version provides the following functionalities :
 * Loading an OBJ model, create a mesh, display it on the globe and display its edges.
 * Modifying the style of the mesh thanks to a user interface (made with dat.gui).
@@ -201,7 +214,7 @@ A tool for saving the current style is currently being implemented, and should b
 ## Next work
 
 The next step of the work will consist in generalizing our tool by setting up the architecture described above (right now, our tests are only located into one example). We also plan on implementing more parameters, similar to those in PLU++, and finalize the saving and loading functionalities.  
-  
+
 Another issue concerns the geolocation of .obj files and how that would work : this will be discussed next week.
 
 **[Back to the top](#summary)** 

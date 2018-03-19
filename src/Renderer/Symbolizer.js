@@ -1,3 +1,4 @@
+/* eslint no-eval: 0 */
 /**
  * Tool to apply 3D stylization on a mesh
  */
@@ -18,51 +19,88 @@ function Symbolizer(view, obj, edges, menu) {
     this.applyStyle();
 }
 
-Symbolizer.prototype.applyStyle = function applyStyle(style = null) {
+Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = null) {
     var i;
-    if (style && style.styles) {
-        // Apply given style to each child
-        for (i = 0; i < this.obj.children.length; i++) {
-            var name = this.obj.children[i].name;
-            var j = 0;
-            while (j < style.styles.length && style.styles[j].name != name) {
-                j++;
+    var j;
+    var k;
+    if (style && style.faces[0].name) {
+        // Update GUI
+        var count = 0;
+        folder.__controllers[2].setValue(style.edges.color);
+        folder.__controllers[3].setValue(style.edges.opacity);
+        folder.__controllers[4].setValue(style.edges.width);
+        for (k in folder.__folders) {
+            if (Object.prototype.hasOwnProperty.call(folder.__folders, k)) {
+                folder.__folders[k].__controllers[0].setValue(style.faces[count].opacity);
+                folder.__folders[k].__controllers[1].setValue(style.faces[count].color);
+                folder.__folders[k].__controllers[2].setValue(style.faces[count].emmissive);
+                folder.__folders[k].__controllers[3].setValue(style.faces[count].specular);
+                folder.__folders[k].__controllers[4].setValue(style.faces[count].shininess);
+                folder.__folders[k].__controllers[5].setValue(style.faces[count].texture == null ? '' : style.faces[count].texture);
             }
-            this._changeOpacity(style.styles[j].opacity, i);
-            this._changeColor(style.styles[j].color, i);
-            this._changeEmissive(style.styles[j].emissive, i);
-            this._changeSpecular(style.styles[j].specular, i);
-            this._changeShininess(style.styles[j].shininess, i);
-            this._changeColorEdge(style.styles[j].colorEdges, i);
-            this._changeOpacityEdge(style.styles[j].opacityEdges, i);
-            if (style.styles[j].texture != null) this._changeTexture(style.styles[j].texture);
+            count++;
+        }
+        // Apply given style to each child
+        for (i = 0; i < this.edges.children.length; i++) {
+            this._changeOpacityEdge(style.edges.opacity, i);
+            this._changeColorEdge(style.edges.color, i);
+            this._changeWidthEdge(style.edges.width, i);
+        }
+        for (j = 0; j < this.obj.children.length; j++) {
+            var name = this.obj.children[j].name;
+            var h = 0;
+            while (h < style.faces.length && style.faces[h].name != name) {
+                h++;
+            }
+            this._changeOpacity(style.faces[h].opacity, j);
+            this._changeColor(style.faces[h].color, j);
+            this._changeEmissive(style.faces[h].emissive, j);
+            this._changeSpecular(style.faces[h].specular, j);
+            this._changeShininess(style.faces[h].shininess, j);
+            if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, j);
         }
     }
-    else if (style && style.style) {
+    else if (style && style.faces.length == 1) {
+        // Update GUI
+        folder.__controllers[2].setValue(style.edges.color);
+        folder.__controllers[3].setValue(style.edges.opacity);
+        folder.__controllers[4].setValue(style.edges.width);
+        folder.__controllers[5].setValue(style.faces[0].opacity);
+        folder.__controllers[6].setValue(style.faces[0].color);
+        folder.__controllers[7].setValue(style.faces[0].emmissive);
+        folder.__controllers[8].setValue(style.faces[0].specular);
+        folder.__controllers[9].setValue(style.faces[0].shininess);
+        folder.__controllers[10].setValue(style.faces[0].texture == null ? '' : style.faces[0].texture);
         // Apply given style to all children
-        for (i = 0; i < this.obj.children.length; i++) {
-            this._changeOpacity(style.style.opacity, i);
-            this._changeColor(style.style.color, i);
-            this._changeEmissive(style.style.emissive, i);
-            this._changeSpecular(style.style.specular, i);
-            this._changeShininess(style.style.shininess, i);
-            this._changeColorEdge(style.styles.colorEdges, i);
-            this._changeOpacityEdge(style.style.opacityEdges, i);
-            if (style.style.texture != null) this._changeTexture(style.style.texture);
+        for (i = 0; i < this.edges.children.length; i++) {
+            this._changeOpacityEdge(style.edges.opacity, i);
+            this._changeColorEdge(style.edges.color, i);
+            this._changeWidthEdge(style.edges.width, i);
+        }
+        for (j = 0; j < this.obj.children.length; j++) {
+            this._changeOpacity(style.faces[0].opacity, j);
+            this._changeColor(style.faces[0].color, j);
+            this._changeEmissive(style.faces[0].emissive, j);
+            this._changeSpecular(style.faces[0].specular, j);
+            this._changeShininess(style.faces[0].shininess, j);
+            if (style.faces.texture != null) this._changeTexture(style.faces.texture, j);
         }
     }
     else {
         // Apply default style
-        for (i = 0; i < this.obj.children.length; i++) {
-            var color = getRandomColor();
-            this._changeOpacity(1, i);
-            this._changeColor(color, i);
-            this._changeEmissive(color, i);
-            this._changeSpecular(color, i);
-            this._changeShininess(30, i);
-            this._changeColorEdge('#000000', i);
+        for (i = 0; i < this.edges.children.length; i++) {
             this._changeOpacityEdge(1, i);
-            // no texture
+            this._changeColorEdge('#000000', i);
+            this._changeWidthEdge(1, i);
+        }
+        for (j = 0; j < this.obj.children.length; j++) {
+            var color = getRandomColor();
+            this._changeOpacity(1, j);
+            this._changeColor(color, j);
+            this._changeEmissive(color, j);
+            this._changeSpecular(color, j);
+            this._changeShininess(30, j);
+            // No texture
         }
     }
 };
@@ -116,14 +154,63 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, index) {
         var texture = new THREE.TextureLoader().load(chemin);
         texture.wrapS = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
-        this.obj.children[index].material = new THREE.MeshPhongMaterial({ map: texture });
+        var meshshininess = this.obj.children[index].material.shininess;
+        var meshspecular = this.obj.children[index].material.specular;
+        var meshemissive = this.obj.children[index].material.emissive;
+        var meshcolor = this.obj.children[index].material.color;
+        var meshopacity = this.obj.children[index].material.opacity;
+        this.obj.children[index].material = new THREE.MeshPhongMaterial({ map: texture, color: meshcolor, emissive: meshemissive, specular: meshspecular, shininess: meshshininess, opacity: meshopacity, transparent: true });
         this.obj.children[index].material.needsUpdate = true;
         this.view.notifyChange(true);
     } else {
         this.obj.children[index].material.map = null;
         this.obj.children[index].material.needsUpdate = true;
-        this.obj.children[index].material.map.needsUpdate = true;
         this.view.notifyChange(true);
+    }
+};
+
+
+Symbolizer.prototype._changeEdgeTexture = function _changeTextureSketchy(chemin) {
+    var vertex = 
+    `attribute vec3  position2;
+    uniform   vec2  resolution;`
+    .concat(getSourceSynch('shaders/sketchy_strokes_pars_vert.glsl'))
+    .concat(`
+    void main()
+    {
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+    vec4 Position2 = projectionMatrix *modelViewMatrix *vec4(position2,1.0);
+    vec2 normal = normalize((gl_Position.xy/gl_Position.w - Position2.xy/Position2.w) * resolution);
+    normal = uv.x * uv.y * vec2(-normal.y, normal.x);
+    if (length((gl_Position.xyz+Position2.xyz)/2.0)>25.0){gl_Position.xy += 25.0*(width/length((gl_Position.xyz+Position2.xyz)/2.0)) * gl_Position.w * normal * 2.0 / resolution;}
+    else {gl_Position.xy += width * gl_Position.w * normal * 2.0 / resolution;}
+    `)
+    .concat(getSourceSynch('shaders/sketchy_strokes_vert.glsl'))
+    .concat('}');
+
+    var fragment = getSourceSynch('shaders/sketchy_strokes_frag.glsl');
+    var shader = 'sketchy_strokes';
+    var color = new THREE.Color(getRandomColor());
+    var width = 5;
+    var texture1 = new THREE.TextureLoader().load('strokes/'.concat('brush').concat('_small.png'));
+    var texture2 = new THREE.TextureLoader().load('strokes/'.concat('brush').concat('.png'));
+
+    var material = new THREE.ShaderMaterial({
+        vertexShader: vertex,
+        fragmentShader: fragment,
+        uniforms:
+        {
+            width: { type: 'f', value: width },
+            resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            texture1: { type: 't', value: texture1 },
+            image: { type: 't', value: texture2 },
+            color: { type: 'v3', value: [color.r, color.g, color.b] },
+        },
+    });
+    material.side = THREE.DoubleSide;
+
+    for (var i = 0; i < this.edges.children.length; i++) {
+        this.edges.children[i].material = material;
     }
 };
 
@@ -133,30 +220,36 @@ Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, index) {
     this.view.notifyChange(true);
 };
 
-// More parameters...
-
 Symbolizer.prototype._saveVibes = function saveVibes() {
-    var vibes = { styles: [] };
+    // Initiate stylesheet with edge style and an empty list for face style
+    var vibes = {
+        edges: {
+            opacity: this.edges.children[0].material.opacity,
+            color: this.edges.children[0].material.color,
+            width: this.edges.children[0].material.linewidth,
+        },
+        faces: [] };
     for (var i = 0; i < this.obj.children.length; i++) {
+        // Get the texture path
         var textureUse = null;
         if (this.obj.children[i].material.map != null) {
             var textureUsetab = this.obj.children[i].material.map.image.src.split('/');
             var j = 0;
-            while (i < textureUsetab.length && textureUsetab[j] != 'textures') i++;
+            while (j < textureUsetab.length && textureUsetab[j] != 'textures') j++;
             textureUse = '.';
             while (j < textureUsetab.length) {
-                textureUse.concat('/', textureUsetab[j]);
+                textureUse = textureUse.concat('/', textureUsetab[j]);
+                j++;
             }
         }
-        vibes.styles.push({
+        // Push each face style in the list
+        vibes.faces.push({
             name: this.obj.children[i].name,
             opacity: this.obj.children[i].material.opacity,
             color: this.obj.children[i].material.color.getHex(),
             emissive: this.obj.children[i].material.emissive.getHex(),
             specular: this.obj.children[i].material.specular.getHex(),
             shininess: this.obj.children[i].material.shininess,
-            colorEdges: this.edges.children[i].material.color,
-            opacityEdges: this.edges.children[i].material.opacity,
             texture: textureUse,
         });
     }
@@ -164,9 +257,9 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
     FILE.saveAs(blob, this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4).concat('.vibes'));
 };
 
-Symbolizer.prototype._readVibes = function readVibes(file) {
+Symbolizer.prototype._readVibes = function readVibes(file, folder) {
     var reader = new FileReader();
-    reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result)), false);
+    reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
     reader.readAsText(file);
 };
 
@@ -202,7 +295,9 @@ Symbolizer.prototype._addTexture = function addTexture(folder, index) {
     Fetcher.json('./textures/listeTexture.json').then((listTextures) => {
         if (listTextures) {
             listTextures[''] = '';
-            folder.add({ texture: '' }, 'texture', listTextures).onChange(value => this._changeTexture('./textures/'.concat(value), index));
+            folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
+                this._changeTexture('./textures/'.concat(value), index);
+            });
         }
     });
 };
@@ -217,7 +312,7 @@ Symbolizer.prototype._addLoad = function addLoad(folder) {
     folder.add({ load: () => {
         var button = document.createElement('input');
         button.setAttribute('type', 'file');
-        button.addEventListener('change', () => this._readVibes(button.files[0]), false);
+        button.addEventListener('change', () => this._readVibes(button.files[0], folder), false);
         button.click();
     } }, 'load');
 };
@@ -229,6 +324,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
     this._addColorEdgeAll(parentFolder);
     this._addOpacityEdgeAll(parentFolder);
     this._addWidthEdgeAll(parentFolder);
+    this._addEdgeTextureAll(parentFolder);
     for (var i = 0; i < this.obj.children.length; i++) {
         var folder = parentFolder.addFolder(this.obj.children[i].name);
         this._addOpacity(folder, i);
@@ -326,6 +422,17 @@ Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
     });
 };
 
+Symbolizer.prototype._addEdgeTextureAll = function addEdgeTextureAll(folder, index) {
+    Fetcher.json('./textures/listeEdgeTexture.json').then((listTextures) => {
+        if (listTextures) {
+            listTextures[''] = '';
+            folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
+                this._changeEdgeTexture('./textures/'.concat(value), index);
+            });
+        }
+    });
+};
+
 Symbolizer.prototype.initGuiAll = function addToGUI() {
     var folder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     this._addSave(folder);
@@ -339,6 +446,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addColorEdgeAll(folder);
     this._addOpacityEdgeAll(folder);
     this._addWidthEdgeAll(folder);
+    this.addEdgeTextureAll(folder);
 };
 
 
@@ -349,6 +457,19 @@ function getRandomColor() {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+}
+
+function getSourceSynch(url) {
+    var req = new XMLHttpRequest();
+    req.open('GET', url, false);
+    req.send();
+    return req.responseText;
+}
+
+function getMethod(shader) {
+    var text = getSourceSynch('./methods/'.concat(shader).concat('.json'));
+    var method = JSON.parse(text);
+    return method;
 }
 
 export default Symbolizer;
