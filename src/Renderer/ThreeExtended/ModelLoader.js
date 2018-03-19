@@ -2,8 +2,9 @@
  * A loader for 3D model of diverse formats
  */
 
-import * as THREE from 'three';
 import * as OBJLoader from 'three-obj-loader';
+import * as THREE from 'three';
+import * as TDSLoader from './TDSLoader2';
 
 OBJLoader(THREE);
 
@@ -67,6 +68,16 @@ ModelLoader.prototype._placeModel = function placeModel(obj, coord, rotateX, rot
     obj.rotateZ(rotateZ);
     obj.scale.set(scale, scale, scale);
     return obj;
+};
+
+ModelLoader.prototype.load3DS = function load3DS(url) {
+    var loader = new TDSLoader();
+    loader.load(url, (object) => {
+        /* object.traverse((child) => {
+            if (child instanceof THREE.Mesh) child.material.normalMap = 'normal';
+        }); */
+        this.view.scene.add(object);
+    });
 };
 
 export default ModelLoader;
