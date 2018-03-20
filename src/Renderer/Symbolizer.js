@@ -170,7 +170,7 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, i, j) {
         var meshemissive = this.obj[i].children[j].material.emissive;
         var meshcolor = this.obj[i].children[j].material.color;
         var meshopacity = this.obj[i].children[j].material.opacity;
-        this.obj[i].children[j].material = new THREE.MeshPhongMaterial({ map: texture, color: meshcolor, emissive: meshemissive, specular: meshspecular, shininess: meshshininess, opacity: meshopacity, transparent: true });
+        this.obj[i].children[j].material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide, map: texture, color: meshcolor, emissive: meshemissive, specular: meshspecular, shininess: meshshininess, opacity: meshopacity, transparent: true });
         this.obj[i].children[j].material.needsUpdate = true;
         this.view.notifyChange(true);
     } else {
