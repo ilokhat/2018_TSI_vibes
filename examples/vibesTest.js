@@ -14,7 +14,12 @@ var viewerDiv = document.getElementById('viewerDiv');
 // Instanciate iTowns GlobeView*
 var globeView = new itowns.GlobeView(viewerDiv, positionOnGlobe);
 
+// GUI initialization
 var menuGlobe = new GuiTools('menuDiv');
+var guiInitialized = false;
+var layerFolder = menuGlobe.gui.addFolder('Layer management');
+var listLayers = [];
+var nbSymbolizer = 0;
 
 var promiseElevation = [];
 
@@ -48,10 +53,19 @@ var rotateZ = 0;
 var scale = 300;
 
 // Symbolizer
-var initSymbolizer = function initSymbolizer(model, menuGlobe) {
-    var object = model[0];
-    var edges = model[1];
-    var symbolizer = new itowns.Symbolizer(globeView, object, edges, menuGlobe);
+var initSymbolizer = function initSymbolizer(listLayers, menuGlobe) {
+    // Merge elements of the list as one group
+    var listObj = [];
+    var listEdge = [];
+    var obj;
+    var edge;
+    listLayers.forEach((layer) => {
+        listObj.push(layer[0]);
+        listEdge.push(layer[1]);
+    })
+    // Call Symbolizer
+    nbSymbolizer++;
+    var symbolizer = new itowns.Symbolizer(globeView, listObj, listEdge, menuGlobe, nbSymbolizer);
     symbolizer.initGui();
 }
 
@@ -63,9 +77,31 @@ function readFile(file) {
     let reader = new FileReader();
     reader.addEventListener('load', () => {
         // Load object
-        loader.loadOBJ(reader.result, coord, rotateX, rotateY, rotateZ, scale, initSymbolizer, menuGlobe);
+        loader.loadOBJ(reader.result, coord, rotateX, rotateY, rotateZ, scale, handleLayer, menuGlobe);
     }, false);
     reader.readAsDataURL(file);
+}
+
+// Layer management
+function handleLayer(model, menuGlobe) {
+    // Add a checkbox to the GUI, named after the layer
+    layerFolder.add({ Layer: false }, 'Layer').name(model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4)).onChange((checked) => {
+        if(checked){
+            // Add layer to the list
+            listLayers.push(model);
+        }
+        else{
+            // Remove layer from the list
+            var i = listLayers.indexOf(model);
+            if(i != -1) {
+                listLayers.splice(i, 1);
+            } 
+        }
+    }); 
+    if(!guiInitialized){
+        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, menuGlobe) }, 'symbolizer').name('Open symbolizer');
+    }
+    guiInitialized = true;
 }
 
 // Drag and drop
