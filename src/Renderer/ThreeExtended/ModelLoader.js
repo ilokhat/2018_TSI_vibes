@@ -2,8 +2,9 @@
  * A loader for 3D model of diverse formats
  */
 
-import * as THREE from 'three';
 import * as OBJLoader from 'three-obj-loader';
+import * as THREE from 'three';
+import TDSLoader from './TDSLoader';
 
 OBJLoader(THREE);
 
@@ -33,6 +34,8 @@ ModelLoader.prototype._loadModel = function loadModel(obj, coord, rotateX, rotat
     // Set camera layer not to disturb the picking
     obj.traverse(obj => obj.layers.set(objID));
     this.view.camera.camera3D.layers.enable(objID);
+    var lines = new THREE.Group();
+    this.view.notifyChange(true);
 
     for (var i = 0; i < obj.children.length; i++) {
         // Material initialization
@@ -73,6 +76,19 @@ ModelLoader.prototype._placeModel = function placeModel(obj, coord, rotateX, rot
     obj.rotateZ(rotateZ);
     obj.scale.set(scale, scale, scale);
     return obj;
+};
+
+ModelLoader.prototype.load3DS = function load3DS(url) {
+    var loader = new TDSLoader();
+    loader.load(url, (object) => {
+        console.log('on load');
+        /* object.traverse((child) => {
+            if (child instanceof THREE.Mesh) child.material.normalMap = 'normal';
+        }); */
+        this.view.scene.add(object);
+        this.view.notifyChange(true);
+        console.log(object);
+    });
 };
 
 export default ModelLoader;
