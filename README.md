@@ -36,12 +36,12 @@ This project will be carried out in March and April 2018 by a group of seven stu
 ### Previsional backlog 
 
 The previsional planning is the following :
-* **Sprint 1** : analysis, conception, first version of the tool.
-* **Sprint 2** : architecture set-up, definition of the 3D style, saving and loading.
-* **Sprint 3** : implementation of new parameters including textures on faces and edges.
-* **Sprint 4** : diversification of input formats, geolocation.
+* **Sprint 1** : analysis, conception, first version of the tool, CI/CD.
+* **Sprint 2** : architecture set-up, definition of the 3D style with basic parameters + texture on faces, saving and loading.
+* **Sprint 3** : adaptation of the architecture to stylize several objects, application of a texture on edges, diversification of input formats (Bati3D, BDTopo).
+* **Sprint 4** : diversification of input formats, geolocation, layer management.
 * **Sprint 5** : advanced parameters including light, shadows, cameras.
-* **Sprint 6** : experimentation of existing and new render techniques (default styles, typical, sketchy...)
+* **Sprint 6** : advanced parameters including edge stylization and advanced texturation.
 * **Sprint 7** : finalization, reports, presentation.  
   
 ### Management tools
@@ -88,9 +88,10 @@ There are two sorts of buildings :
 
 #### Structure of the code
 
-The main code is divided into 4 files, as follow :
+The main code is divided into 5 files, as follow :
 
 * **rendu.html** : contains the main work.
+* **fonctions_gui.js** : contains main functions for file loading, GUI initialization and update.
 * **fonctions_load.js** : contains the utils functions to load 3D files.
 * **fonctions_sliders.js** : contains the utils functions to handle the sliders.
 * **fonctions.js** : contains other utils functions
@@ -104,15 +105,13 @@ The main code is divided into 4 files, as follow :
 4. Event listeners are created on the GUI : each change will be repercuted directly on the materials previously created (for the context) or on each vertice created (for the focus).
 5. OBJ models are loaded with the current material.
 
-#### Problems met with this code
+#### Possible ameliorations
 
-Although the PLU++ project successes in creating an easy-to-use interface to dynamically change the stylization of 3D objects through various parameters, its implementation has some limitations : 
-* The tool seems to works only with the one set of buildings used as an example. It is not clear whether other datasets can be used as input. However, it would be more interesting to create a more generic stylization tool, to be applied on any 3D objects.
-* The tool does not define a clear structure for a stylesheet (only a JSON file to initialize the GUI parameters).
-* Finally, the code is not documented, hardly commented, and not well indented. This makes it difficult to read and to re-use.
+Although the PLU++ project successes in creating an easy-to-use interface to dynamically change the stylization of 3D objects through various parameters, its implementation has some limitations. Particularly, its structure does not clearly separate the 3D geometry and the stylization itself.
 
 However, it provides a helpful set of functions that can be re-use in our project, particularly for edges extraction and texture application.
 
+Therefore, the idea of our project is to re-make the concept of PLU2PLUS inside the iTowns structure, but in a more generic way so it can be re-used and re-adapted more easily.
 
 **[Back to the top](#summary)** 
 
@@ -124,7 +123,11 @@ The architecture of our project must be included in iTowns. The following schema
 
 ![archi_itowns](VIBES/itowns_archi2.png)
 
-The goal is to make this tool as general as possible, which means it must not depend on just one example (the main flaw with PLU++). On the contrary, it should be usable on any example containing a 3D object on an instance of the globe, as a full-fledged functionality of iTowns. Therefore, we will create a new class Symbolizer, which will manage the menu and the 3D render. We will also extend the loading functionalities of iTowns in order to handle .obj files and other formats.
+The goal is to make this tool as general as possible, which means it must not depend on just one example. On the contrary, it should be usable on any example containing a 3D object on an instance of the globe, as a full-fledged functionality of iTowns. Therefore, we will create a new class Symbolizer, which will manage the menu and the 3D render. We will also extend the loading functionalities of iTowns in order to handle .obj files and other formats, using a new class called ModelLoader.
+
+The final architecture is the following :
+
+(add image)
 
 
 ### 3D stylization process
@@ -136,29 +139,36 @@ The 3D stylization will be done according to the following activity diagram :
 
 ### Style format
 
-Mesh style:
+Generic style :
 
 ```json
 {
-    "faces": [{
-        "Opacity": 1,
-        "Color": "ffffff",
-        "Emissive": "ffffff",
-        "Specular": "ffffff",
-        "Shininess": 30,
-        "texture": "./textures/texture.png"
-    }],
     "edges" : {
         "opacity": 1,
         "color": "#ffffff",
         "width": 1
     }
+    "faces": [{
+        "opacity": 1,
+        "color": "ffffff",
+        "emissive": "ffffff",
+        "specular": "ffffff",
+        "shininess": 30,
+        "texture": "./textures/texture.png"
+    }],
+    
 }
-```
-Group style:
+```  
+  
+Syle format for a complex object with several meshes, all defined by a name :
 
 ```json
 {
+    "edges" : {
+            "opacity": 1,
+            "color": "#ffffff",
+            "width": 1
+    },
     "faces": [ 
         {
             "name": "nom_elemen1",
@@ -185,12 +195,7 @@ Group style:
             "shininess": 30,
             "texture": "./textures/texture.png"
         }
-    ],
-    "edges" : {
-        "opacity": 1,
-        "color": "#ffffff",
-        "width": 1
-    }
+    ]
 }
 ```
 **[Back to the top](#summary)** 

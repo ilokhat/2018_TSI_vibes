@@ -1,3 +1,4 @@
+/* eslint no-eval: 0 */
 /**
  * Tool to apply 3D stylization on a mesh
  */
@@ -59,7 +60,6 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                 this._changeEmissive(style.faces[h].emissive, i, j);
                 this._changeSpecular(style.faces[h].specular, i, j);
                 this._changeShininess(style.faces[h].shininess, i, j);
-                console.log(style.faces[h].texture);
                 if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, i, j);
             }
         }
@@ -442,6 +442,17 @@ Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
     });
 };
 
+Symbolizer.prototype._addEdgeTextureAll = function addEdgeTextureAll(folder, index) {
+    Fetcher.json('./textures/listeEdgeTexture.json').then((listTextures) => {
+        if (listTextures) {
+            listTextures[''] = '';
+            folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
+                this._changeEdgeTexture('./textures/'.concat(value), index);
+            });
+        }
+    });
+};
+
 Symbolizer.prototype.initGuiAll = function addToGUI() {
     // var folder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     var folder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
@@ -456,6 +467,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addColorEdgeAll(folder);
     this._addOpacityEdgeAll(folder);
     this._addWidthEdgeAll(folder);
+    // this.addEdgeTextureAll(folder);
 };
 
 Symbolizer.prototype._checkStructure = function checkStructure() {
@@ -496,6 +508,19 @@ function getRandomColor() {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+}
+
+function getSourceSynch(url) {
+    var req = new XMLHttpRequest();
+    req.open('GET', url, false);
+    req.send();
+    return req.responseText;
+}
+
+function getMethod(shader) {
+    var text = getSourceSynch('./methods/'.concat(shader).concat('.json'));
+    var method = JSON.parse(text);
+    return method;
 }
 
 export default Symbolizer;
