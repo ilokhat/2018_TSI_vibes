@@ -34,7 +34,6 @@ ModelLoader.prototype._loadModel = function loadModel(obj, coord, rotateX, rotat
     // Set camera layer not to disturb the picking
     obj.traverse(obj => obj.layers.set(objID));
     this.view.camera.camera3D.layers.enable(objID);
-    var lines = new THREE.Group();
     this.view.notifyChange(true);
 
     for (var i = 0; i < obj.children.length; i++) {
