@@ -1,4 +1,4 @@
-
+var symbolizer = itowns.Symbolizer.prototype ;
 var f = new File([""], "filename.text", {type: "text/plain"})
 
 describe('readFile()', function () {
@@ -23,6 +23,12 @@ describe('readFile()', function () {
 });
 
 
+describe("symbolizer.zero()",function() {
+  console.log("eeeeeeeeeeee", itowns.Symbolizer);
+it("example test unitaire symbolizer",function() {
+  chai.expect(  symbolizer.zero(5) ).to.equal(0);
+});
+});
 var mesh ;
 /*
 describe('readVibes()', function () {

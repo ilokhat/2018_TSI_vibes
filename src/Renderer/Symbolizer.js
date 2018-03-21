@@ -500,6 +500,10 @@ Symbolizer.prototype._checkStructure = function checkStructure() {
     return true;
 };
 
+Symbolizer.prototype.zero = function zero() {
+    return 0;
+  };
+
 
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
