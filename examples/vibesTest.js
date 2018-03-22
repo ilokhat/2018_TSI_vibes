@@ -47,11 +47,11 @@ promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/IGN_MNT_HIGHRES.j
 
 // Object parameters, 48.848340,
 
-var coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 0);
+var coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 50);
 var rotateX = Math.PI/2;
 var rotateY = 0;
 var rotateZ = 0;
-var scale = 1;
+var scale = 300;
 
 // Symbolizer
 var initSymbolizer = function initSymbolizer(listLayers, menuGlobe) {
