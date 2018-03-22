@@ -333,7 +333,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
     else {
         this.initGuiAll();
     }
-    
+
 };
 
 Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
@@ -505,7 +505,7 @@ Symbolizer.prototype.zero = function zero() {
   };
 
 
-function getRandomColor() {
+export function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
     for (var i = 0; i < 6; i++) {
@@ -514,14 +514,14 @@ function getRandomColor() {
     return color;
 }
 
-function getSourceSynch(url) {
+export function getSourceSynch(url) {
     var req = new XMLHttpRequest();
     req.open('GET', url, false);
     req.send();
     return req.responseText;
 }
 
-function getMethod(shader) {
+export function getMethod(shader) {
     var text = getSourceSynch('./methods/'.concat(shader).concat('.json'));
     var method = JSON.parse(text);
     return method;
