@@ -210,6 +210,7 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
             }
         }
         // Push each face style in the list
+        console.log(this.obj[0].children[i].material.color.getHex());
         vibes.faces.push({
             name: this.obj[0].children[i].name,
             opacity: this.obj[0].children[i].material.opacity,
@@ -333,7 +334,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
     else {
         this.initGuiAll();
     }
-
+    
 };
 
 Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
@@ -471,41 +472,34 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
 };
 
 Symbolizer.prototype._checkStructure = function checkStructure() {
-    // Reference number of children (for the first object)
-    var refLength = this.obj[0].children.length;
     var i;
-    var j;
-    // We check the other objects
+    // var j;
+    // We check if the objects have the same number of children
     for (i = 0; i < this.obj.length; i++) {
-        if (this.obj[i].children.length != refLength) {
+        if (this.obj[i].children.length != this.obj[0].children.length) {
             // If one object has a different number of children, the function returns false
             return false;
         }
     }
-    // Reference names of children
-    var names = [];
-    for (j = 0; j < length; j++) {
-        names.push(this.obj[0].children.name);
-    }
-    // We check the other objects
+    /*
+    // We check if the children have the same name (in the right order)
     for (i = 0; i < this.obj.length; i++) {
         for (j = 0; this.obj[i].children.length; j++) {
             // If one child of one object has a different name, the function returns false
-            if (this.obj[i].children[j].name != names[j]) {
+            console.log(this.obj[0].children[j].name);
+            console.log(this.obj[i].children[j].name);
+            if (this.obj[0].children[j].name !== this.obj[i].children[j].name) {
                 return false;
             }
         }
-    }
+
+    */
     // If everything is ok, the function returns true
     return true;
 };
 
-Symbolizer.prototype.zero = function zero() {
-    return 0;
-  };
 
-
-export function getRandomColor() {
+function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
     for (var i = 0; i < 6; i++) {
@@ -514,14 +508,14 @@ export function getRandomColor() {
     return color;
 }
 
-export function getSourceSynch(url) {
+function getSourceSynch(url) {
     var req = new XMLHttpRequest();
     req.open('GET', url, false);
     req.send();
     return req.responseText;
 }
 
-export function getMethod(shader) {
+function getMethod(shader) {
     var text = getSourceSynch('./methods/'.concat(shader).concat('.json'));
     var method = JSON.parse(text);
     return method;

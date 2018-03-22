@@ -29,12 +29,13 @@ ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, r
 ModelLoader.prototype._loadModel = function loadModel(obj, coord, rotateX, rotateY, rotateZ, scale) {
     var objID = this.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
     obj = this._placeModel(obj, coord, rotateX, rotateY, rotateZ, scale);
-    var lines = new THREE.Group();
 
     // Set camera layer not to disturb the picking
     obj.traverse(obj => obj.layers.set(objID));
     this.view.camera.camera3D.layers.enable(objID);
     this.view.notifyChange(true);
+
+    var lines = new THREE.Group();
 
     for (var i = 0; i < obj.children.length; i++) {
         // Material initialization
