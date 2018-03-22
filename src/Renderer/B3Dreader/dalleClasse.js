@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import gfxEngine from './gfxEngine';
 import B3DLoader from './lib/B3DLoader';
-import { Shader } from './Shader';
+import Shader from './Shader';
 
 function dalleClasse(glob) {
     this.dataURL = '';
