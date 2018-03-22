@@ -454,7 +454,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
 Symbolizer.prototype.zero = function zero(x) {
   return 0;
 };
- function getRandomColor() {
+export function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
     for (var i = 0; i < 6; i++) {
@@ -463,14 +463,14 @@ Symbolizer.prototype.zero = function zero(x) {
     return color;
 }
 
- function getSourceSynch(url) {
+export function getSourceSynch(url) {
     var req = new XMLHttpRequest();
     req.open('GET', url, false);
     req.send();
     return req.responseText;
 }
 
- function getMethod(shader) {
+export function getMethod(shader) {
     var text = getSourceSynch('./methods/'.concat(shader).concat('.json'));
     var method = JSON.parse(text);
     return method;
