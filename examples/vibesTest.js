@@ -54,7 +54,7 @@ var rotateZ = 0;
 var scale = 300;
 
 // Symbolizer
-var initSymbolizer = function initSymbolizer(listLayers, menuGlobe) {
+var initSymbolizer = function initSymbolizer(listLayers, menuGlobe, complex) {
     // Merge elements of the list as one group
     var listObj = [];
     var listEdge = [];
@@ -67,7 +67,13 @@ var initSymbolizer = function initSymbolizer(listLayers, menuGlobe) {
     // Call Symbolizer
     nbSymbolizer++;
     var symbolizer = new itowns.Symbolizer(globeView, listObj, listEdge, menuGlobe, nbSymbolizer);
-    symbolizer.initGui();
+    if (complex) {
+        symbolizer.initGui();
+    }
+    else {
+        symbolizer.initGuiAll();
+    }
+    
 }
 
 // Loader initialization
@@ -91,6 +97,10 @@ function readFile(file) {
 // Layer management
 function handleLayer(model, menuGlobe) {
     // Add a checkbox to the GUI, named after the layer
+    if(!guiInitialized){
+        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, menuGlobe, false) }, 'symbolizer').name('Stylize object...');
+        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, menuGlobe, true) }, 'symbolizer').name('Stylize parts...');
+    }
     layerFolder.add({ Layer: false }, 'Layer').name(model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4)).onChange((checked) => {
         if(checked){
             // Add layer to the list
@@ -104,9 +114,6 @@ function handleLayer(model, menuGlobe) {
             } 
         }
     }); 
-    if(!guiInitialized){
-        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, menuGlobe) }, 'symbolizer').name('Open symbolizer');
-    }
     guiInitialized = true;
 }
 
