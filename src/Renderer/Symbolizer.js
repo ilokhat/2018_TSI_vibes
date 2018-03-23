@@ -60,7 +60,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                 this._changeEmissive(style.faces[h].emissive, i, j);
                 this._changeSpecular(style.faces[h].specular, i, j);
                 this._changeShininess(style.faces[h].shininess, i, j);
-                if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, i, j);
+                if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, i, j, folder.__folders.Faces);
             }
         }
     }
@@ -90,7 +90,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                 this._changeEmissive(style.faces[0].emissive, i, j);
                 this._changeSpecular(style.faces[0].specular, i, j);
                 this._changeShininess(style.faces[0].shininess, i, j);
-                if (style.faces.texture != null) this._changeTexture(style.faces.texture, i, j);
+                if (style.faces.texture != null) this._changeTexture(style.faces.texture, i, j, folder.__folders.Faces);
             }
         }
     }
@@ -161,10 +161,23 @@ Symbolizer.prototype._changeShininess = function changeShininess(value, i, j) {
     this.view.notifyChange(true);
 };
 
-Symbolizer.prototype._changeTexture = function changeTexture(chemin, i, j) {
+Symbolizer.prototype._changeTexture = function changeTexture(chemin, i, j, folder) {
+
     if (chemin != './textures/') {
+        var isTextured = false;
+        console.log(folder);
+        for (let k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'textureRepetition') {
+                isTextured = true;
+            }
+        }
+        if (!isTextured) {
+            folder.add({ textureRepetition: 1 }, 'textureRepetition', 0.1, 5).name('Texture Repetition').onChange((value) => {
+                this._changetextureRepetition(value, i, j);
+            });
+        }
         var texture = new THREE.TextureLoader().load(chemin);
-        texture.wrapS = THREE.RepeatWrapping;
+        texture.textureRepetition = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
         var meshshininess = this.obj[i].children[j].material.shininess;
         var meshspecular = this.obj[i].children[j].material.specular;
@@ -174,10 +187,62 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, i, j) {
         this.obj[i].children[j].material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide, map: texture, color: meshcolor, emissive: meshemissive, specular: meshspecular, shininess: meshshininess, opacity: meshopacity, transparent: true });
         this.obj[i].children[j].material.needsUpdate = true;
         this.view.notifyChange(true);
+        
     } else {
+        for (let k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'textureRepetition') {
+                folder.remove(folder.__controllers[k]);
+            }
+        }
         this.obj[i].children[j].material.map = null;
         this.obj[i].children[j].material.needsUpdate = true;
         this.view.notifyChange(true);
+    }
+};
+
+Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, i, folder) {
+
+    if (chemin != './textures/') {
+        var isTextured = false;
+        console.log(folder);
+        for (let k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'textureRepetition') {
+                isTextured = true;
+            }
+        }
+        if (!isTextured) {
+            folder.add({ textureRepetition: 1 }, 'textureRepetition', 0.1, 5).name('Texture Repetition').onChange((value) => {
+                for (let j = 0; j < this.obj[i].children.length; j++) {
+                    this._changetextureRepetition(value, i, j); 
+                }
+            });
+        }
+        for (let j = 0; j < this.obj[i].children.length; j++) {
+            var texture = new THREE.TextureLoader().load(chemin);
+            texture.textureRepetition = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            var meshshininess = this.obj[i].children[j].material.shininess;
+            var meshspecular = this.obj[i].children[j].material.specular;
+            var meshemissive = this.obj[i].children[j].material.emissive;
+            var meshcolor = this.obj[i].children[j].material.color;
+            var meshopacity = this.obj[i].children[j].material.opacity;
+            this.obj[i].children[j].material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide, map: texture, color: meshcolor, emissive: meshemissive, specular: meshspecular, shininess: meshshininess, opacity: meshopacity, transparent: true });
+            this.obj[i].children[j].material.needsUpdate = true;
+            this.view.notifyChange(true);
+        }
+        
+    } else {
+        for (let k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'textureRepetition') {
+                folder.remove(folder.__controllers[k]);
+            }
+        }
+        for (let j = 0; j < this.obj[i].children.length; j++) {
+            this.obj[i].children[j].material.map = null;
+            this.obj[i].children[j].material.needsUpdate = true;
+            this.view.notifyChange(true);
+        }
+
     }
 };
 
@@ -186,6 +251,13 @@ Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, i, j) {
     this.edges[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
+
+Symbolizer.prototype._changetextureRepetition = function changetextureRepetition(value, i, j) {
+    this.obj[i].children[j].material.map.repeat.set(value, value);
+    this.obj[i].children[j].material.needsUpdate = true;
+    this.view.notifyChange(true);
+};
+
 
 Symbolizer.prototype._saveVibes = function saveVibes() {
     // Initiate stylesheet with edge style and an empty list for face style
@@ -321,12 +393,13 @@ Symbolizer.prototype._addTexture = function addTexture(folder, j) {
             listTextures[''] = '';
             folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
                 for (var i = 0; i < this.obj.length; i++) {
-                    this._changeTexture('./textures/'.concat(value), i, j);
+                    this._changeTexture('./textures/'.concat(value), i, j, folder);
                 }
             });
         }
     });
 };
+
 
 // More parameters...
 
@@ -470,14 +543,13 @@ Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
             listTextures[''] = '';
             folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
                 for (var i = 0; i < this.obj.length; i++) {
-                    for (var j = 0; j < this.obj[i].children.length; j++) {
-                        this._changeTexture('./textures/'.concat(value), i, j);
-                    }
+                    this._changeTextureAll('./textures/'.concat(value), i, folder);
                 }
             });
         }
     });
 };
+
 
 Symbolizer.prototype._addEdgeTextureAll = function addEdgeTextureAll(folder, index) {
     Fetcher.json('./textures/listeEdgeTexture.json').then((listTextures) => {

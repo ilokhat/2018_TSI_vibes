@@ -32,3 +32,6 @@ export { default as PlatformInfo } from './Renderer/B3Dreader/lib/PlatformInfo';
 export { default as B3DLoader } from './Renderer/B3Dreader/lib/B3DLoader';
 export { default as dalleClasse } from './Renderer/B3Dreader/dalleClasse';
 export { Shader } from './Renderer/B3Dreader/Shader';
+export { default as clipMap } from './Renderer/B3Dreader/clipMap';
+export { default as Cartography3D } from './Renderer/B3Dreader/Cartography3D';
+export { default as gfxEngine } from './Renderer/B3Dreader/gfxEngine';

@@ -153,3 +153,41 @@ function loadFileException(message) {
     this.message = message;
     this.name = "loadFileException";
  }
+
+
+var options = {
+    images: {
+        url: "images/{YYMMDD}/Paris-{YYMMDD}_0740-{cam.id}-00001_{pano.id:07}.jpg",
+        cam: "cameraCalibration.json",
+        pano: "panoramicsMetaData.json",
+        buildings: "buildingFootprint.json",
+        DTM: "dtm.json",
+        YYMMDD: function() {
+            var d = new Date(this.pano.date);
+            return (""+d.getUTCFullYear()).slice(-2) + ("0"+(d.getUTCMonth()+1)).slice(-2) + ("0" + d.getUTCDate()).slice(-2);
+        },
+        UTCOffset: 15,
+        seconds: function() {
+        var d = new Date(this.pano.date);
+            return (d.getUTCHours()*60 + d.getUTCMinutes())*60+d.getUTCSeconds()-this.UTCOffset;
+        },
+        visible: true
+    },
+    pointCloud: { 
+        offset: {x:650000,y:0,z:6860000},
+        delta: 30,
+        url: 'pointclouds/{images.YYMMDD}/{lod}/{id}.bin',
+        bitsPerAttribute: 32,
+        lods: ['LR','HR'],
+        id: function() { return parseInt(10*this.images.seconds()); }
+    },
+    buildings: { url: "./models/Buildings3D/"},
+    position: { x:651182.91,y:39.6,z:6861343.03 }
+};
+
+itowns.gfxEngine.setCamera(globeView.camera.camera3D);
+itowns.gfxEngine.setScene(globeView.scene);
+itowns.gfxEngine.setZero(options.position)
+if (!itowns.Cartography3D.isCartoInitialized()){
+    itowns.Cartography3D.initCarto3D(options.buildings);
+};
