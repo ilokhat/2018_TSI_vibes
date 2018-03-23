@@ -47,14 +47,14 @@ promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/IGN_MNT_HIGHRES.j
 
 // Object parameters, 48.848340,
 
-var coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 0);
+var coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 50);
 var rotateX = Math.PI/2;
 var rotateY = 0;
 var rotateZ = 0;
-var scale = 1;
+var scale = 300;
 
 // Symbolizer
-var initSymbolizer = function initSymbolizer(listLayers, menuGlobe) {
+var initSymbolizer = function initSymbolizer(listLayers, menuGlobe, complex) {
     // Merge elements of the list as one group
     var listObj = [];
     var listEdge = [];
@@ -67,7 +67,13 @@ var initSymbolizer = function initSymbolizer(listLayers, menuGlobe) {
     // Call Symbolizer
     nbSymbolizer++;
     var symbolizer = new itowns.Symbolizer(globeView, listObj, listEdge, menuGlobe, nbSymbolizer);
-    symbolizer.initGui();
+    if (complex) {
+        symbolizer.initGui();
+    }
+    else {
+        symbolizer.initGuiAll();
+    }
+    
 }
 
 // Loader initialization
@@ -91,6 +97,10 @@ function readFile(file) {
 // Layer management
 function handleLayer(model, menuGlobe) {
     // Add a checkbox to the GUI, named after the layer
+    if(!guiInitialized){
+        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, menuGlobe, false) }, 'symbolizer').name('Stylize object...');
+        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, menuGlobe, true) }, 'symbolizer').name('Stylize parts...');
+    }
     layerFolder.add({ Layer: false }, 'Layer').name(model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4)).onChange((checked) => {
         if(checked){
             // Add layer to the list
@@ -104,9 +114,6 @@ function handleLayer(model, menuGlobe) {
             } 
         }
     }); 
-    if(!guiInitialized){
-        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, menuGlobe) }, 'symbolizer').name('Open symbolizer');
-    }
     guiInitialized = true;
 }
 
@@ -135,3 +142,41 @@ function loadFileException(message) {
     this.message = message;
     this.name = "loadFileException";
  }
+
+
+var options = {
+    images: {
+        url: "images/{YYMMDD}/Paris-{YYMMDD}_0740-{cam.id}-00001_{pano.id:07}.jpg",
+        cam: "cameraCalibration.json",
+        pano: "panoramicsMetaData.json",
+        buildings: "buildingFootprint.json",
+        DTM: "dtm.json",
+        YYMMDD: function() {
+            var d = new Date(this.pano.date);
+            return (""+d.getUTCFullYear()).slice(-2) + ("0"+(d.getUTCMonth()+1)).slice(-2) + ("0" + d.getUTCDate()).slice(-2);
+        },
+        UTCOffset: 15,
+        seconds: function() {
+        var d = new Date(this.pano.date);
+            return (d.getUTCHours()*60 + d.getUTCMinutes())*60+d.getUTCSeconds()-this.UTCOffset;
+        },
+        visible: true
+    },
+    pointCloud: { 
+        offset: {x:650000,y:0,z:6860000},
+        delta: 30,
+        url: 'pointclouds/{images.YYMMDD}/{lod}/{id}.bin',
+        bitsPerAttribute: 32,
+        lods: ['LR','HR'],
+        id: function() { return parseInt(10*this.images.seconds()); }
+    },
+    buildings: { url: "./models/Buildings3D/"},
+    position: { x:651182.91,y:39.6,z:6861343.03 }
+};
+
+itowns.gfxEngine.setCamera(globeView.camera.camera3D);
+itowns.gfxEngine.setScene(globeView.scene);
+itowns.gfxEngine.setZero(options.position)
+if (!itowns.Cartography3D.isCartoInitialized()){
+    itowns.Cartography3D.initCarto3D(options.buildings);
+};
