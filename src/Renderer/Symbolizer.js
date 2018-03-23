@@ -342,7 +342,7 @@ Symbolizer.prototype._readVibes = function readVibes(file, folder) {
 
 Symbolizer.prototype._addOpacity = function addOpacity(folder, j) {
     var initialOpacity = this.obj[0].children[j].material.opacity;
-    folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('opacity').onChange((value) => {
+    folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Opacity').onChange((value) => {
         // Iteration over the list of objects
         for (var i = 0; i < this.obj.length; i++) {
             this._changeOpacity(value, i, j);
@@ -352,7 +352,7 @@ Symbolizer.prototype._addOpacity = function addOpacity(folder, j) {
 
 Symbolizer.prototype._addColor = function addColor(folder, j) {
     var initialColor = '#'.concat(this.obj[0].children[j].material.color.getHexString());
-    folder.addColor({ color: initialColor }, 'color').name('color').onChange((value) => {
+    folder.addColor({ color: initialColor }, 'color').name('Color').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             this._changeColor(value, i, j);
         }
@@ -361,7 +361,7 @@ Symbolizer.prototype._addColor = function addColor(folder, j) {
 
 Symbolizer.prototype._addEmissive = function addEmissive(folder, j) {
     var initialEmissive = '#'.concat(this.obj[0].children[j].material.emissive.getHexString());
-    folder.addColor({ emissive: initialEmissive }, 'emissive').name('emissive').onChange((value) => {
+    folder.addColor({ emissive: initialEmissive }, 'emissive').name('Emissive').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             this._changeEmissive(value, i, j);
         }
@@ -371,7 +371,7 @@ Symbolizer.prototype._addEmissive = function addEmissive(folder, j) {
 
 Symbolizer.prototype._addSpecular = function addSpecular(folder, j) {
     var initialSpecular = '#'.concat(this.obj[0].children[j].material.specular.getHexString());
-    folder.addColor({ specular: initialSpecular }, 'specular').name('specular').onChange((value) => {
+    folder.addColor({ specular: initialSpecular }, 'specular').name('Specular').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             this._changeSpecular(value, i, j);
         }
@@ -380,7 +380,7 @@ Symbolizer.prototype._addSpecular = function addSpecular(folder, j) {
 
 Symbolizer.prototype._addShininess = function addShininess(folder, j) {
     var initialShininess = this.obj[0].children[j].material.shininess;
-    folder.add({ shininess: initialShininess }, 'shininess', 0, 100).name('shininess').onChange((value) => {
+    folder.add({ shininess: initialShininess }, 'shininess', 0, 100).name('Shininess').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             this._changeShininess(value, i, j);
         }
@@ -391,11 +391,11 @@ Symbolizer.prototype._addTexture = function addTexture(folder, j) {
     Fetcher.json('./textures/listeTexture.json').then((listTextures) => {
         if (listTextures) {
             listTextures[''] = '';
-            folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
+            folder.add({ texture: '' }, 'Texture', listTextures).onChange((value) => {
                 for (var i = 0; i < this.obj.length; i++) {
                     this._changeTexture('./textures/'.concat(value), i, j, folder);
                 }
-            });
+            }).name('Texture');
         }
     });
 };
@@ -404,7 +404,7 @@ Symbolizer.prototype._addTexture = function addTexture(folder, j) {
 // More parameters...
 
 Symbolizer.prototype._addSave = function addSave(folder) {
-    folder.add({ save: () => this._saveVibes() }, 'save');
+    folder.add({ save: () => this._saveVibes() }, 'save').name('Save style');
 };
 
 Symbolizer.prototype._addLoad = function addLoad(folder) {
@@ -413,7 +413,7 @@ Symbolizer.prototype._addLoad = function addLoad(folder) {
         button.setAttribute('type', 'file');
         button.addEventListener('change', () => this._readVibes(button.files[0], folder), false);
         button.click();
-    } }, 'load');
+    } }, 'load').name('Load style');
 };
 
 Symbolizer.prototype.initGui = function addToGUI() {
@@ -494,7 +494,7 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
 
 Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
     var initialOpacity = this.obj[0].children[0].material.opacity;
-    folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('opacity').onChange((value) => {
+    folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Opacity').onChange((value) => {
         // Iteration over the list of objects
         for (var i = 0; i < this.obj.length; i++) {
             // Iteration over the children of each object
@@ -507,7 +507,7 @@ Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
 
 Symbolizer.prototype._addOpacityEdgeAll = function addOpacityEdgeAll(folder) {
     var initialOpacity = this.edges[0].children[0].material.opacity;
-    folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Edges opacity').onChange((value) => {
+    folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Edge opacity').onChange((value) => {
         for (var i = 0; i < this.edges.length; i++) {
             for (var j = 0; j < this.edges[i].children.length; j++) {
                 this._changeOpacityEdge(value, i, j);
@@ -518,7 +518,7 @@ Symbolizer.prototype._addOpacityEdgeAll = function addOpacityEdgeAll(folder) {
 
 Symbolizer.prototype._addColorAll = function addColorAll(folder) {
     var initialColor = '#'.concat(this.obj[0].children[0].material.color.getHexString());
-    folder.addColor({ color: initialColor }, 'color').name('color').onChange((value) => {
+    folder.addColor({ color: initialColor }, 'color').name('Color').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             for (var j = 0; j < this.obj[i].children.length; j++) {
                 this._changeColor(value, i, j);
@@ -529,7 +529,7 @@ Symbolizer.prototype._addColorAll = function addColorAll(folder) {
 
 Symbolizer.prototype._addColorEdgeAll = function addColorEdgeAll(folder) {
     var initialColor = '#'.concat(this.edges[0].children[0].material.color.getHexString());
-    folder.addColor({ color: initialColor }, 'color').name('Edges color').onChange((value) => {
+    folder.addColor({ color: initialColor }, 'color').name('Edge color').onChange((value) => {
         for (var i = 0; i < this.edges.length; i++) {
             for (var j = 0; j < this.edges[i].children.length; j++) {
                 this._changeColorEdge(value, i, j);
@@ -540,7 +540,7 @@ Symbolizer.prototype._addColorEdgeAll = function addColorEdgeAll(folder) {
 
 Symbolizer.prototype._addEmissiveAll = function addEmissiveAll(folder) {
     var initialEmissive = '#'.concat(this.obj[0].children[0].material.emissive.getHexString());
-    folder.addColor({ emissive: initialEmissive }, 'emissive').name('emissive').onChange((value) => {
+    folder.addColor({ emissive: initialEmissive }, 'emissive').name('Emissive').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             for (var j = 0; j < this.obj[i].children.length; j++) {
                 this._changeEmissive(value, i, j);
@@ -552,7 +552,7 @@ Symbolizer.prototype._addEmissiveAll = function addEmissiveAll(folder) {
 
 Symbolizer.prototype._addSpecularAll = function addSpecularAll(folder) {
     var initialSpecular = '#'.concat(this.obj[0].children[0].material.specular.getHexString());
-    folder.addColor({ specular: initialSpecular }, 'specular').name('specular').onChange((value) => {
+    folder.addColor({ specular: initialSpecular }, 'specular').name('Specular').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             for (var j = 0; j < this.obj[i].children.length; j++) {
                 this._changeSpecular(value, i, j);
@@ -563,7 +563,7 @@ Symbolizer.prototype._addSpecularAll = function addSpecularAll(folder) {
 
 Symbolizer.prototype._addShininessAll = function addShininessAll(folder) {
     var initialShininess = this.obj[0].children[0].material.shininess;
-    folder.add({ shininess: initialShininess }, 'shininess', 0, 100).name('shininess').onChange((value) => {
+    folder.add({ shininess: initialShininess }, 'shininess', 0, 100).name('Shininess').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             for (var j = 0; j < this.obj[i].children.length; j++) {
                 this._changeShininess(value, i, j);
@@ -591,7 +591,7 @@ Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
                 for (var i = 0; i < this.obj.length; i++) {
                     this._changeTextureAll('./textures/'.concat(value), i, folder);
                 }
-            });
+            }).name('Texture');
         }
     });
 };
@@ -603,13 +603,13 @@ Symbolizer.prototype._addEdgeTextureAll = function addEdgeTextureAll(folder, ind
             listTextures[''] = '';
             folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
                 this._changeEdgeTexture('./textures/'.concat(value), index);
-            });
+            }).name('Edge texture');
         }
     });
 };
 
 Symbolizer.prototype._addSaveAll = function addSave(folder) {
-    folder.add({ save: () => this._saveVibesAll() }, 'save');
+    folder.add({ save: () => this._saveVibesAll() }, 'save').name('Save style');
 };
 
 Symbolizer.prototype.initGuiAll = function addToGUI() {
