@@ -148,7 +148,7 @@ Generic style, applicable to any mesh :
         "color": "#ffffff",
         "width": 1
     }
-    "faces": [{
+    "faces" : [{
         "opacity": 1,
         "color": "ffffff",
         "emissive": "ffffff",
