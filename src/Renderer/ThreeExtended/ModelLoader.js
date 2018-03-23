@@ -86,7 +86,7 @@ ModelLoader.prototype.load3DS = function load3DS(url) {
         */
         /* object.traverse((child) => {
             if (child instanceof THREE.Mesh) child.material.normalMap = 'normal';
-        }); 
+        });
         */
         /*
         this.view.scene.add(object);

@@ -17,8 +17,9 @@ var globeView = new itowns.GlobeView(viewerDiv, positionOnGlobe);
 // GUI initialization
 var menuGlobe = new GuiTools('menuDiv');
 var guiInitialized = false;
-var layerFolder = menuGlobe.gui.addFolder('Layer management');
+var layerFolder = menuGlobe.gui.addFolder('Layers');
 var listLayers = [];
+var listControllers = [];
 var nbSymbolizer = 0;
 
 var promiseElevation = [];
@@ -54,7 +55,7 @@ var rotateZ = 0;
 var scale = 300;
 
 // Symbolizer
-var initSymbolizer = function initSymbolizer(listLayers, menuGlobe, complex) {
+var initSymbolizer = function initSymbolizer(listLayers, listControllers, menuGlobe, complex) {
     // Merge elements of the list as one group
     var listObj = [];
     var listEdge = [];
@@ -73,7 +74,11 @@ var initSymbolizer = function initSymbolizer(listLayers, menuGlobe, complex) {
     else {
         symbolizer.initGuiAll();
     }
-    
+    //Remove the layers from the list
+    console.log(menuGlobe);
+    listControllers.forEach((controller) => {
+        menuGlobe.gui.__folders.Layers.remove(controller);
+    })    
 }
 
 // Loader initialization
@@ -98,19 +103,25 @@ function readFile(file) {
 function handleLayer(model, menuGlobe) {
     // Add a checkbox to the GUI, named after the layer
     if(!guiInitialized){
-        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, menuGlobe, false) }, 'symbolizer').name('Stylize object...');
-        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, menuGlobe, true) }, 'symbolizer').name('Stylize parts...');
+        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, listControllers, menuGlobe, false) }, 'symbolizer').name('Stylize object...');
+        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, listControllers, menuGlobe, true) }, 'symbolizer').name('Stylize parts...');
     }
-    layerFolder.add({ Layer: false }, 'Layer').name(model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4)).onChange((checked) => {
+    var controller = layerFolder.add({ Layer: false }, 'Layer').name(model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4)).onChange((checked) => {
+        console.log(controller);
         if(checked){
-            // Add layer to the list
+            // Add layer and controller to the list
             listLayers.push(model);
+            listControllers.push(controller);
         }
         else{
-            // Remove layer from the list
+            // Remove layer and controller from the list
             var i = listLayers.indexOf(model);
             if(i != -1) {
                 listLayers.splice(i, 1);
+            } 
+            var j = listControllers.indexOf(controller);
+            if(j != -1) {
+                listControllers.splice(j, 1);
             } 
         }
     }); 

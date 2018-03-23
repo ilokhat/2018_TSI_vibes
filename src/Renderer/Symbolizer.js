@@ -27,16 +27,16 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
     if (style && style.faces[0].name) {
         // Update GUI
         var count = 0;
-        folder.__controllers[2].setValue(style.edges.color);
-        folder.__controllers[3].setValue(style.edges.opacity);
-        folder.__controllers[4].setValue(style.edges.width);
-        for (k in folder.__folders) {
-            if (Object.prototype.hasOwnProperty.call(folder.__folders, k)) {
-                folder.__folders[k].__controllers[0].setValue(style.faces[count].opacity);
-                folder.__folders[k].__controllers[1].setValue(style.faces[count].color);
-                folder.__folders[k].__controllers[2].setValue(style.faces[count].emmissive);
-                folder.__folders[k].__controllers[3].setValue(style.faces[count].specular);
-                folder.__folders[k].__controllers[4].setValue(style.faces[count].shininess);
+        folder.__folders.Edges.__controllers[0].setValue(style.edges.color);
+        folder.__folders.Edges.__controllers[1].setValue(style.edges.opacity);
+        folder.__folders.Edges.__controllers[2].setValue(style.edges.width);
+        for (k in folder.__folders.Faces.__folders) {
+            if (Object.prototype.hasOwnProperty.call(folder.__folders.Faces.__folders, k)) {
+                folder.__folders.Faces.__folders[k].__controllers[0].setValue(style.faces[count].opacity);
+                folder.__folders.Faces.__folders[k].__controllers[1].setValue(style.faces[count].color);
+                folder.__folders.Faces.__folders[k].__controllers[2].setValue(style.faces[count].emmissive);
+                folder.__folders.Faces.__folders[k].__controllers[3].setValue(style.faces[count].specular);
+                folder.__folders.Faces.__folders[k].__controllers[4].setValue(style.faces[count].shininess);
             }
             count++;
         }
@@ -66,14 +66,15 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
     }
     else if (style && style.faces.length == 1) {
         // Update GUI
-        folder.__controllers[2].setValue(style.edges.color);
-        folder.__controllers[3].setValue(style.edges.opacity);
-        folder.__controllers[4].setValue(style.edges.width);
-        folder.__controllers[5].setValue(style.faces[0].opacity);
-        folder.__controllers[6].setValue(style.faces[0].color);
-        folder.__controllers[7].setValue(style.faces[0].emmissive);
-        folder.__controllers[8].setValue(style.faces[0].specular);
-        folder.__controllers[9].setValue(style.faces[0].shininess);
+        console.log(folder);
+        folder.__folders.Edges.__controllers[0].setValue(style.edges.color);
+        folder.__folders.Edges.__controllers[1].setValue(style.edges.opacity);
+        folder.__folders.Edges.__controllers[2].setValue(style.edges.width);
+        folder.__folders.Faces.__controllers[0].setValue(style.faces[0].opacity);
+        folder.__folders.Faces.__controllers[1].setValue(style.faces[0].color);
+        folder.__folders.Faces.__controllers[2].setValue(style.faces[0].emmissive);
+        folder.__folders.Faces.__controllers[3].setValue(style.faces[0].specular);
+        folder.__folders.Faces.__controllers[4].setValue(style.faces[0].shininess);
         // Apply given style to all children
         for (i = 0; i < this.edges.length; i++) {
             for (j = 0; j < this.edges[i].children.length; j++) {
@@ -102,9 +103,9 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                 this._changeWidthEdge(1, i, j);
             }
         }
+        var color = getRandomColor();
         for (i = 0; i < this.obj.length; i++) {
             for (j = 0; j < this.obj[i].children.length; j++) {
-                var color = getRandomColor();
                 this._changeOpacity(1, i, j);
                 this._changeColor(color, i, j);
                 this._changeEmissive(color, i, j);
@@ -199,6 +200,7 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
     for (var i = 0; i < this.obj[0].children.length; i++) {
         // Get the texture path
         var textureUse = null;
+        // Checks if the mesh has a texture
         if (this.obj[0].children[i].material.map != null) {
             var textureUsetab = this.obj[0].children[i].material.map.image.src.split('/');
             var j = 0;
@@ -210,17 +212,50 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
             }
         }
         // Push each face style in the list
-        console.log(this.obj[0].children[i].material.color.getHex());
         vibes.faces.push({
             name: this.obj[0].children[i].name,
             opacity: this.obj[0].children[i].material.opacity,
-            color: this.obj[0].children[i].material.color.getHex(),
-            emissive: this.obj[0].children[i].material.emissive.getHex(),
-            specular: this.obj[0].children[i].material.specular.getHex(),
+            color: '#'.concat(this.obj[0].children[i].material.color.getHexString()),
+            emissive: '#'.concat(this.obj[0].children[i].material.emissive.getHexString()),
+            specular: '#'.concat(this.obj[0].children[i].material.specular.getHexString()),
             shininess: this.obj[0].children[i].material.shininess,
             texture: textureUse,
         });
     }
+    var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
+    FILE.saveAs(blob, this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4).concat('.vibes'));
+};
+
+Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
+    var vibes = {
+        edges: {
+            opacity: this.edges[0].children[0].material.opacity,
+            color: this.edges[0].children[0].material.color,
+            width: this.edges[0].children[0].material.linewidth,
+        },
+        faces: [] };
+    // Get the texture path
+    var textureUse = null;
+    // Checks if the mesh has a texture
+    if (this.obj[0].children[0].material.map != null) {
+        var textureUsetab = this.obj[0].children[0].material.map.image.src.split('/');
+        var j = 0;
+        while (j < textureUsetab.length && textureUsetab[j] != 'textures') j++;
+        textureUse = '.';
+        while (j < textureUsetab.length) {
+            textureUse = textureUse.concat('/', textureUsetab[j]);
+            j++;
+        }
+    }
+    vibes.faces.push({
+        opacity: this.obj[0].children[0].material.opacity,
+        color: '#'.concat(this.obj[0].children[0].material.color.getHexString()),
+        emissive: '#'.concat(this.obj[0].children[0].material.emissive.getHexString()),
+        specular: '#'.concat(this.obj[0].children[0].material.specular.getHexString()),
+        shininess: this.obj[0].children[0].material.shininess,
+        texture: textureUse,
+
+    });
     var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
     FILE.saveAs(blob, this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4).concat('.vibes'));
 };
@@ -315,14 +350,16 @@ Symbolizer.prototype.initGui = function addToGUI() {
         var parentFolder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
         this._addSave(parentFolder);
         this._addLoad(parentFolder);
-        this._addColorEdgeAll(parentFolder);
-        this._addOpacityEdgeAll(parentFolder);
-        this._addWidthEdgeAll(parentFolder);
+        var edgesFolder = parentFolder.addFolder('Edges');
+        this._addColorEdgeAll(edgesFolder);
+        this._addOpacityEdgeAll(edgesFolder);
+        this._addWidthEdgeAll(edgesFolder);
         // Iteration over the children of each object (for ex. roof / wall)
         // (We previously checked that each object in the list has the same structure)
+        var facesFolder = parentFolder.addFolder('Faces');
         for (var j = 0; j < this.obj[0].children.length; j++) {
             // We create a folder for each child
-            var folder = parentFolder.addFolder(this.obj[0].children[j].name);
+            var folder = facesFolder.addFolder(this.obj[0].children[j].name);
             this._addOpacity(folder, j);
             this._addColor(folder, j);
             this._addEmissive(folder, j);
@@ -334,7 +371,6 @@ Symbolizer.prototype.initGui = function addToGUI() {
     else {
         this.initGuiAll();
     }
-    
 };
 
 Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
@@ -454,21 +490,27 @@ Symbolizer.prototype._addEdgeTextureAll = function addEdgeTextureAll(folder, ind
     });
 };
 
+Symbolizer.prototype._addSaveAll = function addSave(folder) {
+    folder.add({ save: () => this._saveVibesAll() }, 'save');
+};
+
 Symbolizer.prototype.initGuiAll = function addToGUI() {
     // var folder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     var folder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
-    this._addSave(folder);
+    this._addSaveAll(folder);
     this._addLoad(folder);
-    this._addTextureAll(folder);
-    this._addOpacityAll(folder);
-    this._addColorAll(folder);
-    this._addEmissiveAll(folder);
-    this._addSpecularAll(folder);
-    this._addShininessAll(folder);
-    this._addColorEdgeAll(folder);
-    this._addOpacityEdgeAll(folder);
-    this._addWidthEdgeAll(folder);
+    var edgesFolder = folder.addFolder('Edges');
+    this._addColorEdgeAll(edgesFolder);
+    this._addOpacityEdgeAll(edgesFolder);
+    this._addWidthEdgeAll(edgesFolder);
     // this.addEdgeTextureAll(folder);
+    var facesFolder = folder.addFolder('Faces');
+    this._addTextureAll(facesFolder);
+    this._addOpacityAll(facesFolder);
+    this._addColorAll(facesFolder);
+    this._addEmissiveAll(facesFolder);
+    this._addSpecularAll(facesFolder);
+    this._addShininessAll(facesFolder);
 };
 
 Symbolizer.prototype._checkStructure = function checkStructure() {
