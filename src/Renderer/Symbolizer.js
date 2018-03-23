@@ -160,10 +160,22 @@ Symbolizer.prototype._changeShininess = function changeShininess(value, i, j) {
     this.view.notifyChange(true);
 };
 
-Symbolizer.prototype._changeTexture = function changeTexture(chemin, i, j) {
+Symbolizer.prototype._changeTexture = function changeTexture(chemin, i, j, folder) {
+
     if (chemin != './textures/') {
+        var isTextured = false;
+        for (let k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'textureRepetition') {
+                isTextured = true;
+            }
+        }
+        if (!isTextured) {
+            folder.add({ textureRepetition: 1 }, 'textureRepetition', 0.1, 5).name('Texture Repetition').onChange((value) => {
+                this._changetextureRepetition(value, i, j);
+            });
+        }
         var texture = new THREE.TextureLoader().load(chemin);
-        texture.wrapS = THREE.RepeatWrapping;
+        texture.textureRepetition = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
         var meshshininess = this.obj[i].children[j].material.shininess;
         var meshspecular = this.obj[i].children[j].material.specular;
@@ -173,10 +185,62 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, i, j) {
         this.obj[i].children[j].material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide, map: texture, color: meshcolor, emissive: meshemissive, specular: meshspecular, shininess: meshshininess, opacity: meshopacity, transparent: true });
         this.obj[i].children[j].material.needsUpdate = true;
         this.view.notifyChange(true);
+        
     } else {
+        for (let k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'textureRepetition') {
+                folder.remove(folder.__controllers[k]);
+            }
+        }
         this.obj[i].children[j].material.map = null;
         this.obj[i].children[j].material.needsUpdate = true;
         this.view.notifyChange(true);
+    }
+};
+
+Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, i, folder) {
+
+    if (chemin != './textures/') {
+        var isTextured = false;
+        console.log(folder);
+        for (let k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'textureRepetition') {
+                isTextured = true;
+            }
+        }
+        if (!isTextured) {
+            folder.add({ textureRepetition: 1 }, 'textureRepetition', 0.1, 5).name('Texture Repetition').onChange((value) => {
+                for (let j = 0; j < this.obj[i].children.length; j++) {
+                    this._changetextureRepetition(value, i, j); 
+                }
+            });
+        }
+        for (let j = 0; j < this.obj[i].children.length; j++) {
+            var texture = new THREE.TextureLoader().load(chemin);
+            texture.textureRepetition = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            var meshshininess = this.obj[i].children[j].material.shininess;
+            var meshspecular = this.obj[i].children[j].material.specular;
+            var meshemissive = this.obj[i].children[j].material.emissive;
+            var meshcolor = this.obj[i].children[j].material.color;
+            var meshopacity = this.obj[i].children[j].material.opacity;
+            this.obj[i].children[j].material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide, map: texture, color: meshcolor, emissive: meshemissive, specular: meshspecular, shininess: meshshininess, opacity: meshopacity, transparent: true });
+            this.obj[i].children[j].material.needsUpdate = true;
+            this.view.notifyChange(true);
+        }
+        
+    } else {
+        for (let k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'textureRepetition') {
+                folder.remove(folder.__controllers[k]);
+            }
+        }
+        for (let j = 0; j < this.obj[i].children.length; j++) {
+            this.obj[i].children[j].material.map = null;
+            this.obj[i].children[j].material.needsUpdate = true;
+            this.view.notifyChange(true);
+        }
+
     }
 };
 
@@ -185,6 +249,13 @@ Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, i, j) {
     this.edges[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
+
+Symbolizer.prototype._changetextureRepetition = function changetextureRepetition(value, i, j) {
+    this.obj[i].children[j].material.map.repeat.set(value, value);
+    this.obj[i].children[j].material.needsUpdate = true;
+    this.view.notifyChange(true);
+};
+
 
 Symbolizer.prototype._saveVibes = function saveVibes() {
     // Initiate stylesheet with edge style and an empty list for face style
@@ -285,12 +356,13 @@ Symbolizer.prototype._addTexture = function addTexture(folder, j) {
             listTextures[''] = '';
             folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
                 for (var i = 0; i < this.obj.length; i++) {
-                    this._changeTexture('./textures/'.concat(value), i, j);
+                    this._changeTexture('./textures/'.concat(value), i, j, folder);
                 }
             });
         }
     });
 };
+
 
 // More parameters...
 
@@ -309,31 +381,31 @@ Symbolizer.prototype._addLoad = function addLoad(folder) {
 
 Symbolizer.prototype.initGui = function addToGUI() {
     // We check if the objects of the list have the same structure
-    if (this._checkStructure()) {
-        // If the structure is similar, we create a folder for the symbolizer
-        var parentFolder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
-        this._addSave(parentFolder);
-        this._addLoad(parentFolder);
-        this._addColorEdgeAll(parentFolder);
-        this._addOpacityEdgeAll(parentFolder);
-        this._addWidthEdgeAll(parentFolder);
-        // Iteration over the children of each object (for ex. roof / wall)
-        // (We previously checked that each object in the list has the same structure)
-        for (var j = 0; j < this.obj[0].children.length; j++) {
-            // We create a folder for each child
-            var folder = parentFolder.addFolder(this.obj[0].children[j].name);
-            this._addOpacity(folder, j);
-            this._addColor(folder, j);
-            this._addEmissive(folder, j);
-            this._addSpecular(folder, j);
-            this._addShininess(folder, j);
-            this._addTexture(folder, j);
-        }
+    // if (this._checkStructure()) {
+    // If the structure is similar, we create a folder for the symbolizer
+    var parentFolder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
+    this._addSave(parentFolder);
+    this._addLoad(parentFolder);
+    this._addColorEdgeAll(parentFolder);
+    this._addOpacityEdgeAll(parentFolder);
+    this._addWidthEdgeAll(parentFolder);
+    // Iteration over the children of each object (for ex. roof / wall)
+    // (We previously checked that each object in the list has the same structure)
+    for (var j = 0; j < this.obj[0].children.length; j++) {
+        // We create a folder for each child
+        var folder = parentFolder.addFolder(this.obj[0].children[j].name);
+        this._addOpacity(folder, j);
+        this._addColor(folder, j);
+        this._addEmissive(folder, j);
+        this._addSpecular(folder, j);
+        this._addShininess(folder, j);
+        this._addTexture(folder, j);
+        // this._addTextureRepetition(folder, j);
     }
-    else {
-        this.initGuiAll();
-    }
-    
+    // }
+    // else {
+    //    this.initGuiAll();
+    // }  
 };
 
 Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
@@ -433,14 +505,13 @@ Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
             listTextures[''] = '';
             folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
                 for (var i = 0; i < this.obj.length; i++) {
-                    for (var j = 0; j < this.obj[i].children.length; j++) {
-                        this._changeTexture('./textures/'.concat(value), i, j);
-                    }
+                    this._changeTextureAll('./textures/'.concat(value), i, folder);
                 }
             });
         }
     });
 };
+
 
 Symbolizer.prototype._addEdgeTextureAll = function addEdgeTextureAll(folder, index) {
     Fetcher.json('./textures/listeEdgeTexture.json').then((listTextures) => {
