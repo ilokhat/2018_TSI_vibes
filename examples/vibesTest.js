@@ -17,8 +17,9 @@ var globeView = new itowns.GlobeView(viewerDiv, positionOnGlobe);
 // GUI initialization
 var menuGlobe = new GuiTools('menuDiv');
 var guiInitialized = false;
-var layerFolder = menuGlobe.gui.addFolder('Layer management');
+var layerFolder = menuGlobe.gui.addFolder('Layers');
 var listLayers = [];
+var listControllers = [];
 var nbSymbolizer = 0;
 
 var promiseElevation = [];
@@ -54,7 +55,7 @@ var rotateZ = 0;
 var scale = 300;
 
 // Symbolizer
-var initSymbolizer = function initSymbolizer(listLayers, menuGlobe, complex) {
+var initSymbolizer = function initSymbolizer(listLayers, listControllers, menuGlobe, complex) {
     // Merge elements of the list as one group
     var listObj = [];
     var listEdge = [];
@@ -73,7 +74,10 @@ var initSymbolizer = function initSymbolizer(listLayers, menuGlobe, complex) {
     else {
         symbolizer.initGuiAll();
     }
-    
+    //Remove the layers from the list
+    listControllers.forEach((controller) => {
+        menuGlobe.gui.__folders.Layers.remove(controller);
+    })    
 }
 
 // Loader initialization
@@ -81,15 +85,26 @@ var loader = new itowns.ModelLoader(globeView);
 
 // Read the file dropped and actually load the object
 function readFile(file) {
-    if(file.name.endsWith(".obj")){
-        let reader = new FileReader();
+    var reader = new FileReader();
+    if(file.name.endsWith('.obj')){
         reader.addEventListener('load', () => {
             // Load object
             loader.loadOBJ(reader.result, coord, rotateX, rotateY, rotateZ, scale, handleLayer, menuGlobe);
         }, false);
         reader.readAsDataURL(file);
         return 0 ;
-    }else{
+    }
+        /*
+    else if(file.name.endsWith('.gibes')){
+        reader.addEventListener('load', () => {
+            var json = JSON.parse(reader.result);
+            var layer = json.name;
+
+        })
+        reader.readAsText(file);
+    }
+    */
+    else{
         throw new loadFileException("fichier de type .obj attendu");
     }
 }
@@ -98,19 +113,24 @@ function readFile(file) {
 function handleLayer(model, menuGlobe) {
     // Add a checkbox to the GUI, named after the layer
     if(!guiInitialized){
-        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, menuGlobe, false) }, 'symbolizer').name('Stylize object...');
-        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, menuGlobe, true) }, 'symbolizer').name('Stylize parts...');
+        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, listControllers, menuGlobe, false) }, 'symbolizer').name('Stylize object...');
+        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, listControllers, menuGlobe, true) }, 'symbolizer').name('Stylize parts...');
     }
-    layerFolder.add({ Layer: false }, 'Layer').name(model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4)).onChange((checked) => {
+    var controller = layerFolder.add({ Layer: false }, 'Layer').name(model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4)).onChange((checked) => {
         if(checked){
-            // Add layer to the list
+            // Add layer and controller to the list
             listLayers.push(model);
+            listControllers.push(controller);
         }
         else{
-            // Remove layer from the list
+            // Remove layer and controller from the list
             var i = listLayers.indexOf(model);
             if(i != -1) {
                 listLayers.splice(i, 1);
+            } 
+            var j = listControllers.indexOf(controller);
+            if(j != -1) {
+                listControllers.splice(j, 1);
             } 
         }
     }); 
@@ -138,6 +158,7 @@ window.onload = () => initListener();
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
     globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
 });
+
 function loadFileException(message) {
     this.message = message;
     this.name = "loadFileException";
