@@ -75,7 +75,6 @@ var initSymbolizer = function initSymbolizer(listLayers, listControllers, menuGl
         symbolizer.initGuiAll();
     }
     //Remove the layers from the list
-    console.log(menuGlobe);
     listControllers.forEach((controller) => {
         menuGlobe.gui.__folders.Layers.remove(controller);
     })    
@@ -86,15 +85,26 @@ var loader = new itowns.ModelLoader(globeView);
 
 // Read the file dropped and actually load the object
 function readFile(file) {
-    if(file.name.endsWith(".obj")){
-        let reader = new FileReader();
+    var reader = new FileReader();
+    if(file.name.endsWith('.obj')){
         reader.addEventListener('load', () => {
             // Load object
             loader.loadOBJ(reader.result, coord, rotateX, rotateY, rotateZ, scale, handleLayer, menuGlobe);
         }, false);
         reader.readAsDataURL(file);
         return 0 ;
-    }else{
+    }
+        /*
+    else if(file.name.endsWith('.gibes')){
+        reader.addEventListener('load', () => {
+            var json = JSON.parse(reader.result);
+            var layer = json.name;
+
+        })
+        reader.readAsText(file);
+    }
+    */
+    else{
         throw new loadFileException("fichier de type .obj attendu");
     }
 }
@@ -107,7 +117,6 @@ function handleLayer(model, menuGlobe) {
         layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, listControllers, menuGlobe, true) }, 'symbolizer').name('Stylize parts...');
     }
     var controller = layerFolder.add({ Layer: false }, 'Layer').name(model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4)).onChange((checked) => {
-        console.log(controller);
         if(checked){
             // Add layer and controller to the list
             listLayers.push(model);
@@ -149,6 +158,7 @@ window.onload = () => initListener();
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
     globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
 });
+
 function loadFileException(message) {
     this.message = message;
     this.name = "loadFileException";

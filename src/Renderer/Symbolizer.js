@@ -66,7 +66,6 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
     }
     else if (style && style.faces.length == 1) {
         // Update GUI
-        console.log(folder);
         folder.__folders.Edges.__controllers[0].setValue(style.edges.color);
         folder.__folders.Edges.__controllers[1].setValue(style.edges.opacity);
         folder.__folders.Edges.__controllers[2].setValue(style.edges.width);
@@ -165,7 +164,6 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, i, j, folde
 
     if (chemin != './textures/') {
         var isTextured = false;
-        console.log(folder);
         for (let k = 0; k < folder.__controllers.length; k++) {
             if (folder.__controllers[k].property == 'textureRepetition') {
                 isTextured = true;
@@ -204,7 +202,6 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, i, fo
 
     if (chemin != './textures/') {
         var isTextured = false;
-        console.log(folder);
         for (let k = 0; k < folder.__controllers.length; k++) {
             if (folder.__controllers[k].property == 'textureRepetition') {
                 isTextured = true;
@@ -391,7 +388,7 @@ Symbolizer.prototype._addTexture = function addTexture(folder, j) {
     Fetcher.json('./textures/listeTexture.json').then((listTextures) => {
         if (listTextures) {
             listTextures[''] = '';
-            folder.add({ texture: '' }, 'Texture', listTextures).onChange((value) => {
+            folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
                 for (var i = 0; i < this.obj.length; i++) {
                     this._changeTexture('./textures/'.concat(value), i, j, folder);
                 }
