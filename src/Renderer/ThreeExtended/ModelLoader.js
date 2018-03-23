@@ -48,10 +48,10 @@ ModelLoader.prototype._loadModel = function loadModel(obj, coord, rotateX, rotat
         // Extract edges
         var edges = new THREE.EdgesGeometry(obj.children[i].geometry);
         var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true }));
-        line = this._placeModel(line, coord, rotateX, rotateY, rotateZ, scale);
-        line.updateMatrixWorld();
         lines.add(line);
     }
+    lines = this._placeModel(lines, coord, rotateX, rotateY, rotateZ, scale); 
+    lines.updateMatrixWorld();
 
     var linesID = this.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
     lines.traverse(lines => lines.layers.set(linesID));
