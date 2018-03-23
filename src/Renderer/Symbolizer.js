@@ -420,6 +420,9 @@ Symbolizer.prototype.initGui = function addToGUI() {
         var parentFolder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
         this._addSave(parentFolder);
         this._addLoad(parentFolder);
+        var positionFolder = parentFolder.addFolder('Position');
+        this._addRotationsAll(positionFolder); 
+        this._addScaleAll(positionFolder);
         var edgesFolder = parentFolder.addFolder('Edges');
         this._addColorEdgeAll(edgesFolder);
         this._addOpacityEdgeAll(edgesFolder);
@@ -441,6 +444,49 @@ Symbolizer.prototype.initGui = function addToGUI() {
     else {
         this.initGuiAll();
     }
+};
+
+Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
+    folder.add({ scale: 0 }, 'scale', 0.1, 1000, 0.01).name('scale').onChange((value) => {
+        for (var i = 0; i < this.obj.length; i++) {
+           this.obj[i].scale.set(value, value, value);
+           this.edges[i].scale.set(value, value, value);
+           this.obj[i].updateMatrixWorld();
+           this.edges[i].updateMatrixWorld();
+        }
+        this.view.notifyChange(true);
+    });
+};
+
+Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
+    
+    folder.add({ rotationX: 0 }, 'rotationX', 0, 1, 0.01).name('rotationX').onChange((value) => {
+        for (var i = 0; i < this.obj.length; i++) {
+           this.obj[i].rotateX(value);
+           this.edges[i].rotateX(value);
+           this.obj[i].updateMatrixWorld();
+           this.edges[i].updateMatrixWorld();
+        }
+        this.view.notifyChange(true);
+    });
+    folder.add({ rotationY: 0 }, 'rotationY', 0, 1, 0.01).name('rotationY').onChange((value) => {
+        for (var i = 0; i < this.obj.length; i++) {
+           this.obj[i].rotateY(value);
+           this.edges[i].rotateY(value);
+           this.obj[i].updateMatrixWorld();
+           this.edges[i].updateMatrixWorld();
+        }
+        this.view.notifyChange(true);
+    });
+    folder.add({ rotationZ: 0 }, 'rotationZ', 0, 1, 0.01).name('rotationZ').onChange((value) => {
+        for (var i = 0; i < this.obj.length; i++) {
+           this.obj[i].rotateZ(value);
+           this.edges[i].rotateZ(value);
+           this.obj[i].updateMatrixWorld();
+           this.edges[i].updateMatrixWorld();
+        }
+        this.view.notifyChange(true);
+    });
 };
 
 Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
@@ -568,6 +614,9 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     var folder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
     this._addSaveAll(folder);
     this._addLoad(folder);
+    var positionFolder = folder.addFolder('Position');
+    this._addRotationsAll(positionFolder); 
+    this._addScaleAll(positionFolder);
     var edgesFolder = folder.addFolder('Edges');
     this._addColorEdgeAll(edgesFolder);
     this._addOpacityEdgeAll(edgesFolder);
