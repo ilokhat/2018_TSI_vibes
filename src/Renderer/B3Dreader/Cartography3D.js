@@ -23,6 +23,7 @@ var requestAnimSelectionAlpha = (function select() {
     };
 }());
 
+// zone de travail; (EPSG:2153 = lambert94 ) / 500
 var bbox = { xmin: 1286,
     xmax: 1315, // +1
     ymin: 13715,
@@ -37,7 +38,8 @@ const Cartography3D = {
     listDalles: [],
     scale: 500,
     zero: null,
-    paris: {
+    // zone de travail; EPSG:2153 = lambert94
+    limitZone: {
         xmin: bbox.xmin * 500,
         xmax: bbox.xmax * 500,
         ymin: bbox.ymin * 500,
@@ -60,8 +62,6 @@ const Cartography3D = {
     gmap: null,
 
     generateGrid: function generateGrid() {
-        var leftBottomCornerGrid = new THREE.Vector3(bbox.xmin * 500, 0, bbox.ymin * 500);
-        this.sceneleftBottomCornerGrid = new THREE.Vector3().subVectors(leftBottomCornerGrid, this.zero);
         this.grid = [];
         var nbdallesX = bbox.xmax - bbox.xmin + 1;
         var nbdallesY = bbox.ymax - bbox.ymin + 1;
@@ -79,86 +79,11 @@ const Cartography3D = {
     },
 
     isDataAvailable: function isDataAvailable(p) {
-        console.log('isDataAvailable', (p.x > this.paris.xmin) && (p.x < this.paris.xmax) && (p.z > this.paris.ymin) && (p.z < this.paris.ymax));
-        return (p.x > this.paris.xmin) && (p.x < this.paris.xmax) && (p.z > this.paris.ymin) && (p.z < this.paris.ymax);
-    },
-
-    loadDallesAroundPosition: function loadDallesAroundPosition(p, zero) {
-        console.log('loadDallesAroundPosition :'.concat(p));
-        var lon = Math.floor(p.x / this.scale);
-        var lat = Math.floor(p.z / this.scale);
-        var map = new clipMap(lon, lat, 1, 1, _textureType);
-        this.listDalles = map.getListTiles();
-        for (var i = 0; i < this.listDalles.length; i++) {
-            if (this.dalleSet[this.listDalles[i].name] === undefined) {
-                var currentDalle = this.listDalles[i];
-                var currentDalleNameSplit = this.listDalles[i].name.split('-');
-                var currentDalleXinGrid = currentDalleNameSplit[0] - bbox.xmin;
-                var currentDalleYinGrid = currentDalleNameSplit[1] - bbox.ymin;
-                this.grid[currentDalleXinGrid][currentDalleYinGrid] = currentDalle;
-                this.listDalles[i].setDalleZeroPivot(zero);
-                if (!this.using3DS) {
-                    this.listDalles[i].load();
-                }
-            }
-        }
-        this.checkWhatToLoad();   // Then launch auto update
-        // call update LOD texture here
-        // this.updateLODTextureInClipMap(listDalles);
-    },
-
-    // List dalle around position and check if already loaded or not
-    createDalleListAroundPosition: function createDalleListAroundPosition(lon, lat) {
-        var list = [];
-        var x = [0, 1];
-        var y = [0, 1];
-        for (var i = 0; i < x.length; i++) {
-            for (var j = 0; j < y.length; j++) {
-                if (this.grid[lon + x[i] - bbox.xmin][lat + y[j] - bbox.ymin] == null) {
-                    this.grid[lon + x[i] - bbox.xmin][lat + y[j] - bbox.ymin] = {};
-                    var name = (lon + x[i]).toString().concat('-', (lat + y[j]).toString());
-                    list.push(name);
-                }
-            }
-        }
-        return list;
-    },
-
-    // with Alex changes
-    loadDallesAtPosition: function loadDallesAtPosition(lon, lat) {
-        console.log('loadDallesAtPosition', lon, lat);
-        var dalle = null;
-        var listDalles = this.createDalleListAroundPosition(lon, lat);
-        for (var i = 0; i < listDalles.length; i++) {
-            var name = listDalles[i];
-            if (this.dalleSet[name] === undefined) {
-                dalle = new dalleClasse();
-                dalle.dataURL = this.dataURL;
-                dalle.textureType = this.textureType;
-                dalle.setDalleZeroPivot(gfxEngine.getZeroAsVec3D());
-                dalle.setNamePath(name);
-                dalle.setLoDLevel(2);
-                dalle.load();
-                this.grid[lon - bbox.xmin][lat - bbox.ymin] = dalle;
-                // empty texture cache
-                this.dalleSet[name] = dalle;
-                // add to Global listDalles
-                this.listDalles.push(dalle);
-            }
-        }
-    },
-
-    checkWhatToLoad: function checkWhatToLoad() {
-        this.iteration++;
-        if (this.iteration % 30 == 0 && this.opacity == 1) {
-            var pLook = this.getDalleXYFromCamDirection();
-            if (pLook.x != -9999 && this.grid[pLook.x][pLook.z] == null) {
-                var lon = bbox.xmin + pLook.x;
-                var lat = bbox.ymin + pLook.z;
-                this.loadDallesAtPosition(lon, lat);
-            }
-        }
-        requestAnimSelectionAlpha(this.checkWhatToLoad.bind(this));
+        /*
+        console.log('isDataAvailable', (p.x > this.limitZone.xmin) && (p.x < this.limitZone.xmax) && (p.z > this.limitZone.ymin) && (p.z < this.limitZone.ymax));
+        return (p.x > this.limitZone.xmin) && (p.x < this.limitZone.xmax) && (p.z > this.limitZone.ymin) && (p.z < this.limitZone.ymax);
+        */
+       return true;
     },
 
     setInitStatus: function setInitStatus(v) {
@@ -173,19 +98,46 @@ const Cartography3D = {
         }
     },
 
+    loadAllDalles: function loadAllDalles() {
+        for (var i = 0; i < this.grid.length; i++) {
+            for (var j = 0; j < this.grid[i].length; j++) {
+                var lat = (i + bbox.xmin) * 500;
+                var lon = (j + bbox.ymin) * 500;
+                var name = (i + bbox.xmin).toString().concat('-', (j + bbox.ymin).toString());
+                var dalle = new dalleClasse();
+                dalle.dataURL = this.dataURL;
+                dalle.textureType = this.textureType;
+                dalle.setDalleZeroPivot(new THREE.Vector3(lat + 250, lon + 250, 0));
+                dalle.setNamePath(name);
+                dalle.setLoDLevel(2);
+                dalle.load();
+                this.grid[i][j] = dalle;
+                // empty texture cache
+                this.dalleSet[name] = dalle;
+                // add to Global listDalles
+                this.listDalles.push(dalle);
+            }
+        }
+    },
     initCarto3D: function initCarto3D(options) {
         this.dataURL = options.url;
-        this.zero = gfxEngine.getZeroAsVec3D();
-        this.textureType = gfxEngine.isMobileEnvironment() ? '.jpg' : '.dds';
+        this.textureType = '.dds';
         console.log('this.textureType', this.textureType);
         _textureType = this.textureType;
+        /*
         var pos = gfxEngine.getCameraPosition();
         console.log('pos', pos);
+        */
         this.generateGrid();
-        if (this.isDataAvailable(pos.add(this.zero))) {
-            this.loadDallesAroundPosition(pos, this.zero);
+        /*
+        if (this.isDataAvailable(pos)) {
+            this.loadDallesAroundPosition(pos);
             this.setInitStatus(true);
         }
+        */
+        // chargement de toutes les dalles possibles
+        this.loadAllDalles();
+        this.setInitStatus(true);
         this.setVisibility(!!options.visible);
     },
     isCartoInitialized: function isCartoInitialized() {

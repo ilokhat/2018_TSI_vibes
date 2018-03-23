@@ -35,3 +35,4 @@ export { Shader } from './Renderer/B3Dreader/Shader';
 export { default as clipMap } from './Renderer/B3Dreader/clipMap';
 export { default as Cartography3D } from './Renderer/B3Dreader/Cartography3D';
 export { default as gfxEngine } from './Renderer/B3Dreader/gfxEngine';
+export { default as BufferGeometryUtils } from './Renderer/B3Dreader/lib/postprocessing/BufferGeometryUtils';
