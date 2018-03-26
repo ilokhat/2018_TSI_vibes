@@ -52,10 +52,10 @@ var coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 50);
 var rotateX = Math.PI/2;
 var rotateY = 0;
 var rotateZ = 0;
-var scale = 300;
+var scale = 10;
 
 // Symbolizer
-var initSymbolizer = function initSymbolizer(listLayers, listControllers, menuGlobe, complex) {
+var initSymbolizer = function initSymbolizer(menuGlobe, complex) {
     // Merge elements of the list as one group
     var listObj = [];
     var listEdge = [];
@@ -74,10 +74,14 @@ var initSymbolizer = function initSymbolizer(listLayers, listControllers, menuGl
     else {
         symbolizer.initGuiAll();
     }
-    //Remove the layers from the list
+    //Remove the layers from the list on the GUI
     listControllers.forEach((controller) => {
         menuGlobe.gui.__folders.Layers.remove(controller);
-    })    
+    })
+
+    // Empty layer and controllers list;
+    listLayers = [];
+    listControllers = [];
 }
 
 // Loader initialization
@@ -94,16 +98,25 @@ function readFile(file) {
         reader.readAsDataURL(file);
         return 0;
     }
-    /*
     else if(file.name.endsWith('.gibes')){
         reader.addEventListener('load', () => {
             var json = JSON.parse(reader.result);
-            var layer = json.name;
-
-        })
+            listLayers.forEach((layer) => {
+                // Position parameters
+                var coordX = json.coordX;
+                var coordY = json.coordY;
+                var coordZ = json.coordZ;
+                var rotateX = Math.PI * json.rotateX;
+                var rotateY = Math.PI * json.rotateY;
+                var rotateZ = Math.PI * json.rotateZ;
+                var scale = json.scale;
+                // Moving object
+                var coord = new itowns.Coordinates('EPSG:4326', coordX, coordY, coordZ);
+                loader._loadModel(layer[0], layer[1], coord, rotateX, rotateY, rotateZ, scale);
+            })
+        });
         reader.readAsText(file);
     }
-    */
     else{
         throw new loadFileException("fichier de type .obj attendu");
     }
@@ -113,8 +126,8 @@ function readFile(file) {
 function handleLayer(model, menuGlobe) {
     // Add a checkbox to the GUI, named after the layer
     if(!guiInitialized){
-        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, listControllers, menuGlobe, false) }, 'symbolizer').name('Stylize object...');
-        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, listControllers, menuGlobe, true) }, 'symbolizer').name('Stylize parts...');
+        layerFolder.add({ symbolizer: () => initSymbolizer(menuGlobe, false) }, 'symbolizer').name('Stylize object...');
+        layerFolder.add({ symbolizer: () => initSymbolizer(menuGlobe, true) }, 'symbolizer').name('Stylize parts...');
     }
     var controller = layerFolder.add({ Layer: false }, 'Layer').name(model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4)).onChange((checked) => {
         if(checked){
@@ -164,6 +177,7 @@ function loadFileException(message) {
     this.name = "loadFileException";
  }
 
+/*
 
 var options = {
     buildings: { url: "./models/Buildings3D/", visible: true, },
@@ -176,6 +190,8 @@ itowns.proj4.defs("EPSG:2154","+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=
 itowns.gfxEngine.setCamera(globeView.camera.camera3D);
 itowns.gfxEngine.setScene(globeView.scene);
 
+*/
+
 /*
 var coord1 = itowns.proj4(options.position.CRS, "EPSG:4326", [options.position.x, options.position.y])
 var coord2 = new itowns.Coordinates("EPSG:4326", coord1[0], coord1[1], 40);
@@ -184,10 +200,13 @@ var coord3 = coord2.as('EPSG:4978');
 console.log('2', coord3.x(), coord3.y(), coord3.z());
 /*
 itowns.gfxEngine.setZero(options.position);
-*/
+
 if (!itowns.Cartography3D.isCartoInitialized()){
     itowns.Cartography3D.initCarto3D(options.buildings);
 };
+
+*/ 
+
 /*
 globeView.controls.setCameraTargetGeoPosition({longitude:60, latitude:40}, true);
 */

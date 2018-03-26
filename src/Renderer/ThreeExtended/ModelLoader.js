@@ -18,15 +18,16 @@ ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, r
     // OBJ loader
     var loader = new THREE.OBJLoader();
     var promise = new Promise((resolve) => {
+        var lines = new THREE.Group();
         loader.load(url, (obj) => {
-            this._loadModel(obj, coord, rotateX, rotateY, rotateZ, scale);
+            this._loadModel(obj, lines, coord, rotateX, rotateY, rotateZ, scale);
             resolve();
         });
     });
     promise.then(() => callback(this.model, menu));
 };
 
-ModelLoader.prototype._loadModel = function loadModel(obj, coord, rotateX, rotateY, rotateZ, scale) {
+ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX, rotateY, rotateZ, scale) {
     var objID = this.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
     obj = this._placeModel(obj, coord, rotateX, rotateY, rotateZ, scale);
 
@@ -34,8 +35,6 @@ ModelLoader.prototype._loadModel = function loadModel(obj, coord, rotateX, rotat
     obj.traverse(obj => obj.layers.set(objID));
     this.view.camera.camera3D.layers.enable(objID);
     this.view.notifyChange(true);
-
-    var lines = new THREE.Group();
 
     for (var i = 0; i < obj.children.length; i++) {
         // Material initialization
