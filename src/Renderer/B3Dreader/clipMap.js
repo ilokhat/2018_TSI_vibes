@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 import dalleClasse from './dalleClasse';
 
-function clipMap(lon, lat, levels, scale, textureType) {
+function clipMap(lon, lat, levels, scale, textureType, dataURL) {
     THREE.Object3D.call(this);
     this.levels = (levels !== undefined) ? levels : 4;
     this.scale = (scale !== undefined) ? scale : 1;
     this.list = [];
     this.textureType = textureType;
-    this.createMapWithSingleTile(lon, lat);
+    this.createMapWithSingleTile(lon, lat, dataURL);
 }
 
 var LODs = {
@@ -29,26 +29,26 @@ clipMap.prototype = {
         this.list.push(dalle);
     },
 
-    createMap: function createMap(lon, lat) {
+    createMap: function createMap(lon, lat, dataURL) {
         var nbDallesCote = 2;
         if (this.textureType == '.jpg') nbDallesCote = 2;
         for (var i = -nbDallesCote / 2 + 1; i < nbDallesCote / 2 + 1; ++i) {
             for (var j = -nbDallesCote / 2; j < nbDallesCote / 2; ++j) {
                 if (this.textureType == '.jpg') {
-                    this.createTile(lon, lat, i, j, LODs.SECOND);
+                    this.createTile(lon, lat, i, j, LODs.SECOND, dataURL);
                 } else if (Math.abs(i) < 1) {
-                    this.createTile(lon, lat, i, j, LODs.ORIGIN);
+                    this.createTile(lon, lat, i, j, LODs.ORIGIN, dataURL);
                 } else if (Math.abs(i) < 3) {
-                    this.createTile(lon, lat, i, j, LODs.ORIGIN);
+                    this.createTile(lon, lat, i, j, LODs.ORIGIN, dataURL);
                 } else {
-                    this.createTile(lon, lat, i, j, LODs.THIRD);
+                    this.createTile(lon, lat, i, j, LODs.THIRD, dataURL);
                 }
             }
         }
     },
 
-    createMapWithSingleTile: function createMapWithSingleTile(lon, lat) {
-        this.createTile(lon, lat, 0, 0, LODs.SECOND);
+    createMapWithSingleTile: function createMapWithSingleTile(lon, lat, dataURL) {
+        this.createTile(lon, lat, 0, 0, LODs.SECOND, dataURL);
     },
 
     getListTiles: function getListTiles() {

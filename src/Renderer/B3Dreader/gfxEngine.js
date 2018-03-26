@@ -25,6 +25,7 @@ const gfxEngine = {
     },
     getCameraPosition: function getCameraPosition() {
         return this._camera.position.clone();
+        // TODO : changer en camera target position
     },
     addToScene: function addToScene(obj) {
         this._scene.add(obj);

@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import gfxEngine from './gfxEngine';
 import B3DLoader from './lib/B3DLoader';
 import Shader from './Shader';
+import BufferGeometryUtils from './lib/postprocessing/BufferGeometryUtils';
+import DDSLoader from './lib/DDSLoader';
 
 function dalleClasse(glob) {
     this.dataURL = '';
@@ -119,7 +121,7 @@ dalleClasse.prototype.showDalleInScene = function showDalleInScene() {
                 geom2.faceVertexUvs[0].push(faceUV);
             }
         }
-        var bufferGeometry = THREE.BufferGeometryUtils.fromGeometry(geom2, { indice: n });
+        var bufferGeometry = BufferGeometryUtils.fromGeometry(geom2, { indice: n });
         var mat = this.createShaderForBati();
         for (var a = 0; a < nbTexturesInShader; ++a) {
             if (n + a < nbMaterials) this.affectTexture(mat, n + a, a);
@@ -135,7 +137,7 @@ dalleClasse.prototype.affectTexture = function affectTexture(shaderMat, numMater
     var texture;
     THREE.ImageUtils.crossOrigin = 'use-credentials';   // No anonymous to keep ability to access password protected files (behind dir Viewer)
     if (this.textureType == '.dds') {
-        var loader = new THREE.DDSLoader();
+        var loader = new DDSLoader();
         texture = loader.load(urlTexture, () => {
             shaderMat.uniforms.u_textures.value[numTexture] = texture;   // onLoad function
             texture.dispose();
@@ -351,7 +353,6 @@ dalleClasse.prototype.parseB3DObject = function parseB3DObject(instantB3D) {
     // add vertices and faces
     this.geometry.vertices = obj.verts;
     this.geometry.faces = obj.indices; // face index
-    if (gfxEngine.isMobileEnvironment()) this.racineFile = 'Version4LODS_o';
     // load texture one time at begining
     var materialName;
     if (self.isMaterialsLoaded()) {

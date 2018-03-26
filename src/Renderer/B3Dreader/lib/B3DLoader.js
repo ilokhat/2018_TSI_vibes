@@ -7,13 +7,13 @@ function B3DLoader(dalle) {
     this._materials = {};
     this._unfinalized_objects = {};
     this._textures = {};
-    this._cur_obj_end = 0;
+    this._cur_obj_end = Number.MAX_VALUE;
     this._cur_obj = {};
-    this._cur_mat_end = 0;
+    this._cur_mat_end = 0; // Number.MAX_VALUE;
     this._cur_mat = {};
 
     this.totalFaces = 0;
-    this.pivot = new THREE.Vector3(0, 0, 0);
+    this.pivot = dalle.pivot || new THREE.Vector3(0, 0, 0);
     // only for test
     this.dalle = dalle;
     var self = this;
@@ -38,10 +38,13 @@ function B3DLoader(dalle) {
                 else {
                     self.parseB3D(this.responseText);
                 }
+                console.log('load "'.concat(urlName, '".'));
             }
+            /*
             else {
                 console.log('Failed to load B3D file "'.concat(urlName, '".'));
             }
+            */
         }
     };
 
@@ -182,7 +185,7 @@ B3DLoader.prototype.parseVertexList = function parseVertexList(reader) {
         x = reader.readFloat32();
         y = reader.readFloat32();
         z = reader.readFloat32();
-        this._cur_obj.verts[i] = new THREE.Vector3(x, z, y);           
+        this._cur_obj.verts[i] = new THREE.Vector3(x, y, z);           
         i++;
     }
 };
@@ -313,7 +316,7 @@ B3DLoader.prototype.parseB3D = function parseB3D(data) {
         }
     }
     if (reader.eof()) {
-        this.dalle.parseDallePivot(this.pivot);
+        // this.dalle.parseDallePivot();
         this.dalle.showDalleInScene();
         this.dalle.emptyGeometryCache();
         this.dalle.emptyMaterialsCache();
