@@ -92,9 +92,9 @@ function readFile(file) {
             loader.loadOBJ(reader.result, coord, rotateX, rotateY, rotateZ, scale, handleLayer, menuGlobe);
         }, false);
         reader.readAsDataURL(file);
-        return 0 ;
+        return 0;
     }
-        /*
+    /*
     else if(file.name.endsWith('.gibes')){
         reader.addEventListener('load', () => {
             var json = JSON.parse(reader.result);
