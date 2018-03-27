@@ -20,6 +20,7 @@ var guiInitialized = false;
 var layerFolder = menuGlobe.gui.addFolder('Layers');
 var listLayers = [];
 var listControllers = [];
+var listLayerDelete = [];
 var nbSymbolizer = 0;
 
 var promiseElevation = [];
@@ -52,10 +53,10 @@ var coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 50);
 var rotateX = Math.PI/2;
 var rotateY = 0;
 var rotateZ = 0;
-var scale = 10;
+var scale = 150;
 
 // Symbolizer
-var initSymbolizer = function initSymbolizer(menuGlobe, complex) {
+var initSymbolizer = function initSymbolizer(menuGlobe, complex) {sgdfgfgdgdfgdfgdfgf
     // Merge elements of the list as one group
     var listObj = [];
     var listEdge = [];
@@ -74,7 +75,7 @@ var initSymbolizer = function initSymbolizer(menuGlobe, complex) {
     else {
         symbolizer.initGuiAll();
     }
-    //Remove the layers from the list on the GUI
+   /* //Remove the layers from the list on the GUI
     listControllers.forEach((controller) => {
         menuGlobe.gui.__folders.Layers.remove(controller);
     })
@@ -82,6 +83,7 @@ var initSymbolizer = function initSymbolizer(menuGlobe, complex) {
     // Empty layer and controllers list;
     listLayers = [];
     listControllers = [];
+    */
 }
 
 // Loader initialization
@@ -125,18 +127,47 @@ function readFile(file) {
 // Layer management
 function handleLayer(model, menuGlobe) {
     // Add a checkbox to the GUI, named after the layer
+    console.log("gui ", menuGlobe.gui.__folders.Layers);
+    
+    var lFolder,lFolder1,deleteBtn;
     if(!guiInitialized){
-        layerFolder.add({ symbolizer: () => initSymbolizer(menuGlobe, false) }, 'symbolizer').name('Stylize object...');
-        layerFolder.add({ symbolizer: () => initSymbolizer(menuGlobe, true) }, 'symbolizer').name('Stylize parts...');
+       lFolder =  layerFolder.add({ symbolizer: () => {initSymbolizer(menuGlobe, false);    console.log("gui 2", menuGlobe.gui.__folders.Layers);
+    } }, 'symbolizer').name('Stylize object...');
+       lFolder1 = layerFolder.add({ symbolizer: () => {initSymbolizer(menuGlobe, true);console.log("gui 36", menuGlobe.gui.__folders.Layers) } }, 'symbolizer').name('Stylize parts...');
     }
-    var controller = layerFolder.add({ Layer: false }, 'Layer').name(model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4)).onChange((checked) => {
+   var name =model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4) ;
+    var controller = layerFolder.add({ Layer: false }, 'Layer').name(name).onChange((checked) => {
         if(checked){
             // Add layer and controller to the list
             listLayers.push(model);
             listControllers.push(controller);
+            if ( !listLayerDelete.includes(model)){
+            listLayerDelete.push(model);
+             deleteBtn=  layerFolder.add({ "delete": function(){             
+                var i = listLayers.indexOf(model);
+                if(i != -1) {
+                    listLayers.splice(i, 1);
+                }
+                menuGlobe.gui.__folders.Layers.remove(controller);
+                menuGlobe.gui.__folders.Layers.remove(deleteBtn)
+    
+                globeView.scene.remove(model[0]);
+                globeView.scene.remove(model[1]);
+                globeView.notifyChange(true); 
+           
+            }}, 'delete').name("delete "+name);
+        }
+        
+        
         }
         else{
+            var i = listLayerDelete.indexOf(model);
+            if(i != -1) {
+                listLayerDelete.splice(i, 1);
+            }
             // Remove layer and controller from the list
+            
+            menuGlobe.gui.__folders.Layers.remove(deleteBtn);
             var i = listLayers.indexOf(model);
             if(i != -1) {
                 listLayers.splice(i, 1);
@@ -147,7 +178,10 @@ function handleLayer(model, menuGlobe) {
             } 
         }
     }); 
-    guiInitialized = true;
+  
+        guiInitialized = true;
+
+    
 }
 
 // Drag and drop
