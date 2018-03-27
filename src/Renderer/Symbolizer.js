@@ -460,28 +460,28 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
 
 Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     
-    folder.add({ rotationX: 0 }, 'rotationX', 0, 1, 0.01).name('rotationX').onChange((value) => {
+    folder.add({ rotationX: 0 }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('rotationX').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-           this.obj[i].rotateX(value);
-           this.edges[i].rotateX(value);
+           this.obj[i].rotation.x = value;
+           this.edges[i].rotation.x = value;
            this.obj[i].updateMatrixWorld();
            this.edges[i].updateMatrixWorld();
         }
         this.view.notifyChange(true);
     });
-    folder.add({ rotationY: 0 }, 'rotationY', 0, 1, 0.01).name('rotationY').onChange((value) => {
+    folder.add({ rotationY: 0 }, 'rotationY', -Math.PI, Math.PI, Math.PI / 100).name('rotationY').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-           this.obj[i].rotateY(value);
-           this.edges[i].rotateY(value);
+            this.obj[i].rotation.y = value;
+            this.edges[i].rotation.y = value;
            this.obj[i].updateMatrixWorld();
            this.edges[i].updateMatrixWorld();
         }
         this.view.notifyChange(true);
     });
-    folder.add({ rotationZ: 0 }, 'rotationZ', 0, 1, 0.01).name('rotationZ').onChange((value) => {
+    folder.add({ rotationZ: 0 }, 'rotationZ', -Math.PI, Math.PI, Math.PI / 100).name('rotationZ').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-           this.obj[i].rotateZ(value);
-           this.edges[i].rotateZ(value);
+            this.obj[i].rotation.z = value;
+            this.edges[i].rotation.z = value;
            this.obj[i].updateMatrixWorld();
            this.edges[i].updateMatrixWorld();
         }
@@ -641,20 +641,6 @@ Symbolizer.prototype._checkStructure = function checkStructure() {
             return false;
         }
     }
-    /*
-    // We check if the children have the same name (in the right order)
-    for (i = 0; i < this.obj.length; i++) {
-        for (j = 0; this.obj[i].children.length; j++) {
-            // If one child of one object has a different name, the function returns false
-            console.log(this.obj[0].children[j].name);
-            console.log(this.obj[i].children[j].name);
-            if (this.obj[0].children[j].name !== this.obj[i].children[j].name) {
-                return false;
-            }
-        }
-
-    */
-    // If everything is ok, the function returns true
     return true;
 };
 
