@@ -49,7 +49,7 @@ ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX
         var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true }));
         lines.add(line);
     }
-    lines = this._placeModel(lines, coord, rotateX, rotateY, rotateZ, scale); 
+    lines = this._placeModel(lines, coord, rotateX, rotateY, rotateZ, scale);
     lines.updateMatrixWorld();
 
     var linesID = this.view.mainLoop.gfxEngine.getUniqueThreejsLayer();

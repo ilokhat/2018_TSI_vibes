@@ -70,7 +70,7 @@ The main challenge of this project is that it has to be included into the archit
 
 ### PLU++
 
-The PLU++ project, developed in 2016 using Three.js, will be used as proof of concept to help start our project. To that end, we analyzed the code from the latest version available on github : [IGN/PLU2PLUS](https://github.com/IGNF/PLU2PLUS)
+The PLU++ project, developed in 2016 by Anouk Vinesse under the supervision of Sidonie Christophe and Mickaël Brasebin (COGIT), is a tool of 3D buiding stylization using Three.js, It will be used as proof of concept to help start our project. To that end, we analyzed the code from the latest version available on github : [IGN/PLU2PLUS](https://github.com/IGNF/PLU2PLUS)
 
 ![archi_itowns](VIBES/plu2plus.png)
 
@@ -135,7 +135,7 @@ The goal is to make this tool as general as possible, which means it must not de
 
 The 3D stylization will be done according to the following activity diagram :
 
-![ActivityDiagram](VIBES/3DStylizationProcess.png)
+![ActivityDiagram](VIBES/3DStylizationProcess.png)  
   
 ### Style format
 
@@ -160,7 +160,7 @@ Generic style, applicable to any mesh :
 }
 ```  
   
-Syle format for a complex object with several meshes, all defined by a name :
+Style format for a complex object with several meshes, all defined by a name :
 
 ```json
 {
@@ -288,6 +288,8 @@ When the Symbolizer is instanciated, a default style is applied to the object wi
 The public methods are the two different GUI initialization : 
 * **initGuiAll** : opens one Symbolizer for all the meshes of the object.
 * **initGui** : opens one Symbolizer for each mesh.
+
+(image croutitower with initGuiAll and with initGui)
   
 Each initializer method builds the structure of the GUI, with the appropriate folders and call the 'add' functions.  
 The 'add' functions create buttons and sliders to the menu with dat.GUI, and define the 'change' functions as callbacks.  
@@ -309,10 +311,39 @@ This layer manager should be improved in the next week, with ameliorations such 
 * Closing a symbolizer.
 * Making impossible to open the same layer in different symbolizers.  
   
-An important issue concerning the layers is how to geolocalize them. This is easy when the data itself is georeferenced, but formats like .OBJ do not provide this information. Therefore, in this case, the user should tell where the object is located, but the question is how.  
+An important issue concerning the layers is how to **geolocalize** them. This is easy when the data itself is georeferenced, but formats like .OBJ do not provide this information. Therefore, in this case, the user should tell where the object is located, but the question is how.  
+  
+The answer to this issue is twofold :
+* The user should be able to enter (somehow) the parameters to locate the object he wants to stylize.
+* He also should be able to adjust the position he chose (slight translations, rotations, scaling) later.  
+  
+The second problem can be solved thanks to the GUI, with a few more sliders to move the objects, just like it is done in PLU++.  
+  
+(image of the GUI - position)  
+  
+But this method cannot be used to georeference an object completely - we cannot use a slider to move a mesh from one end of the world to the other. Until this step, the coordinates were hard-coded in the example, which is not satisfying.  
+  
+We could open a window for the user to enter the coordinates between the drag and drop and the actual loading of the object, but it seems pretty heavy. Plus, the user may not care about where the object is located, and just want to use the stylization tool.  
+  
+Therefore, we went for an intermediary solution, where a default position (on place de la Nation, Paris) is hard-coded, and the user can drag and drop a second file containing the necessary parameters to put the object at its right position (coordinates, rotations and scaling). The file looks like this :  
+  
+```json
+{
+    "name": "croutitower",
+    "coordX": 2.396159,
+    "coordY": 48.848264,
+    "coordZ": 50,
+    "rotateX": 0.5,
+    "rotateY": 0,
+    "rotateZ": 0,
+    "scale": 300
+}
+```  
+
+It can be drag and dropped at any time, and will be applied to all the checked layers in the GUI.
   
 **[Back to the top](#summary)** 
-    
+  
   
 ## Advanced functionalities
   
@@ -365,6 +396,11 @@ Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), 
   
 **[Back to the top](#summary)** 
   
+## Object formats
+  
+* OBJ
+* BATI3D
+* BDTOPO WFS extruded
   
 ## Tests
   
