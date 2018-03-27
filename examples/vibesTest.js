@@ -52,7 +52,7 @@ var coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 50);
 var rotateX = Math.PI/2;
 var rotateY = 0;
 var rotateZ = 0;
-var scale = 10;
+var scale = 300;
 
 // Symbolizer
 var initSymbolizer = function initSymbolizer(menuGlobe, complex) {
