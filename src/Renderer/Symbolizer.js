@@ -593,19 +593,26 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     var initialRotateX = this.obj[0].rotation.x;
     var initialRotateY = this.obj[0].rotation.y;
     var initialRotateZ = this.obj[0].rotation.z;
+    var prevValueX = 0;
+    var prevValueY = 0;
+    var prevValueZ = 0;
     folder.add({ rotationX: initialRotateX }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('rotationX').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-           this.obj[i].rotation.x = value;
-           this.edges[i].rotation.x = value;
-           this.obj[i].updateMatrixWorld();
-           this.edges[i].updateMatrixWorld();
+
+            this.obj[i].rotateX(value - prevValueX);
+            this.edges[i].rotateX(value - prevValueX);
+            prevValueX = value;
+            this.obj[i].updateMatrixWorld();
+            this.edges[i].updateMatrixWorld();
         }
         this.view.notifyChange(true);
     });
     folder.add({ rotationY: initialRotateY }, 'rotationY', -Math.PI, Math.PI, Math.PI / 100).name('rotationY').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-            this.obj[i].rotation.y = value;
-            this.edges[i].rotation.y = value;
+
+            this.obj[i].rotateY(value - prevValueY);
+            this.edges[i].rotateY(value - prevValueY);
+            prevValueY = value;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
         }
@@ -613,8 +620,10 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     });
     folder.add({ rotationZ: initialRotateZ }, 'rotationZ', -Math.PI, Math.PI, Math.PI / 100).name('rotationZ').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-            this.obj[i].rotation.z = value;
-            this.edges[i].rotation.z = value;
+
+            this.obj[i].rotateZ(value - prevValueZ);
+            this.edges[i].rotateZ(value - prevValueZ);
+            prevValueZ = value;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
         }
