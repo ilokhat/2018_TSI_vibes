@@ -120,7 +120,7 @@ dalleClasse.prototype.showDalleInScene = function showDalleInScene() {
         console.log('position', gfxEngine);
     }
     this.globalObject.updateMatrixWorld();
-    gfxEngine.addToScene(this.globalObject);
+    this.doAfter(this.globalObject);
 };
 
 dalleClasse.prototype.affectTexture = function affectTexture(shaderMat, numMaterial, numTexture) {

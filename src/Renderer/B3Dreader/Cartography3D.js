@@ -64,10 +64,11 @@ const Cartography3D = {
     },
 
     // initialisation de la visualisation
-    initCarto3D: function initCarto3D(options) {
+    initCarto3D: function initCarto3D(options, doAfter) {
         this.dataURL = options.url;
         this.zero = gfxEngine.getZeroAsVec3D();
         this.textureType = '.dds';
+        this.doAfter = doAfter;
         _textureType = this.textureType;
         this.generateGrid();
         for (var i = 0; i < this.grid.length; i++) {
@@ -116,6 +117,7 @@ const Cartography3D = {
                 this.grid[currentDalleXinGrid][currentDalleYinGrid] = currentDalle;
                 this.listDalles[i].setDalleZeroPivot(zero);
                 if (!this.using3DS) {
+                    this.listDalles[i].doAfter = this.doAfter;
                     this.listDalles[i].load();
                 }
             }

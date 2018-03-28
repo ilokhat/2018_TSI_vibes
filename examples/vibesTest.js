@@ -181,9 +181,10 @@ itowns.gfxEngine.init(globeView);
 itowns.gfxEngine.setZero(options.position);
 
 if (!itowns.Cartography3D.isCartoInitialized()){
-    itowns.Cartography3D.initCarto3D(options.buildings);
+    itowns.Cartography3D.initCarto3D(options.buildings, doAfter);
 };
 
-function doafter(obj){
+function doAfter(obj){
+    globeView.scene.add(obj);
     console.log(obj);
 }
