@@ -2,26 +2,25 @@ import * as THREE from 'three';
 import BinaryStream from './BinaryStream';
 import PlatformInfo from './PlatformInfo';
 
+
 function B3DLoader(dalle) {
     this.decimalPrecision = 3;
     this._materials = {};
     this._unfinalized_objects = {};
     this._textures = {};
-    this._cur_obj_end = Number.MAX_VALUE;
-    this._cur_obj = {};
-    this._cur_mat_end = 0; // Number.MAX_VALUE;
-    this._cur_mat = {};
-
+    this._cur_obj_end = 0;
+    this._cur_mat_end = 0;
     this.totalFaces = 0;
-    this.pivot = dalle.pivot || new THREE.Vector3(0, 0, 0);
+    this.pivot = new THREE.Vector3(0, 0, 0);
     // only for test
     this.dalle = dalle;
     var self = this;
     var xhr = new XMLHttpRequest();
     var urlName = dalle.getUrlDSFile();
     xhr.open('GET', urlName, true);
-    if (PlatformInfo.browser === 'ie' && PlatformInfo.version >= '10') xhr.responseType = 'blob'; // use blob method to deal with b3d files for IE >= 10
-    else {
+    if (PlatformInfo.browser === 'ie' && PlatformInfo.version >= '10') {
+        xhr.responseType = 'blob'; // use blob method to deal with b3d files for IE >= 10
+    } else {
         xhr.overrideMimeType('text/plain; charset=x-user-defined');
     }
 
@@ -34,23 +33,17 @@ function B3DLoader(dalle) {
                         self.parseB3D(event.target.result);
                     };
                     blobReader.readAsText(this.response, 'x-user-defined');
-                }
-                else {
+                } else {
                     self.parseB3D(this.responseText);
                 }
-                console.log('load "'.concat(urlName, '".'));
-            }
-            /*
-            else {
+            } else {
                 console.log('Failed to load B3D file "'.concat(urlName, '".'));
             }
-            */
         }
     };
 
     xhr.send();
 }
-
 B3DLoader.prototype.setDecimalPrecision = function setDecimalPrecision(precision) {
     this.decimalPrecision = precision;
 };
@@ -99,10 +92,8 @@ B3DLoader.prototype.parseMaterial = function parseMaterial(reader, endMaterial) 
 
 B3DLoader.prototype.readAmount = function readAmount(reader, end) {
     var cid;
-    var len;
     var amount = 0;
     cid = reader.readUInt16();
-    len = reader.readUInt32();
     switch (cid) {
         case 0x0030: // Floats
             amount = reader.readUInt16();
@@ -122,7 +113,6 @@ B3DLoader.prototype.readColor = function readColor(reader) {
     var b;
     cid = reader.readUInt16();
     len = reader.readUInt32();
-
     switch (cid) {
         case 0x0010: // Floats
             r = reader.readFloat32() * 255;
@@ -142,7 +132,7 @@ B3DLoader.prototype.readColor = function readColor(reader) {
 };
 
 B3DLoader.prototype.parseTexture = function parseTexture(reader, endTexture) {
-    var tex = {};
+    var tex = { };
     while (reader.tell() < endTexture) {
         var cid;
         var len;
@@ -152,7 +142,6 @@ B3DLoader.prototype.parseTexture = function parseTexture(reader, endTexture) {
             case 0xA300:
                 tex.url = this.readNulTermString(reader);
                 break;
-
             default:
                 // Skip this unknown texture sub-chunk
                 reader.skip(len - 6);
@@ -179,13 +168,11 @@ B3DLoader.prototype.parseVertexList = function parseVertexList(reader) {
     var count = reader.readUInt16();
     this._cur_obj.verts = new Array(count);
     while (i < count) {
-        var x;
-        var y;
-        var z;
+        var x; var y; var z;
         x = reader.readFloat32();
         y = reader.readFloat32();
         z = reader.readFloat32();
-        this._cur_obj.verts[i] = new THREE.Vector3(x, y, z);           
+        this._cur_obj.verts[i] = new THREE.Vector3(x, z, y);
         i++;
     }
 };
@@ -197,9 +184,7 @@ B3DLoader.prototype.parseFaceList = function parseFaceList(reader) {
     this._cur_obj.indices = [];
     this._cur_obj.uvsIndexes = [];
     while (i < count) {
-        var i0;
-        var i1;
-        var i2;
+        var i0; var i1; var i2;
         i0 = reader.readUInt16();
         i1 = reader.readUInt16();
         i2 = reader.readUInt16();
@@ -219,8 +204,7 @@ B3DLoader.prototype.parseUVList = function parseUVList(reader) {
     var count = reader.readUInt16();
     this._cur_obj.uvs = [];
     while (i < count) {
-        var u;
-        var v;
+        var u; var v;
         u = reader.readFloat32();
         v = 1 - reader.readFloat32();
         this._cur_obj.uvs.push(new THREE.Vector2(u, v));
@@ -254,22 +238,16 @@ B3DLoader.prototype.parseB3D = function parseB3D(data) {
     while (!reader.eof()) {
         if (this._cur_mat && reader.tell() >= this._cur_mat_end) {
             this.finalizeCurrentMaterial();
-        }
-        else if (this._cur_obj && reader.tell() >= this._cur_obj_end) {
+        } else if (this._cur_obj && reader.tell() >= this._cur_obj_end) {
             this.dalle.parseB3DObject(this);
             this.totalFaces += this._cur_obj.facesCount;
             this._unfinalized_objects[this._cur_obj.name] = this._cur_obj;
             this._cur_obj_end = Number.MAX_VALUE;
             this._cur_obj = null;
-        } // end if
-
-        var cid;
-        var len;
-        var end;
-        cid = reader.readUInt16();
-        len = reader.readUInt32();
-        end = reader.tell() + (len - 6);
-
+        }// end if
+        var cid = reader.readUInt16();
+        var len = reader.readUInt32();
+        var end = reader.tell() + (len - 6);
         switch (cid) {
             case 0x4D4D: // MAINB3D
                 continue;
@@ -281,7 +259,6 @@ B3DLoader.prototype.parseB3D = function parseB3D(data) {
                 this._cur_mat_end = end;
                 this._cur_mat = this.parseMaterial(reader, end);
                 break;
-
             case 0x4000: // EDIT_OBJECT
                 this._cur_obj_end = end;
                 this._cur_obj = {};
@@ -289,39 +266,33 @@ B3DLoader.prototype.parseB3D = function parseB3D(data) {
                 this._cur_obj.materials = [];
                 this._cur_obj.materialFaces = [];
                 break;
-
             case 0x4100: // OBJ_TRIMESH
-
                 this._cur_obj.type = 'mesh';
                 break;
-
             case 0x4110: // TRI_VERTEXL
                 this.parseVertexList(reader);
                 break;
-
             case 0x4140: // TRI_MAPPINGCOORDS
                 this.parseUVList(reader);
                 break;
-
             case 0x4120: // TRI_FACELIST
                 this.parseFaceList(reader);
                 break;
             case 0x4130: // Face materials
                 this.parseFaceMaterialList(reader);
                 break;
-
             default:
                 reader.skip(len - 6);
                 break;
         }
     }
     if (reader.eof()) {
-        // this.dalle.parseDallePivot();
+        this.dalle.parseDallePivot(this.pivot);
         this.dalle.showDalleInScene();
         this.dalle.emptyGeometryCache();
         this.dalle.emptyMaterialsCache();
         console.log('B3D object was loaded !');
-        console.log(' totalFaces='.concat(this.totalFaces, '\nDalle Name=', this.dalle.name));
+        console.log(' totalFaces='.concat(this.totalFaces, ', Dalle Name = ', this.dalle.name));
     }
 };
 

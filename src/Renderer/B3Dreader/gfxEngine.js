@@ -14,7 +14,8 @@ const gfxEngine = {
         if (z instanceof THREE.Vector3) {
             this._zero = z;
         } else {
-            this._zero = new THREE.Vector3(z.x, z.y, z.z);
+            if (z.CRS) this._crs = z.CRS;
+            this._zero = new THREE.Vector3(z.x, z.z, z.y);
         }
     },
     getZeroAsVec3D: function getZeroAsVec3D() {
@@ -29,6 +30,11 @@ const gfxEngine = {
     },
     addToScene: function addToScene(obj) {
         this._scene.add(obj);
+    },
+    init: function init(view) {
+        this.setCamera(view.camera);
+        this.setScene(view.scene);
+        this._referenceCrs = view.referenceCrs;
     },
 };
 

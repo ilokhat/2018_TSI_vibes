@@ -1,11 +1,14 @@
 import * as THREE from 'three';
+import proj4 from 'proj4';
 import gfxEngine from './gfxEngine';
 import B3DLoader from './lib/B3DLoader';
 import Shader from './Shader';
 import BufferGeometryUtils from './lib/postprocessing/BufferGeometryUtils';
 import DDSLoader from './lib/DDSLoader';
+import Coordinates from '../../Core/Geographic/Coordinates';
 
-function dalleClasse(glob) {
+
+function dalleClasse() {
     this.dataURL = '';
     this.name = '';
     this.path = '';
@@ -28,11 +31,10 @@ function dalleClasse(glob) {
     this.geometry = new THREE.Geometry();
     this.materialsName = [];
     this.mesh = null;
-    this.globalObject = new THREE.Object3D();
+    this.globalObject = new THREE.Group();
     this.shaderMat = null;
     this.texture1 = null;
     this.racineFile = '';// Version4LODS';  // Version4LODS_o for jpg
-    this.glob = glob;
 }
 
 dalleClasse.prototype.setDalleZeroPivot = function setDalleZeroPivot(v) {
@@ -65,28 +67,8 @@ dalleClasse.prototype.setMaterialsLoaded = function setMaterialsLoaded(v) {
     this.cachedMaterials.loadMaterials = v;
 };
 
-dalleClasse.prototype.addDalleMaterials = function addDalleMaterials(mat) {
-    this.cachedMaterials.materials.push(mat);
-};
-
 dalleClasse.prototype.addTextureURL = function addTextureURL(url) {
     this.cachedMaterials.urls.push(url);
-};
-
-dalleClasse.prototype.addTextureAlex = function addTextureAlex(texture) {
-    this.cachedMaterials.textures.push(texture);
-};
-
-dalleClasse.prototype.mergeObject = function mergeObject(object) {
-    THREE.GeometryUtils.merge(this.geometry, object);
-};
-
-dalleClasse.prototype.mergeGeometry = function mergeGeometry(geom) {
-    this.geometry.merge(geom);
-};
-
-dalleClasse.prototype.checkDoubleVertices = function checkDoubleVertices() {
-    this.geometry.mergeVertices();
 };
 
 dalleClasse.prototype.setLoDLevel = function setLoDLevel(v) {
@@ -95,10 +77,6 @@ dalleClasse.prototype.setLoDLevel = function setLoDLevel(v) {
 
 dalleClasse.prototype.getLoDLevel = function getLoDLevel() {
     return this.LOBLevel.level;
-};
-
-dalleClasse.prototype.getDalleGemetry = function getDalleGemetry() {
-    return this.geometry;
 };
 
 dalleClasse.prototype.showDalleInScene = function showDalleInScene() {
@@ -126,8 +104,19 @@ dalleClasse.prototype.showDalleInScene = function showDalleInScene() {
         for (var a = 0; a < nbTexturesInShader; ++a) {
             if (n + a < nbMaterials) this.affectTexture(mat, n + a, a);
         }
+        mat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         var mesh = new THREE.Mesh(bufferGeometry, mat);
+        mesh.name = this.name.concat('-', n);
         this.globalObject.add(mesh);
+    }
+    console.log('test : ', gfxEngine._referenceCrs, gfxEngine._crs);
+    if (gfxEngine._referenceCrs && gfxEngine._crs) {
+        console.log('position', gfxEngine._referenceCrs, gfxEngine._crs);
+        console.log(parseFloat(gfxEngine._zero.x), parseFloat(gfxEngine._zero.z), parseFloat(gfxEngine._zero.y));
+        var pos = new Coordinates(gfxEngine._crs, parseFloat(gfxEngine._zero.x), parseFloat(gfxEngine._zero.z), parseFloat(gfxEngine._zero.y));
+        this.globalObject.position.copy(pos.as(gfxEngine._referenceCrs).xyz());
+    } else {
+        console.log('position', gfxEngine);
     }
     gfxEngine.addToScene(this.globalObject);
 };
@@ -156,11 +145,6 @@ dalleClasse.prototype.affectTexture = function affectTexture(shaderMat, numMater
     texture.needsUpdate = true;
     texture.name = numMaterial;
 };
-
-dalleClasse.prototype.pushTextureToGPU = function pushTextureToGPU(texture) {
-    console.log('pushTextureToGPU'.concat(texture));
-};
-
 dalleClasse.prototype.createShaderForBati = function createShaderForBati() {
     var uniformsBati = {
         alpha: { type: 'f', value: this.dalleOpacity },
@@ -193,6 +177,7 @@ dalleClasse.prototype.emptyMaterialsCache = function emptyMaterialsCache() {
     this.cachedMaterials.materials = [];
     this.setMaterialsLoaded(true);
 };
+
 dalleClasse.prototype.computeUrlLoBLevel = function computeUrlLoBLevel() {
     if (this.textureType == '.dds') {
         switch (this.getLoDLevel()) {
@@ -256,71 +241,6 @@ dalleClasse.prototype.computeUrlLoBLevel = function computeUrlLoBLevel() {
         }
     }
 };
-
-dalleClasse.prototype.computeUrlLoBLevelSAVE = function computeUrlLoBLevelSAVE() {
-    if (this.textureType == '.dds') {
-        switch (this.getLoDLevel()) {
-            case 0:
-                this.LOBLevel.urlDS3 = '../Bati3D_LOB/Version4LODS/'.concat(this.path, 'ZoneAExporter.3DS');
-                this.LOBLevel.urlDDS = this.textureType;
-                break;
-            case 2:
-                this.LOBLevel.urlDS3 = '../Bati3D_LOB/Version4LODS/'.concat(this.path, 'ZoneAExporter-0.b3d');
-                this.LOBLevel.urlDDS = this.textureType;
-                this.LOBLevel.urlDDS16 = '-16'.concat(this.textureType);
-                break;
-            case 4:
-                this.LOBLevel.urlDS3 = '../Bati3D_LOB/Version4LODS/'.concat(this.path, 'ZoneAExporter-1.b3d');
-                this.LOBLevel.urlDDS = '-4'.concat(this.textureType);
-                this.LOBLevel.urlDDS16 = '-16'.concat(this.textureType);
-                break;
-            case 8:
-                this.LOBLevel.urlDS3 = '../Bati3D_LOB/Version4LODS/'.concat(this.path, 'ZoneAExporter-2.b3d');
-                this.LOBLevel.urlDDS = '-8'.concat(this.textureType);
-                this.LOBLevel.urlDDS16 = '-16'.concat(this.textureType);
-                break;
-            case 16:
-                this.LOBLevel.urlDS3 = '../Bati3D_LOB/Version4LODS/'.concat(this.path, 'ZoneAExporter-3.b3d');// 'images/Bati3D/' + this.path + 'ZoneAExporter-3.b3d';
-                this.LOBLevel.urlDDS = '-16'.concat(this.textureType);
-                this.LOBLevel.urlDDS16 = '-16'.concat(this.textureType);
-                break;
-            default:
-                console.log('Cartography3D: does not support this level');
-                break;
-        }
-    } else {
-        switch (this.getLoDLevel()) {
-            case 0:
-                this.LOBLevel.urlDS3 = '../Bati3D_LOB/Version4LODS/'.concat(this.path, 'ZoneAExporter.3DS');
-                this.LOBLevel.urlDDS = this.textureType;
-                break;
-            case 2:
-                this.LOBLevel.urlDS3 = '../Bati3D_LOB/Version4LODS/'.concat(this.path, 'ZoneAExporter-0.b3d');
-                this.LOBLevel.urlDDS = this.textureType;
-                this.LOBLevel.urlDDS16 = this.textureType;
-                break;
-            case 4:
-                this.LOBLevel.urlDS3 = '../Bati3D_LOB/Version4LODS/'.concat(this.path, 'ZoneAExporter-1.b3d');
-                this.LOBLevel.urlDDS = this.textureType;
-                this.LOBLevel.urlDDS16 = this.textureType;
-                break;
-            case 8:
-                this.LOBLevel.urlDS3 = '../Bati3D_LOB/Version4LODS/'.concat(this.path, 'ZoneAExporter-2.b3d');
-                this.LOBLevel.urlDDS = this.textureType;
-                this.LOBLevel.urlDDS16 = this.textureType;
-                break;
-            case 16:
-                this.LOBLevel.urlDS3 = '../Bati3D_LOB/Version4LODS/'.concat(this.path, 'ZoneAExporter-3.b3d');// 'images/Bati3D/' + this.path + 'ZoneAExporter-3.b3d';
-                this.LOBLevel.urlDDS = this.textureType;
-                this.LOBLevel.urlDDS16 = this.textureType;
-                break;
-            default:
-                console.log('Cartography3D: does not support this level');
-                break;
-        }
-    }
-};
-
 dalleClasse.prototype.getUrlDSFile = function getUrlDSFile() {
     return this.LOBLevel.urlDS3;
 };
@@ -339,11 +259,6 @@ dalleClasse.prototype.load = function load() {
 dalleClasse.prototype.setVisible = function setVisible(v) {
     this.globalObject.traverse((object) => { object.visible = v; });
     console.log('Bati3D visibility is ', v);
-};
-
-dalleClasse.prototype.setOpacity = function setOpacity(v) {
-    this.globalObject.traverse((object) => { if (object.material) object.material.uniforms.alpha.value = v; });
-    // console.log('Bati3D opacity is ',v);
 };
 
 dalleClasse.prototype.parseB3DObject = function parseB3DObject(instantB3D) {
@@ -390,7 +305,6 @@ dalleClasse.prototype.parseB3DObject = function parseB3DObject(instantB3D) {
     this.geometry.computeFaceNormals();
     this.geometry.computeVertexNormals();
 };
-
 dalleClasse.prototype.parseDallePivot = function parseDallePivot() {
     var xp = -this.pivot.x;
     var yp = -this.pivot.y;
@@ -398,48 +312,11 @@ dalleClasse.prototype.parseDallePivot = function parseDallePivot() {
     this.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(xp, yp, zp));
 };
 
-dalleClasse.prototype.parseB3DGeometry = function parseB3DGeometry(instantB3D) {
-    var self = this;
-    var obj = instantB3D._cur_obj;
-    if (obj.uvs !== undefined) {
-        var geometry = new THREE.Geometry();
-        // add vertices and faces
-        geometry.vertices = obj.verts;
-        geometry.faces = obj.indices;    // face index
-        // load texture one time at begining
-        var materialName;
-        if (self.isMaterialsLoaded()) {
-            var mat = null;
-            for (materialName in instantB3D._materials) {
-                if (Object.prototype.hasOwnProperty.call(instantB3D._materials, materialName)) {
-                    mat = instantB3D._materials[materialName];
-                    if (mat.colorMap) {
-                        self.addDalleMaterials(new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true }));
-                        self.addMaterialsName(materialName);
-                    }
-                }
-            }
-            self.setMaterialsLoaded(false);
-        }
-        // add uv texture if exist
-        for (var i = 0; i < obj.uvsIndexes.length; i++) {
-            geometry.faceVertexUvs[0].push([
-                obj.uvs[obj.uvsIndexes[i].x],
-                obj.uvs[obj.uvsIndexes[i].y],
-                obj.uvs[obj.uvsIndexes[i].z],
-            ]);
-        }
-        var materialFaces = obj.materialFaces;
-        for (materialName in materialFaces) {
-            if (Object.prototype.hasOwnProperty.call(materialFaces, materialName)) {
-                var ind = self.getIndexMaterialName(materialName);
-                for (var j = 0; j < geometry.faces.length; j++) {
-                    geometry.faces[j].materialIndex = ind;
-                }
-            }
-        }
-        self.mergeGeometry(geometry);
+/*
+    proj4.defs("EPSG:2154","+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+    if (gfxEngine._crs) {
+        var pos = new Coordinates(gfxEngine._crs, gfxEngine._zero.x, gfxEngine._zero.y, gfxEngine._zero.z);
+        this.globalObject.position.copy(pos.as(gfxEngine._referenceCrs).xyz());
     }
-};
-
+*/
 export default dalleClasse;
