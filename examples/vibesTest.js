@@ -183,3 +183,7 @@ itowns.gfxEngine.setZero(options.position);
 if (!itowns.Cartography3D.isCartoInitialized()){
     itowns.Cartography3D.initCarto3D(options.buildings);
 };
+
+function doafter(obj){
+    console.log(obj);
+}

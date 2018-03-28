@@ -104,7 +104,8 @@ dalleClasse.prototype.showDalleInScene = function showDalleInScene() {
         for (var a = 0; a < nbTexturesInShader; ++a) {
             if (n + a < nbMaterials) this.affectTexture(mat, n + a, a);
         }
-        mat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        mat = new THREE.MeshPhongMaterial({ color: 0x2194ce, emissive: 0xbb2727, specular: 0x111111, side: THREE.DoubleSide });
+        mat.needsUpdate = true;
         var mesh = new THREE.Mesh(bufferGeometry, mat);
         mesh.name = this.name.concat('-', n);
         this.globalObject.add(mesh);
@@ -118,6 +119,7 @@ dalleClasse.prototype.showDalleInScene = function showDalleInScene() {
     } else {
         console.log('position', gfxEngine);
     }
+    this.globalObject.updateMatrixWorld();
     gfxEngine.addToScene(this.globalObject);
 };
 
@@ -312,11 +314,4 @@ dalleClasse.prototype.parseDallePivot = function parseDallePivot() {
     this.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(xp, yp, zp));
 };
 
-/*
-    proj4.defs("EPSG:2154","+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
-    if (gfxEngine._crs) {
-        var pos = new Coordinates(gfxEngine._crs, gfxEngine._zero.x, gfxEngine._zero.y, gfxEngine._zero.z);
-        this.globalObject.position.copy(pos.as(gfxEngine._referenceCrs).xyz());
-    }
-*/
 export default dalleClasse;
