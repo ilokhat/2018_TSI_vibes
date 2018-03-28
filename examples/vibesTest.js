@@ -20,6 +20,7 @@ var guiInitialized = false;
 var layerFolder = menuGlobe.gui.addFolder('Layers');
 var listLayers = [];
 var listControllers = [];
+var listLayerDelete = [];
 var nbSymbolizer = 0;
 
 var promiseElevation = [];
@@ -55,29 +56,36 @@ var rotateZ = 0;
 var scale = 300;
 
 // Symbolizer
-var initSymbolizer = function initSymbolizer(listLayers, listControllers, menuGlobe, complex) {
-    // Merge elements of the list as one group
-    var listObj = [];
-    var listEdge = [];
-    var obj;
-    var edge;
-    listLayers.forEach((layer) => {
-        listObj.push(layer[0]);
-        listEdge.push(layer[1]);
-    })
-    // Call Symbolizer
-    nbSymbolizer++;
-    var symbolizer = new itowns.Symbolizer(globeView, listObj, listEdge, menuGlobe, nbSymbolizer);
-    if (complex) {
-        symbolizer.initGui();
-    }
-    else {
-        symbolizer.initGuiAll();
-    }
-    //Remove the layers from the list
-    listControllers.forEach((controller) => {
-        menuGlobe.gui.__folders.Layers.remove(controller);
-    })    
+var initSymbolizer = function initSymbolizer(menuGlobe, complex) {
+    // Checks if a layer is selected (if not, nothing happens)
+    if (listLayers.length != 0) {
+        // Merge elements of the list as one group
+        var listObj = [];
+        var listEdge = [];
+        var obj;
+        var edge;
+        listLayers.forEach((layer) => {
+            listObj.push(layer[0]);
+            listEdge.push(layer[1]);
+        })
+        // Call Symbolizer
+        nbSymbolizer++;
+        var symbolizer = new itowns.Symbolizer(globeView, listObj, listEdge, menuGlobe, nbSymbolizer);
+        if (complex) {
+            symbolizer.initGui();
+        }
+        else {
+            symbolizer.initGuiAll();
+        }
+        //Remove the layers from the list on the GUI
+        listControllers.forEach((controller) => {
+            menuGlobe.gui.__folders.Layers.remove(controller);
+        })
+
+        // Empty layer and controllers list;
+        listLayers = [];
+        listControllers = [];
+        }
 }
 
 // Loader initialization
@@ -92,18 +100,27 @@ function readFile(file) {
             loader.loadOBJ(reader.result, coord, rotateX, rotateY, rotateZ, scale, handleLayer, menuGlobe);
         }, false);
         reader.readAsDataURL(file);
-        return 0 ;
+        return 0;
     }
-        /*
     else if(file.name.endsWith('.gibes')){
         reader.addEventListener('load', () => {
             var json = JSON.parse(reader.result);
-            var layer = json.name;
-
-        })
+            listLayers.forEach((layer) => {
+                // Position parameters
+                var coordX = json.coordX;
+                var coordY = json.coordY;
+                var coordZ = json.coordZ;
+                var rotateX = Math.PI * json.rotateX;
+                var rotateY = Math.PI * json.rotateY;
+                var rotateZ = Math.PI * json.rotateZ;
+                var scale = json.scale;
+                // Moving object
+                var coord = new itowns.Coordinates('EPSG:4326', coordX, coordY, coordZ);
+                loader._loadModel(layer[0], layer[1], coord, rotateX, rotateY, rotateZ, scale);
+            })
+        });
         reader.readAsText(file);
     }
-    */
     else{
         throw new loadFileException("fichier de type .obj attendu");
     }
@@ -111,19 +128,51 @@ function readFile(file) {
 
 // Layer management
 function handleLayer(model, menuGlobe) {
-    // Add a checkbox to the GUI, named after the layer
-    if(!guiInitialized){
-        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, listControllers, menuGlobe, false) }, 'symbolizer').name('Stylize object...');
-        layerFolder.add({ symbolizer: () => initSymbolizer(listLayers, listControllers, menuGlobe, true) }, 'symbolizer').name('Stylize parts...');
+    // Add a checkbox to the GUI, named after the layer  
+    var lFolder, lFolder1, deleteBtn;
+    if (!guiInitialized) {
+        // Creates buttons to start symbolizers
+        lFolder =  layerFolder.add({ symbolizer: () => {
+            initSymbolizer(menuGlobe, false);    
+        }}, 'symbolizer').name('Stylize object...');
+        lFolder1 = layerFolder.add({ symbolizer: () => {
+            initSymbolizer(menuGlobe, true);
+        }}, 'symbolizer').name('Stylize parts...');
     }
-    var controller = layerFolder.add({ Layer: false }, 'Layer').name(model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4)).onChange((checked) => {
-        if(checked){
+    var name = model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4);
+    var controller = layerFolder.add({ Layer: false }, 'Layer').name(name).onChange((checked) => {
+        if (checked) {
             // Add layer and controller to the list
             listLayers.push(model);
             listControllers.push(controller);
+            if (!listLayerDelete.includes(model)) {
+                listLayerDelete.push(model);
+                deleteBtn = layerFolder.add({ delete: () => {
+                    // Remove the layer from the list of layers to stylize
+                    var i = listLayers.indexOf(model);
+                    if(i != -1) {
+                        listLayers.splice(i, 1);
+                    }
+                    // Removes the controllers
+                    console.log(menuGlobe.gui.__folders.Layers);
+                    if (menuGlobe.gui.__folders.Layers != undefined){
+                        menuGlobe.gui.__folders.Layers.remove(controller);
+                    }
+                    menuGlobe.gui.__folders.Layers.remove(deleteBtn);
+                    // Actually remove the model from the scene
+                    globeView.scene.remove(model[0]);
+                    globeView.scene.remove(model[1]);
+                    globeView.notifyChange(true); 
+                }}, 'delete').name('Delete ' + name);
+            }
         }
         else{
+            var i = listLayerDelete.indexOf(model);
+            if(i != -1) {
+                listLayerDelete.splice(i, 1);
+            }
             // Remove layer and controller from the list
+            menuGlobe.gui.__folders.Layers.remove(deleteBtn);
             var i = listLayers.indexOf(model);
             if(i != -1) {
                 listLayers.splice(i, 1);
@@ -134,7 +183,10 @@ function handleLayer(model, menuGlobe) {
             } 
         }
     }); 
-    guiInitialized = true;
+  
+        guiInitialized = true;
+
+    
 }
 
 // Drag and drop
@@ -164,17 +216,10 @@ function loadFileException(message) {
     this.name = "loadFileException";
  }
 
-
 var options = {
     buildings: { url: "./models/Buildings3D/", visible: true, },
     position: { x:651250, y:6861250, z:0 , CRS: 'EPSG:2154'},
 };
-
-// https://epsg.io/
-// itowns.proj4.defs("EPSG:2154","+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
-
-co = new itowns.Coordinates(options.position.CRS, options.position.x, options.position.y, options.position.z);
-console.log(co.as(globeView.referenceCrs));
 
 itowns.gfxEngine.init(globeView);
 
@@ -183,6 +228,7 @@ itowns.gfxEngine.setZero(options.position);
 if (!itowns.Cartography3D.isCartoInitialized()){
     itowns.Cartography3D.initCarto3D(options.buildings, doAfter);
 };
+
 
 function doAfter(obj){
     globeView.scene.add(obj);

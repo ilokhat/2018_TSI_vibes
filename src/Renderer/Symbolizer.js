@@ -119,79 +119,94 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
 // Callback functions (concrete stylization)
 
 Symbolizer.prototype._changeOpacity = function changeOpacity(value, i, j) {
+    // Update opacity with selected value
     this.obj[i].children[j].material.opacity = value;
     this.obj[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
 
 Symbolizer.prototype._changeOpacityEdge = function changeOpacityEdge(value, i, j) {
+    // Update edge opacity with selected value
     this.edges[i].children[j].material.opacity = value;
     this.edges[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
 
 Symbolizer.prototype._changeColor = function changeColor(value, i, j) {
+    // Update color with selected value
     this.obj[i].children[j].material.color = new THREE.Color(value);
     this.obj[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
 
 Symbolizer.prototype._changeColorEdge = function changeColorEdge(value, i, j) {
+    // Update edge color with selected value
     this.edges[i].children[j].material.color = new THREE.Color(value);
     this.edges[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
 
 Symbolizer.prototype._changeEmissive = function changeEmissive(value, i, j) {
+    // Update edge width with selected value
     this.obj[i].children[j].material.emissive = new THREE.Color(value);
     this.obj[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
 
 Symbolizer.prototype._changeSpecular = function changeSpecular(value, i, j) {
+    // Update specular with selected value
     this.obj[i].children[j].material.specular = new THREE.Color(value);
     this.obj[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
 
 Symbolizer.prototype._changeShininess = function changeShininess(value, i, j) {
+    // Update shininess with selected value
     this.obj[i].children[j].material.shininess = value;
     this.obj[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
 
 Symbolizer.prototype._changeTexture = function changeTexture(chemin, i, j, folder) {
-
+    // Add texture
     if (chemin != './textures/') {
+        // Checks if a texture repetition controller already exists
         var isTextured = false;
         for (let k = 0; k < folder.__controllers.length; k++) {
             if (folder.__controllers[k].property == 'textureRepetition') {
                 isTextured = true;
             }
         }
+        // If not, a texture repetition controller is added to the GUI
         if (!isTextured) {
             folder.add({ textureRepetition: 1 }, 'textureRepetition', 0.1, 5).name('Texture Repetition').onChange((value) => {
-                this._changetextureRepetition(value, i, j);
+                this._changeTextureRepetition(value, i, j);
             });
         }
+        // Create new texture
         var texture = new THREE.TextureLoader().load(chemin);
         texture.textureRepetition = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
+        // Save material properties
         var meshshininess = this.obj[i].children[j].material.shininess;
         var meshspecular = this.obj[i].children[j].material.specular;
         var meshemissive = this.obj[i].children[j].material.emissive;
         var meshcolor = this.obj[i].children[j].material.color;
         var meshopacity = this.obj[i].children[j].material.opacity;
+        // Create and apply new material
         this.obj[i].children[j].material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide, map: texture, color: meshcolor, emissive: meshemissive, specular: meshspecular, shininess: meshshininess, opacity: meshopacity, transparent: true });
         this.obj[i].children[j].material.needsUpdate = true;
         this.view.notifyChange(true);
-        
-    } else {
+    }
+    // Remove texture
+    else {
+        // Remove texture repetition controller from the GUI
         for (let k = 0; k < folder.__controllers.length; k++) {
             if (folder.__controllers[k].property == 'textureRepetition') {
                 folder.remove(folder.__controllers[k]);
             }
         }
+        // Set map attribute to null to remove the texture
         this.obj[i].children[j].material.map = null;
         this.obj[i].children[j].material.needsUpdate = true;
         this.view.notifyChange(true);
@@ -199,57 +214,139 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, i, j, folde
 };
 
 Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, i, folder) {
-
+    // Add texture to all faces
     if (chemin != './textures/') {
+        // Checks if a texture repetition controller already exists
         var isTextured = false;
         for (let k = 0; k < folder.__controllers.length; k++) {
             if (folder.__controllers[k].property == 'textureRepetition') {
                 isTextured = true;
             }
         }
+        // If not, a texture repetition controller is added to the GUI
         if (!isTextured) {
             folder.add({ textureRepetition: 1 }, 'textureRepetition', 0.1, 5).name('Texture Repetition').onChange((value) => {
                 for (let j = 0; j < this.obj[i].children.length; j++) {
-                    this._changetextureRepetition(value, i, j); 
+                    this._changeTextureRepetition(value, i, j);
                 }
             });
         }
+        // Create new texture
         for (let j = 0; j < this.obj[i].children.length; j++) {
             var texture = new THREE.TextureLoader().load(chemin);
             texture.textureRepetition = THREE.RepeatWrapping;
             texture.wrapT = THREE.RepeatWrapping;
+            // Save material properties
             var meshshininess = this.obj[i].children[j].material.shininess;
             var meshspecular = this.obj[i].children[j].material.specular;
             var meshemissive = this.obj[i].children[j].material.emissive;
             var meshcolor = this.obj[i].children[j].material.color;
             var meshopacity = this.obj[i].children[j].material.opacity;
+            // Create and apply new material
             this.obj[i].children[j].material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide, map: texture, color: meshcolor, emissive: meshemissive, specular: meshspecular, shininess: meshshininess, opacity: meshopacity, transparent: true });
             this.obj[i].children[j].material.needsUpdate = true;
             this.view.notifyChange(true);
         }
-        
-    } else {
+    }
+    // Remove texture
+    else {
+        // Remove texture repetition controller from the GUI
         for (let k = 0; k < folder.__controllers.length; k++) {
             if (folder.__controllers[k].property == 'textureRepetition') {
                 folder.remove(folder.__controllers[k]);
             }
         }
+        // Set map attribute to null to remove the texture
         for (let j = 0; j < this.obj[i].children.length; j++) {
             this.obj[i].children[j].material.map = null;
             this.obj[i].children[j].material.needsUpdate = true;
             this.view.notifyChange(true);
         }
-
     }
 };
 
 Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, i, j) {
+    // Update edge width with selected value
     this.edges[i].children[j].material.linewidth = value;
     this.edges[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
 };
 
-Symbolizer.prototype._changetextureRepetition = function changetextureRepetition(value, i, j) {
+Symbolizer.prototype._changeStyleEdge = function _changeStyleEdge(value, i, j, folder) {
+    // Save edges property
+    var oldOpacity = this.edges[i].children[j].material.opacity;
+    var oldColor = this.edges[i].children[j].material.color;
+    var oldWidth = this.edges[i].children[j].material.linewidth;
+    // Create new material
+    var newMaterial;
+    if (value === 'Dashed') {
+        // Create dashed material
+        newMaterial = new THREE.LineDashedMaterial({
+            color: oldColor,
+            linewidth: oldWidth,
+            opacity: oldOpacity,
+            dashSize: 0.05,
+            gapSize: 0.05,
+        });
+        // Checks if dash size and gap size controllers already exist
+        var isDashed = false;
+        for (let k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'dashSize') {
+                isDashed = true;
+            }
+        }
+        // If not, add dashSize and gapSize controllers to the GUI
+        if (!isDashed) {
+            folder.add({ dashSize: 0.05 }, 'dashSize', 0.01, 0.5).name('Dash Size').onChange((value) => {
+                for (let j = 0; j < this.obj[i].children.length; j++) {
+                    this._changeDashSize(value, i, j);
+                }
+            });
+            folder.add({ gapSize: 0.05 }, 'gapSize', 0.01, 0.5).name('Gap Size').onChange((value) => {
+                for (let j = 0; j < this.obj[i].children.length; j++) {
+                    this._changeGapSize(value, i, j);
+                }
+            });
+        }
+    }
+    else {
+        // Create basic material
+        newMaterial = new THREE.LineBasicMaterial({
+            color: oldColor,
+            linewidth: oldWidth,
+            opacity: oldOpacity,
+        });
+        // Remove dashSize and gapSize controllers from the GUI
+        for (let k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'dashSize') {
+                folder.remove(folder.__controllers[k]);
+            }
+            if (folder.__controllers[k].property == 'gapSize') {
+                folder.remove(folder.__controllers[k]);
+            }
+        }
+    }
+    // Compute line distances (necessary to apply dashed material)
+    this.edges[i].children[j].computeLineDistances();
+    // Apply new material
+    this.edges[i].children[j].material = newMaterial;
+    this.edges[i].children[j].material.needsUpdate = true;
+    this.view.notifyChange(true);
+};
+
+Symbolizer.prototype._changeDashSize = function changeDashSize(value, i, j) {
+    this.edges[i].children[j].material.dashSize = value;
+    this.edges[i].children[j].material.needsUpdate = true;
+    this.view.notifyChange(true);
+};
+
+Symbolizer.prototype._changeGapSize = function changeGapSize(value, i, j) {
+    this.edges[i].children[j].material.gapSize = value;
+    this.edges[i].children[j].material.needsUpdate = true;
+    this.view.notifyChange(true);
+};
+
+Symbolizer.prototype._changeTextureRepetition = function changeTextureRepetition(value, i, j) {
     this.obj[i].children[j].material.map.repeat.set(value, value);
     this.obj[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
@@ -421,12 +518,14 @@ Symbolizer.prototype.initGui = function addToGUI() {
         this._addSave(parentFolder);
         this._addLoad(parentFolder);
         var positionFolder = parentFolder.addFolder('Position');
-        this._addRotationsAll(positionFolder); 
+        this._addResetPosition(positionFolder);
+        this._addRotationsAll(positionFolder);
         this._addScaleAll(positionFolder);
         var edgesFolder = parentFolder.addFolder('Edges');
         this._addColorEdgeAll(edgesFolder);
         this._addOpacityEdgeAll(edgesFolder);
         this._addWidthEdgeAll(edgesFolder);
+        this._addStyleEdgeAll(edgesFolder);
         // Iteration over the children of each object (for ex. roof / wall)
         // (We previously checked that each object in the list has the same structure)
         var facesFolder = parentFolder.addFolder('Faces');
@@ -446,44 +545,87 @@ Symbolizer.prototype.initGui = function addToGUI() {
     }
 };
 
-Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
-    folder.add({ scale: 0 }, 'scale', 0.1, 1000, 0.01).name('scale').onChange((value) => {
+Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
+    // Get initial values
+    var initialRotateX = this.obj[0].rotation.x;
+    var initialRotateY = this.obj[0].rotation.y;
+    var initialRotateZ = this.obj[0].rotation.z;
+    var initialScale = this.obj[0].scale.x;
+    // Add a button to reset all initial parameters
+    folder.add({ resetPosition: () => {
+        // Reset GUI
+        folder.__controllers[1].setValue(initialRotateX);
+        folder.__controllers[2].setValue(initialRotateY);
+        folder.__controllers[3].setValue(initialRotateZ);
+        folder.__controllers[4].setValue(initialScale);
+        // Reset parameters
         for (var i = 0; i < this.obj.length; i++) {
-           this.obj[i].scale.set(value, value, value);
-           this.edges[i].scale.set(value, value, value);
-           this.obj[i].updateMatrixWorld();
-           this.edges[i].updateMatrixWorld();
+            this.obj[i].rotation.x = initialRotateX;
+            this.edges[i].rotation.x = initialRotateX;
+            this.obj[i].rotation.y = initialRotateY;
+            this.edges[i].rotation.y = initialRotateY;
+            this.obj[i].rotation.z = initialRotateZ;
+            this.edges[i].rotation.z = initialRotateZ;
+            this.obj[i].scale.set(initialScale, initialScale, initialScale);
+            this.edges[i].scale.set(initialScale, initialScale, initialScale);
+            this.obj[i].updateMatrixWorld();
+            this.edges[i].updateMatrixWorld();
+        }
+        this.view.notifyChange(true);
+    },
+    }, 'resetPosition').name('Reset position');
+};
+
+Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
+    var initialScale = this.obj[0].scale.x;
+    folder.add({ scale: initialScale }, 'scale', 0.1, 1000, 0.01).name('scale').onChange((value) => {
+        for (var i = 0; i < this.obj.length; i++) {
+            this.obj[i].scale.set(value, value, value);
+            this.edges[i].scale.set(value, value, value);
+            this.obj[i].updateMatrixWorld();
+            this.edges[i].updateMatrixWorld();
         }
         this.view.notifyChange(true);
     });
 };
 
 Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
-    
-    folder.add({ rotationX: 0 }, 'rotationX', 0, 1, 0.01).name('rotationX').onChange((value) => {
+    var initialRotateX = this.obj[0].rotation.x;
+    var initialRotateY = this.obj[0].rotation.y;
+    var initialRotateZ = this.obj[0].rotation.z;
+    var prevValueX = 0;
+    var prevValueY = 0;
+    var prevValueZ = 0;
+    folder.add({ rotationX: initialRotateX }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('rotationX').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-           this.obj[i].rotateX(value);
-           this.edges[i].rotateX(value);
-           this.obj[i].updateMatrixWorld();
-           this.edges[i].updateMatrixWorld();
+
+            this.obj[i].rotateX(value - prevValueX);
+            this.edges[i].rotateX(value - prevValueX);
+            prevValueX = value;
+            this.obj[i].updateMatrixWorld();
+            this.edges[i].updateMatrixWorld();
         }
         this.view.notifyChange(true);
     });
-    folder.add({ rotationY: 0 }, 'rotationY', 0, 1, 0.01).name('rotationY').onChange((value) => {
+    folder.add({ rotationY: initialRotateY }, 'rotationY', -Math.PI, Math.PI, Math.PI / 100).name('rotationY').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-           this.obj[i].rotateY(value);
-           this.edges[i].rotateY(value);
-           this.obj[i].updateMatrixWorld();
-           this.edges[i].updateMatrixWorld();
+
+            this.obj[i].rotateY(value - prevValueY);
+            this.edges[i].rotateY(value - prevValueY);
+            prevValueY = value;
+            this.obj[i].updateMatrixWorld();
+            this.edges[i].updateMatrixWorld();
         }
         this.view.notifyChange(true);
     });
-    folder.add({ rotationZ: 0 }, 'rotationZ', 0, 1, 0.01).name('rotationZ').onChange((value) => {
+    folder.add({ rotationZ: initialRotateZ }, 'rotationZ', -Math.PI, Math.PI, Math.PI / 100).name('rotationZ').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-           this.obj[i].rotateZ(value);
-           this.edges[i].rotateZ(value);
-           this.obj[i].updateMatrixWorld();
-           this.edges[i].updateMatrixWorld();
+
+            this.obj[i].rotateZ(value - prevValueZ);
+            this.edges[i].rotateZ(value - prevValueZ);
+            prevValueZ = value;
+            this.obj[i].updateMatrixWorld();
+            this.edges[i].updateMatrixWorld();
         }
         this.view.notifyChange(true);
     });
@@ -572,9 +714,19 @@ Symbolizer.prototype._addShininessAll = function addShininessAll(folder) {
 Symbolizer.prototype._addWidthEdgeAll = function addWidthEdgeAll(folder) {
     var initialWidth = this.edges[0].children[0].material.linewidth;
     folder.add({ width: initialWidth }, 'width', 0, 5).name('Edge width').onChange((value) => {
-        for (var i = 0; i < this.obj.length; i++) {
-            for (var j = 0; j < this.obj[i].children.length; j++) {
+        for (var i = 0; i < this.edges.length; i++) {
+            for (var j = 0; j < this.edges[i].children.length; j++) {
                 this._changeWidthEdge(value, i, j);
+            }
+        }
+    });
+};
+
+Symbolizer.prototype._addStyleEdgeAll = function addStyleEdgeAll(folder) {
+    folder.add({ style: 'Continuous' }, 'style', ['Continous', 'Dashed']).name('Edge style').onChange((value) => {
+        for (var i = 0; i < this.edges.length; i++) {
+            for (var j = 0; j < this.edges[i].children.length; j++) {
+                this._changeStyleEdge(value, i, j, folder);
             }
         }
     });
@@ -615,12 +767,14 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addSaveAll(folder);
     this._addLoad(folder);
     var positionFolder = folder.addFolder('Position');
-    this._addRotationsAll(positionFolder); 
+    this._addResetPosition(positionFolder);
+    this._addRotationsAll(positionFolder);
     this._addScaleAll(positionFolder);
     var edgesFolder = folder.addFolder('Edges');
     this._addColorEdgeAll(edgesFolder);
     this._addOpacityEdgeAll(edgesFolder);
     this._addWidthEdgeAll(edgesFolder);
+    this._addStyleEdgeAll(edgesFolder);
     // this.addEdgeTextureAll(folder);
     var facesFolder = folder.addFolder('Faces');
     this._addTextureAll(facesFolder);
@@ -641,20 +795,6 @@ Symbolizer.prototype._checkStructure = function checkStructure() {
             return false;
         }
     }
-    /*
-    // We check if the children have the same name (in the right order)
-    for (i = 0; i < this.obj.length; i++) {
-        for (j = 0; this.obj[i].children.length; j++) {
-            // If one child of one object has a different name, the function returns false
-            console.log(this.obj[0].children[j].name);
-            console.log(this.obj[i].children[j].name);
-            if (this.obj[0].children[j].name !== this.obj[i].children[j].name) {
-                return false;
-            }
-        }
-
-    */
-    // If everything is ok, the function returns true
     return true;
 };
 
@@ -668,6 +808,7 @@ function getRandomColor() {
     return color;
 }
 
+/*
 function getSourceSynch(url) {
     var req = new XMLHttpRequest();
     req.open('GET', url, false);
@@ -680,5 +821,6 @@ function getMethod(shader) {
     var method = JSON.parse(text);
     return method;
 }
+*/
 
 export default Symbolizer;
