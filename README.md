@@ -38,15 +38,15 @@ This project was proposed by Sidonie Christophe, from the COGIT laboratory (IGN)
 
 This project will be carried out in March and April 2018 by a group of seven students in ENSG TSI, using SCRUM methodology. It will be divided into seven sprints, each one during a week. 
   
-### Previsional backlog 
+### Backlog 
 
 The previsional planning is the following :
 * **Sprint 1** : analysis, conception, first version of the tool, CI/CD.
 * **Sprint 2** : architecture set-up, definition of the 3D style with basic parameters + texture on faces, saving and loading.
-* **Sprint 3** : adaptation of the architecture to stylize several objects, application of a texture on edges, diversification of input formats (Bati3D, BDTopo).
-* **Sprint 4** : diversification of input formats, geolocation, layer management.
-* **Sprint 5** : advanced parameters including light, shadows, cameras.
-* **Sprint 6** : advanced parameters including edge stylization and advanced texturation.
+* **Sprint 3** : adaptation of the architecture to stylize several objects, first trials on shadow management and edge texturation, analyse of exisiting situation regarding BATI3D loading in iTowns.
+* **Sprint 4** : implementation of a BATI3D loader, edge stylization (dashed or continuous), basic geolocation and object movements, basic shadow management, layer management.
+* **Sprint 5** : implementation of a BDTOPO loader (WFS), integration of the BATI3D loader in the project, edge texturation (sketchy style), possibility to click on objects.
+* **Sprint 6** : advanced parameters including light, shadows, cameras and advanced texturation.
 * **Sprint 7** : finalization, reports, presentation.  
   
 ### Management tools
@@ -148,14 +148,16 @@ Generic style, applicable to any mesh :
         "color": "#ffffff",
         "width": 1
     }
-    "faces" : [{
-        "opacity": 1,
-        "color": "ffffff",
-        "emissive": "ffffff",
-        "specular": "ffffff",
-        "shininess": 30,
-        "texture": "./textures/texture.png"
-    }],
+    "faces" : [
+        {
+            "opacity": 1,
+            "color": "ffffff",
+            "emissive": "ffffff",
+            "specular": "ffffff",
+            "shininess": 30,
+            "texture": "./textures/texture.png"
+        }
+    ],
     
 }
 ```  
@@ -169,7 +171,7 @@ Style format for a complex object with several meshes, all defined by a name :
             "color": "#ffffff",
             "width": 1
     },
-    "faces": [ 
+    "faces" : [ 
         {
             "name": "nom_element1",
             "opacity": 1,
@@ -259,9 +261,10 @@ When a stylesheet is loaded, the values of the GUI are updated to match the curr
 
 ## Architecture set-up
 
-Although the first version is functional, it did not respond to the main issue of the project, which is created a generic tool, included in iTowns. Therefore, in a second step, we divided the functionalities described in the previous paragraph into three files :
-* **ModelLoader.js** : the class to load different sort of 3D objects (just *.OBJ* for now).
-* **Symbolizer.js** : the class that carry all the stylization functionalities and the GUI.
+Although the first version is functional, it did not respond to the main issue of the project, which is created a generic tool, included in iTowns. Therefore, in a second step, we divided the functionalities described in the previous paragraph into four files :
+* **ModelLoader.js** : the class to loads different sort of 3D objects (just *.OBJ* for now).
+* **Symbolizer.js** : the class that carries all the stylization functionalities.
+* **LayerManager.js** : the class that manages the user interface.
 * **VibesTest.js** : the example file (linked to the HTML document) where we call the previous classes.
 
 ### Class ModelLoader
@@ -270,7 +273,12 @@ This class has 2 attributes :
 * **view** : the iTowns view, passed as parameter of the constructor.
 * **model** : initialized as null, this attribute will carry the object loaded and the edges extracted from it (see [after](#edges-extraction)).  
   
-It contains one public method for each format. Only one (*loadOBJ()*) is implemented for now. These functions convert the 3D object into a group of meshes adapted to the symbolizer, and call an internal method to load the object in iTowns. The final object (and its edges) are stored in the attribute *model*.  
+It contains one public method for each format. These functions convert the 3D object into a group of meshes adapted to the symbolizer, and call an internal method to load the object in iTowns. The final object (and its edges) are stored in the attribute *model*.  
+
+The implemented formats are :
+* OBJ : done.
+* BATI3D : almost done (we just need to integrate it with the Symbolizer but it works).
+* BDTOPO WFS extruded : soon.
   
 A callback function should be passed in the parameters of the public method, to specify what should be done when the loading is complete.  
   
@@ -294,8 +302,11 @@ The public methods are the two different GUI initialization :
 Each initializer method builds the structure of the GUI, with the appropriate folders and call the 'add' functions.  
 The 'add' functions create buttons and sliders to the menu with dat.GUI, and define the 'change' functions as callbacks.  
 The 'change' functions perform the concrete stylization on the object/edges.  
+(TODO : replace this paragraph by a schema)
+
+(here describe what the Symbolizer actually does, with images and everything...)
   
-### Layer management
+### Class LayerManager
   
 At this step, our tool is able to stylize one object. But what if the user wants to apply a style to several objects ? To answer this issue, we need to add a layer management functionality.  
   
@@ -384,7 +395,7 @@ Customizing the stylization of the environment in iTowns is a little more challe
   
 #### Lights
   
-Possible addition : changing light direction, color, intensity.  
+Possible addition : changing light direction, color, intensity... 
   
 #### Shadows
   
@@ -396,11 +407,6 @@ Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), 
   
 **[Back to the top](#summary)** 
   
-## Object formats
-  
-* OBJ
-* BATI3D
-* BDTOPO WFS extruded
   
 ## Tests
   
