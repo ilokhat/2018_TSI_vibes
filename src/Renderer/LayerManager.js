@@ -90,10 +90,13 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
     var name = model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4);
     var controller = _this.layerFolder.add({ Layer: false }, 'Layer').name(name).onChange((checked) => {
         if (checked) {
+            // Add layer and controller to the list
+            _this.listLayers.push(model);
+            _this.listControllers.push(controller);
             // Creates buttons to start symbolizers
             if (!_this.guiInitialized) {
                 _this.stylizeObjectBtn = _this.layerFolder.add({ symbolizer: () => {
-                    _this.initSymbolizer(false); 
+                    _this.initSymbolizer(false);
                 },
                 }, 'symbolizer').name('Stylize object...');
                 _this.stylizePartsBtn = _this.layerFolder.add({ symbolizer: () => {
@@ -107,56 +110,30 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
                             _this.menu.gui.__folders.Layers.remove(controller);
                         });
                     }
-                    var j = _this.listControllers.indexOf(controller);
-                    if (j != -1) {
-                        _this.listControllers.splice(j, 1);
-                    }
+                    _this.listControllers = [];
                     // Actually remove the model from the scene
-                    console.log(_this.listLayers);
                     _this.listLayers.forEach((layer) => {
-                        console.log(layer);
                         _this.view.scene.remove(layer[0]);
                         _this.view.scene.remove(layer[1]);
                     });
                     _this.view.notifyChange(true);
-                    // Remove the layer from the list of layers to stylize
-                    var i = _this.listLayers.indexOf(model);
-                    if (i != -1) {
-                        _this.listLayers.splice(i, 1);
-                    }
+                    // Remove the layers from the list of layers to stylize
+                    _this.listLayers = [];
                     // If there is no more layers, remove 'Open symbolizer' and 'Delete Layer' buttons
-                    if (_this.listLayers.length == 0) {
-                        _this.menu.gui.__folders.Layers.remove(_this.stylizeObjectBtn);
-                        _this.menu.gui.__folders.Layers.remove(_this.stylizePartsBtn);
-                        _this.menu.gui.__folders.Layers.remove(_this.deleteBtn);
-                        _this.guiInitialized = false;
-                    }
-            },
-            }, 'delete').name('Delete layer');
+                    _this._cleanGUI();
+                },
+                }, 'delete').name('Delete layer');
             }
-            // Add layer and controller to the list
-            _this.listLayers.push(model);
-            _this.listControllers.push(controller);
             // GUI initialized
             _this.guiInitialized = true;
         }
         else {
             // Remove layer controller from the list
-            // _this.menu.gui.__folders.Layers.remove(deleteBtn);
-            var i = _this.listLayers.indexOf(model);
-            if (i != -1) {
-                _this.listLayers.splice(i, 1);
-            }
-            var j = _this.listControllers.indexOf(controller);
-            if (j != -1) {
-                _this.listControllers.splice(j, 1);
-            }
-            // If there is no more layers, remove 'Open symbolizer' buttons
+            removeFromList(_this.listLayers, model);
+            removeFromList(_this.listControllers, controller);
+            // If there is no more layers, clean the GUI
             if (_this.listLayers.length == 0) {
-                _this.menu.gui.__folders.Layers.remove(_this.stylizeObjectBtn);
-                _this.menu.gui.__folders.Layers.remove(_this.stylizePartsBtn);
-                _this.menu.gui.__folders.Layers.remove(_this.deleteBtn);
-                _this.guiInitialized = false;
+                _this._cleanGUI();
             }
         }
     });
@@ -165,6 +142,7 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
 LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
     var i;
     var deleteSymbolizerBtn;
+    _this._cleanGUI();
     // Checks if a layer is selected (if not, nothing happens)
     if (_this.listLayers.length != 0) {
         // Merge elements of the list as one group
@@ -193,7 +171,6 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
                 _this.menu.gui.remove(deleteSymbolizerBtn);
             },
             }, 'deleteSymbolizer').name('Close Symbolizer '.concat(_this.nbSymbolizer));
-
         }
         // Open symbolizer with 'stylize object'
         else {
@@ -222,6 +199,21 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         _this.listControllers = [];
     }
 };
+
+LayerManager.prototype._cleanGUI = function cleanGUI() {
+    // Remove the layer management buttons
+    _this.menu.gui.__folders.Layers.remove(_this.stylizeObjectBtn);
+    _this.menu.gui.__folders.Layers.remove(_this.stylizePartsBtn);
+    _this.menu.gui.__folders.Layers.remove(_this.deleteBtn);
+    _this.guiInitialized = false;
+};
+
+function removeFromList(list, elmt) {
+    var i = list.indexOf(elmt);
+    if (i != -1) {
+        list.splice(i, 1);
+    }
+}
 
 function loadFileException(message) {
     this.message = message;
