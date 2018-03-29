@@ -12,7 +12,8 @@ function ModelLoader(view) {
     // Constructor
     this.view = view;
     this.model = [new THREE.Group(), new THREE.Group()];
-    this.obj = new THREE.Group();
+    this.model[0].name = 'bati3D';
+    this.model[1].name = 'bati3D_lines';
 }
 
 ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale, callback, menu) {
