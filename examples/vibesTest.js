@@ -183,8 +183,7 @@ function handleLayer(model, menuGlobe) {
             } 
         }
     }); 
-  
-        guiInitialized = true;
+    guiInitialized = true;
 
     
 }
@@ -216,21 +215,5 @@ function loadFileException(message) {
     this.name = "loadFileException";
  }
 
-var options = {
-    buildings: { url: "./models/Buildings3D/", visible: true, },
-    position: { x:651250, y:6861250, z:0 , CRS: 'EPSG:2154'},
-};
-
-itowns.gfxEngine.init(globeView);
-
-itowns.gfxEngine.setZero(options.position);
-
-if (!itowns.Cartography3D.isCartoInitialized()){
-    itowns.Cartography3D.initCarto3D(options.buildings, doAfter);
-};
-
-
-function doAfter(obj){
-    globeView.scene.add(obj);
-    console.log(obj);
-}
+var loader2 = new itowns.ModelLoader(globeView);
+loader2.loadBati3D();

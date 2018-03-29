@@ -11,8 +11,6 @@ function B3DLoader(dalle) {
     this._cur_obj_end = 0;
     this._cur_mat_end = 0;
     this.totalFaces = 0;
-    this.pivot = new THREE.Vector3(0, 0, 0);
-    // only for test
     this.dalle = dalle;
     var self = this;
     var xhr = new XMLHttpRequest();
@@ -23,7 +21,6 @@ function B3DLoader(dalle) {
     } else {
         xhr.overrideMimeType('text/plain; charset=x-user-defined');
     }
-
     xhr.onreadystatechange = function onreadystatechange() {
         if (this.readyState === 4) {
             if (this.status === 200 || this.status === 0) {
@@ -37,11 +34,10 @@ function B3DLoader(dalle) {
                     self.parseB3D(this.responseText);
                 }
             } else {
-                console.log('Failed to load B3D file "'.concat(urlName, '".'));
+                self.dalle.doAfter(self.dalle.globalObject, self.dalle.isLast, self.dalle.modelLoader);
             }
         }
     };
-
     xhr.send();
 }
 B3DLoader.prototype.setDecimalPrecision = function setDecimalPrecision(precision) {
@@ -172,7 +168,7 @@ B3DLoader.prototype.parseVertexList = function parseVertexList(reader) {
         x = reader.readFloat32();
         y = reader.readFloat32();
         z = reader.readFloat32();
-        this._cur_obj.verts[i] = new THREE.Vector3(x, z, y);
+        this._cur_obj.verts[i] = new THREE.Vector3(x, y, z);
         i++;
     }
 };
@@ -188,8 +184,8 @@ B3DLoader.prototype.parseFaceList = function parseFaceList(reader) {
         i0 = reader.readUInt16();
         i1 = reader.readUInt16();
         i2 = reader.readUInt16();
-        this._cur_obj.indices.push(new THREE.Face3(i0, i2, i1));
-        this._cur_obj.uvsIndexes.push(new THREE.Vector3(i0, i2, i1));
+        this._cur_obj.indices.push(new THREE.Face3(i0, i1, i2));
+        this._cur_obj.uvsIndexes.push(new THREE.Vector3(i0, i1, i2));
         i++;
         // Skip "face info", irrelevant data
         reader.skip(2);
@@ -287,12 +283,9 @@ B3DLoader.prototype.parseB3D = function parseB3D(data) {
         }
     }
     if (reader.eof()) {
-        this.dalle.parseDallePivot(this.pivot);
         this.dalle.showDalleInScene();
         this.dalle.emptyGeometryCache();
         this.dalle.emptyMaterialsCache();
-        console.log('B3D object was loaded !');
-        console.log(' totalFaces='.concat(this.totalFaces, ', Dalle Name = ', this.dalle.name));
     }
 };
 

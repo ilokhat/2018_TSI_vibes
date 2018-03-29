@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import Coordinates from '../../../../Core/Geographic/Coordinates';
 
 const BufferGeometryUtils = {
     fromGeometry: function geometryToBufferGeometry(geometry, settings) {
@@ -30,15 +31,18 @@ const BufferGeometryUtils = {
             var a = vertices[face.a];
             var b = vertices[face.b];
             var c = vertices[face.c];
-            positions[i3] = a.x;
-            positions[i3 + 1] = a.y;
-            positions[i3 + 2] = a.z;
-            positions[i3 + 3] = b.x;
-            positions[i3 + 4] = b.y;
-            positions[i3 + 5] = b.z;
-            positions[i3 + 6] = c.x;
-            positions[i3 + 7] = c.y;
-            positions[i3 + 8] = c.z;
+            var coordA = new Coordinates('EPSG:2154', a.x, a.y, a.z).as('EPSG:4978');
+            var coordB = new Coordinates('EPSG:2154', b.x, b.y, b.z).as('EPSG:4978');
+            var coordC = new Coordinates('EPSG:2154', c.x, c.y, c.z).as('EPSG:4978');
+            positions[i3 + 0] = coordA.x();
+            positions[i3 + 1] = coordA.y();
+            positions[i3 + 2] = coordA.z();
+            positions[i3 + 3] = coordB.x();
+            positions[i3 + 4] = coordB.y();
+            positions[i3 + 5] = coordB.z();
+            positions[i3 + 6] = coordC.x();
+            positions[i3 + 7] = coordC.y();
+            positions[i3 + 8] = coordC.z();
             if (vertexColors === THREE.FaceColors) {
                 var fc = face.color;
                 colors[i3] = fc.r;
@@ -82,7 +86,7 @@ const BufferGeometryUtils = {
         bufferGeometry.addAttribute('materialindice', new THREE.BufferAttribute(materialindice, 1));
         if (vertexColors !== THREE.NoColors) bufferGeometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
         if (hasFaceVertexUv === true) bufferGeometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-        bufferGeometry.computeBoundingSphere();
+        // bufferGeometry.computeBoundingSphere();
         return bufferGeometry;
     },
 };

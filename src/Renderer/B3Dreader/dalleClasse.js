@@ -1,18 +1,13 @@
 import * as THREE from 'three';
-import proj4 from 'proj4';
-import gfxEngine from './gfxEngine';
 import B3DLoader from './lib/B3DLoader';
 import Shader from './Shader';
 import BufferGeometryUtils from './lib/postprocessing/BufferGeometryUtils';
 import DDSLoader from './lib/DDSLoader';
-import Coordinates from '../../Core/Geographic/Coordinates';
-
 
 function dalleClasse() {
     this.dataURL = '';
     this.name = '';
     this.path = '';
-    this.pivot = new THREE.Vector3(0, 0, 0);
     this.LOBLevel = {
         level: 0,
         urlDS3: '',
@@ -36,11 +31,6 @@ function dalleClasse() {
     this.texture1 = null;
     this.racineFile = '';// Version4LODS';  // Version4LODS_o for jpg
 }
-
-dalleClasse.prototype.setDalleZeroPivot = function setDalleZeroPivot(v) {
-    // this is zero
-    this.pivot = v;
-};
 
 dalleClasse.prototype.setTextureType = function setTextureType(t) {
     this.textureType = t;
@@ -110,17 +100,8 @@ dalleClasse.prototype.showDalleInScene = function showDalleInScene() {
         mesh.name = this.name.concat('-', n);
         this.globalObject.add(mesh);
     }
-    console.log('test : ', gfxEngine._referenceCrs, gfxEngine._crs);
-    if (gfxEngine._referenceCrs && gfxEngine._crs) {
-        console.log('position', gfxEngine._referenceCrs, gfxEngine._crs);
-        console.log(parseFloat(gfxEngine._zero.x), parseFloat(gfxEngine._zero.z), parseFloat(gfxEngine._zero.y));
-        var pos = new Coordinates(gfxEngine._crs, parseFloat(gfxEngine._zero.x), parseFloat(gfxEngine._zero.z), parseFloat(gfxEngine._zero.y));
-        this.globalObject.position.copy(pos.as(gfxEngine._referenceCrs).xyz());
-    } else {
-        console.log('position', gfxEngine);
-    }
     this.globalObject.updateMatrixWorld();
-    this.doAfter(this.globalObject);
+    this.doAfter(this.globalObject, this.isLast, this.modelLoader);
 };
 
 dalleClasse.prototype.affectTexture = function affectTexture(shaderMat, numMaterial, numTexture) {
@@ -260,7 +241,6 @@ dalleClasse.prototype.load = function load() {
 };
 dalleClasse.prototype.setVisible = function setVisible(v) {
     this.globalObject.traverse((object) => { object.visible = v; });
-    console.log('Bati3D visibility is ', v);
 };
 
 dalleClasse.prototype.parseB3DObject = function parseB3DObject(instantB3D) {
@@ -306,12 +286,6 @@ dalleClasse.prototype.parseB3DObject = function parseB3DObject(instantB3D) {
     }
     this.geometry.computeFaceNormals();
     this.geometry.computeVertexNormals();
-};
-dalleClasse.prototype.parseDallePivot = function parseDallePivot() {
-    var xp = -this.pivot.x;
-    var yp = -this.pivot.y;
-    var zp = -this.pivot.z;
-    this.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(xp, yp, zp));
 };
 
 export default dalleClasse;

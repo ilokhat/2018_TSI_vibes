@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import gfxEngine from './gfxEngine';
 import clipMap from './clipMap';
 
 // GLOBAL VARIABLE
@@ -8,9 +7,9 @@ var _textureType = '.dds';
 // END OF OBJECT CLASSS
 var bbox = {
     xmin: 1302,
-    xmax: 1303,
+    xmax: 1304,
     ymin: 13722,
-    ymax: 13723,
+    ymax: 13724,
 };
 const Cartography3D = {
     intialized: false,
@@ -20,7 +19,6 @@ const Cartography3D = {
     dalleSet: {},
     listDalles: [],
     scale: 500,
-    zero: null,
     limitZone: {
         xmin: bbox.xmin * 500,
         xmax: bbox.xmax * 500,
@@ -48,11 +46,9 @@ const Cartography3D = {
 
     // création d'une grille pour toutes les dalles de la limiteZone
     generateGrid: function generateGrid() {
-        var leftBottomCornerGrid = new THREE.Vector3(bbox.xmin * 500, 0, bbox.ymin * 500);
-        this.sceneleftBottomCornerGrid = new THREE.Vector3().subVectors(leftBottomCornerGrid, this.zero);
         this.grid = [];
-        var nbdallesX = bbox.xmax - bbox.xmin + 1;
-        var nbdallesY = bbox.ymax - bbox.ymin + 1;
+        var nbdallesX = bbox.xmax - bbox.xmin;
+        var nbdallesY = bbox.ymax - bbox.ymin;
         // on parcourt les lignes...
         for (var i = 0; i < nbdallesX; i++) {
             this.grid[i] = [];
@@ -64,18 +60,18 @@ const Cartography3D = {
     },
 
     // initialisation de la visualisation
-    initCarto3D: function initCarto3D(options, doAfter) {
+    initCarto3D: function initCarto3D(options, doAfter, modelLoader) {
         this.dataURL = options.url;
-        this.zero = gfxEngine.getZeroAsVec3D();
         this.textureType = '.dds';
         this.doAfter = doAfter;
+        this.modelLoader = modelLoader;
         _textureType = this.textureType;
         this.generateGrid();
         for (var i = 0; i < this.grid.length; i++) {
             for (var j = 0; j < this.grid[i].length; j++) {
                 var pos = new THREE.Vector3((i + bbox.xmin) * 500 + 250, 0, (j + bbox.ymin) * 500 + 250);
                 if (this.isDataAvailable(pos)) {
-                    this.loadDallesAroundPosition(pos, this.zero);
+                    this.loadDallesAroundPosition(pos, (i == this.grid.length - 1 && j == this.grid[i].length - 1));
                     this.setInitStatus(true);
                 }
             }
@@ -103,7 +99,7 @@ const Cartography3D = {
     },
 
     // chargement des dalles autout d'une position
-    loadDallesAroundPosition: function loadDallesAroundPosition(p, zero) {
+    loadDallesAroundPosition: function loadDallesAroundPosition(p, islast) {
         var lon = Math.floor(p.x / this.scale);
         var lat = Math.floor(p.z / this.scale);
         var map = new clipMap(lon, lat, 1, 1, _textureType, this.dataURL);
@@ -115,9 +111,10 @@ const Cartography3D = {
                 var currentDalleXinGrid = currentDalleNameSplit[0] - bbox.xmin;
                 var currentDalleYinGrid = currentDalleNameSplit[1] - bbox.ymin;
                 this.grid[currentDalleXinGrid][currentDalleYinGrid] = currentDalle;
-                this.listDalles[i].setDalleZeroPivot(zero);
                 if (!this.using3DS) {
                     this.listDalles[i].doAfter = this.doAfter;
+                    this.listDalles[i].modelLoader = this.modelLoader;
+                    this.listDalles[i].isLast = islast;
                     this.listDalles[i].load();
                 }
             }
