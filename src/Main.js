@@ -26,6 +26,7 @@ export { default as FeaturesUtils } from './Renderer/ThreeExtended/FeaturesUtils
 export { CONTROL_EVENTS } from './Renderer/ThreeExtended/GlobeControls';
 export { default as DEMUtils } from './utils/DEMUtils';
 export { default as Symbolizer } from './Renderer/Symbolizer';
+export { default as LayerManager } from './Renderer/LayerManager';
 export { default as ModelLoader } from './Renderer/ThreeExtended/ModelLoader';
 export { default as BinaryStream } from './Renderer/B3Dreader/lib/BinaryStream';
 export { default as PlatformInfo } from './Renderer/B3Dreader/lib/PlatformInfo';

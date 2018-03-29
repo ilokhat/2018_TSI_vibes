@@ -17,6 +17,7 @@ function Symbolizer(view, obj, edges, menu, nb) {
     this.menu = menu;
     this.menu.view = this.view;
     this.nb = nb;
+    this.folder = null;
     this.applyStyle();
 }
 
@@ -515,6 +516,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
     if (this._checkStructure()) {
         // If the structure is similar, we create a folder for the symbolizer
         var parentFolder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
+        this.folder = parentFolder;
         this._addSave(parentFolder);
         this._addLoad(parentFolder);
         var positionFolder = parentFolder.addFolder('Position');
@@ -764,6 +766,7 @@ Symbolizer.prototype._addSaveAll = function addSave(folder) {
 Symbolizer.prototype.initGuiAll = function addToGUI() {
     // var folder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     var folder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
+    this.folder = folder;
     this._addSaveAll(folder);
     this._addLoad(folder);
     var positionFolder = folder.addFolder('Position');
