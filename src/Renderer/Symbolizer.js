@@ -922,13 +922,12 @@ Symbolizer.prototype._ymoins = function _ymoins() {
     }
     this.view.notifyChange(true);
 };
-
+var valZplus = 0;
 Symbolizer.prototype._zplus = function zplus() {
+    valZplus += 10;
     for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.z += 20;
-        this.obj[i].position.x += 18;
-        this.edges[i].position.z += 20;
-        this.edges[i].position.x += 18;
+        this.obj[i].translateY(valZplus);
+        this.edges[i].translateY(valZplus);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();
@@ -937,12 +936,12 @@ Symbolizer.prototype._zplus = function zplus() {
     this.view.notifyChange(true);
 };
 
+var valZmoins = 0;
 Symbolizer.prototype._zmoins = function _zmoins() {
+    valZmoins -= 10;
     for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.z -= 20;
-        this.obj[i].position.x -= 18;
-        this.edges[i].position.z -= 20;
-        this.edges[i].position.x -= 18;
+        this.obj[i].translateY(valZmoins);
+        this.edges[i].translateY(valZmoins);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();
