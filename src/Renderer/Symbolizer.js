@@ -600,33 +600,33 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
 };
 
 Symbolizer.prototype._addMoveobjcoordXAll = function addMoveobjcoordXAll(folder) {
-   folder.add({ MovecoordX: 0 }, 'MovecoordX', -100, 100, 1).name('MovecoordX').onChange((value) => {
+   folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 1).name('MovecoordX').onChange((value) => {
        for (var i = 0; i < this.obj.length; i++) {
             console.log(value);
-            this.obj[i].position.x += value;
-            this.edges[i].position.x += value;
+            this.obj[i].translateX(value);
+            this.edges[i].translateX(value);
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
 
          }
       this.view.notifyChange(true);
     });
-    folder.add({ MovecoordY: 0 }, 'MovecoordY', -100, 100, 1).name('MovecoordY').onChange((value) => {
+    folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('MovecoordY').onChange((value) => {
          for (var i = 0; i < this.obj.length; i++) {
               console.log(value);
-              this.obj[i].translateX(value);
-              this.edges[i].translateX(value);
+              this.obj[i].translateY(value);
+              this.edges[i].translateY(value);
               this.obj[i].updateMatrixWorld();
               this.edges[i].updateMatrixWorld();
 
            }
         this.view.notifyChange(true);
       });
-      folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -100, 100, 1).name('MovecoordZ').onChange((value) => {
+      folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('MovecoordZ').onChange((value) => {
            for (var i = 0; i < this.obj.length; i++) {
                 console.log(value);
-                this.obj[i].position.z += value;
-                this.edges[i].position.z += value;
+                this.obj[i].translateZ(value);
+                this.edges[i].translateZ(value);
                 this.obj[i].updateMatrixWorld();
                 this.edges[i].updateMatrixWorld();
 
@@ -863,7 +863,7 @@ function getRandomColor() {
     return color;
 }
 
-/*
+
 function getSourceSynch(url) {
     var req = new XMLHttpRequest();
     req.open('GET', url, false);
@@ -876,7 +876,7 @@ function getMethod(shader) {
     var method = JSON.parse(text);
     return method;
 }
-*/
+
 
 Symbolizer.prototype._xplus = function xplus() {
   for (var i = 0; i < this.obj.length; i++) {

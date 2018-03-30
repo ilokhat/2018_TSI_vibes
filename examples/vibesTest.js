@@ -57,32 +57,7 @@ var loader = new itowns.ModelLoader(globeView);
 var symbolizer = function(view, listObj, listEdge, menu, nbSymbolizer) {
     return new itowns.Symbolizer(view, listObj, listEdge, menu, nbSymbolizer);
 }
-/*
-window.addEventListener("keypress",checkKeyPress,false);
-function checkKeyPress(key){
 
-    if ((key.keyCode == "56")||(key.keyCode == "113")) {
-        symbolizer._xplus();
-    }
-    if ((key.keyCode == "50")||(key.keyCode == "115")){
-        symbolizer._xmoins();
-    }
-
-    if ((key.keyCode == "52")||(key.keyCode == "97")){
-        symbolizer._yplus();
-    }
-    if ((key.keyCode == "54")||(key.keyCode == "122")){
-        symbolizer._ymoins();
-    }
-
-    if ((key.keyCode == "55")||(key.keyCode == "119")){
-        symbolizer._zplus();
-    }
-    if ((key.keyCode == "51")||(key.keyCode == "120")){
-        symbolizer._zmoins();
-    }
-}
-*/
 
 // Layer management
 var manager = new itowns.LayerManager(globeView, document, menuGlobe, coord, rotateX, rotateY, rotateZ, scale, loader, symbolizer)
@@ -102,6 +77,7 @@ var loader2 = new itowns.ModelLoader(globeView);
 loader2.loadBati3D();
 
 function picking(event) {
+    console.log(event);
     // Pick an object with batch id
     var mouse = globeView.eventToNormalizedCoords(event);
     var raycaster = new itowns.THREE.Raycaster();
@@ -115,6 +91,7 @@ function picking(event) {
             for (var i = 0; i < source.children.length; i++) {
                 source.children[i].material = new THREE.MeshPhongMaterial({ color: 0x2194ce, emissive: 0x000000, specular: 0x111111, side: THREE.DoubleSide });
                 source.children[i].material.needUpdate = true;
+                // source.children[i].obj[i].position.x += 200;
             }
         }
     }
