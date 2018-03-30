@@ -501,6 +501,18 @@ Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), 
 ## Tests
   
 ### Unit tests
+
+In order to write our unit tests we rely on the mocha framework which was used in the previous unit tests of Itowns project. This framework is a feature-rich JavaScript test that can be used for both Node.js and browser-based testing,it's 
+interfaces system such as BDD, TDD, Exports, QUnit and Require-style allows developers to choose their style of DSL.
+
+In our project we choose to continue working with the BDD (Behavior Driven Development ) interface which provide a syntax including describe() , context(), it(), specify(), before(), after(), beforeEach(), and afterEach(), it focus on what the application should do, and on how it will do it.
+
+we need to run our tests in a browser, we need to set up a simple HTML
+page to be our test runner page. The page loads Mocha, the testing
+libraries and our actual test files. To run the tests, we’ll simply open
+the runner in a browser.
+
+
   
 We made some.
 
