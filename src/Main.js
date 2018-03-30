@@ -26,13 +26,6 @@ export { default as FeaturesUtils } from './Renderer/ThreeExtended/FeaturesUtils
 export { CONTROL_EVENTS } from './Renderer/ThreeExtended/GlobeControls';
 export { default as DEMUtils } from './utils/DEMUtils';
 export { default as Symbolizer } from './Renderer/Symbolizer';
+export { default as LayerManager } from './Renderer/LayerManager';
 export { default as ModelLoader } from './Renderer/ThreeExtended/ModelLoader';
-export { default as BinaryStream } from './Renderer/B3Dreader/lib/BinaryStream';
-export { default as PlatformInfo } from './Renderer/B3Dreader/lib/PlatformInfo';
-export { default as B3DLoader } from './Renderer/B3Dreader/lib/B3DLoader';
-export { default as dalleClasse } from './Renderer/B3Dreader/dalleClasse';
-export { Shader } from './Renderer/B3Dreader/Shader';
-export { default as clipMap } from './Renderer/B3Dreader/clipMap';
 export { default as Cartography3D } from './Renderer/B3Dreader/Cartography3D';
-export { default as gfxEngine } from './Renderer/B3Dreader/gfxEngine';
-export { default as BufferGeometryUtils } from './Renderer/B3Dreader/lib/postprocessing/BufferGeometryUtils';
