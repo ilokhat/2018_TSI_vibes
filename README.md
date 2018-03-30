@@ -52,7 +52,7 @@ The seven members of the team are :
 Given the number of people in the team, it is crucial to apply an efficient orgnization so everyone can be involved. To that end, we chose to work mostly in variable pairs, and to divide the tasks each week among these pairs (one person would be working alone since we are an uneven number).  
     
 ### Backlog 
-  
+  
 The previsional planning is the following :
 * **Sprint 1** : analysis, conception, first version of the tool, CI/CD.
 * **Sprint 2** : architecture set-up, definition of the 3D style with basic parameters + texture on faces, saving and loading.
@@ -507,10 +507,11 @@ interfaces system such as BDD, TDD, Exports, QUnit and Require-style allow
 
 In our project we choose to continue working with the BDD (Behavior Driven Development ) interface which provide a syntax including describe() , context(), it(), specify(), before(), after(), beforeEach(), and afterEach(), it focus on what the application should do, and on how it will do it.
 
-we need to run our tests in a browser, we need to set up a simple HTML
-page to be our test runner page. The page loads Mocha, the testing
-libraries and our actual test files. To run the tests, we’ll simply open
-the runner in a browser.
+As we mentioned above we continued working and adding some tests to the previous test folder of the Itowns project, a part of these unit tests run using the CLI (commande line interface) and the others need the browser to be executed since our application uses the Dom element,and the nodeJs server does not have access to the Dom,we had to run these kind of tests on the browser. to do that we made a simple HTML page which our test runner page (/mochaTest.html). 
+The page loads Mocha, the testing libraries and our test file(/tests/vibesObjTest.js) and finally to run the tests, we simply needed to open the runner in a browser.
+the pictures below show the results of the test units:
+
+<img src="VIBES/mochaTest.png" style="width: 400px;"/>
 
 
   
