@@ -38,8 +38,21 @@ This project was proposed by Sidonie Christophe, from the COGIT laboratory (IGN)
 
 This project will be carried out in March and April 2018 by a group of seven students in ENSG TSI, using SCRUM methodology. It will be divided into seven sprints, each one during a week. 
   
+### Team
+  
+The seven members of the team are :
+* Houssem Adouni
+* El-Hadi Bouchaour
+* Arnaud Grégoire
+* Rose Mathelier *(Scrum Master)*
+* Laurie Nino
+* Adel Ouhabi
+* Ludivine Schlegel
+  
+Given the number of people in the team, it is crucial to apply an efficient orgnization so everyone can be involved. To that end, we chose to work mostly in variable pairs, and to divide the tasks each week among these pairs (one person would be working alone since we are an uneven number).  
+    
 ### Backlog 
-
+  
 The previsional planning is the following :
 * **Sprint 1** : analysis, conception, first version of the tool, CI/CD.
 * **Sprint 2** : architecture set-up, definition of the 3D style with basic parameters + texture on faces, saving and loading.
@@ -48,6 +61,12 @@ The previsional planning is the following :
 * **Sprint 5** : implementation of a BDTOPO loader (WFS), integration of the BATI3D loader in the project, edge texturation (sketchy style), possibility to click on objects.
 * **Sprint 6** : advanced parameters including light, shadows, cameras and advanced texturation.
 * **Sprint 7** : finalization, reports, presentation.  
+  
+A first previsional backlog was created at the beginning of the project. 
+Each friday afternoon, at the end of the sprint, we take some time for :
+* a review of the work completed during the week.
+* a backlog grooming to plan the next sprint and divide the tasks (usually one or two tasks per pair).
+* updating the report.
   
 ### Management tools
 
@@ -63,11 +82,16 @@ The previsional planning is the following :
   
 ### The iTowns environment
   
-The main challenge of this project is that it has to be included into the architecture of the existing [iTowns](http://www.itowns-project.org/) project. Therefore, a necessary step is to get to know this architecture and to analyze it in order to know where our new functionalities could be located.
+The main challenge of this project is that it has to be included into the architecture of the existing [iTowns](http://www.itowns-project.org/) project (version 2.3.0). Therefore, a necessary step is to get to know this architecture and to analyze it in order to know where our new functionalities could be located.
 
 ![archi_itowns](VIBES/itowns_archi.png)
   
-
+Two sorts of development can be carried out in iTowns :
+* develop a new example, based on the existing classes of the core of iTowns.
+* add new functionalities directly to the core.
+  
+This choice depends on the purpose of the tool. Our stylization tool is intended to be applied in multiple examples, therefore the main functionalities should be integrated in the source of iTowns. This implies that they should be as generic as possible, and respect the iTowns standards. An example will also be created, only to demonstrate how our tool should be used, but the goal is to make this example as simple as possible and to avoid including too much logic in it.
+    
 ### PLU++
 
 The PLU++ project, developed in 2016 by Anouk Vinesse under the supervision of Sidonie Christophe and Mickaël Brasebin (COGIT), is a tool of 3D buiding stylization using Three.js, It will be used as proof of concept to help start our project. To that end, we analyzed the code from the latest version available on github : [IGN/PLU2PLUS](https://github.com/IGNF/PLU2PLUS)
@@ -80,7 +104,6 @@ The goal of this analysis is to find out how the following things can be done :
 * Applying a style to a mesh.
 * Changing this style dynamically using a user interface (dat.GUI).
   
-
 #### Description of the project
 
 The project consists in a webpage which display a 3D scene that contains a plane geometry with building on it, and a user menu made with dat.GUI to change the visual aspect of the buildings (color, opacity, style...) and do some other actions, such as recenter the camera, save the current style, etc.  
@@ -118,6 +141,10 @@ However, it provides a helpful set of functions that can be re-use in our projec
 
 Therefore, the idea of our project is to re-make the concept of PLU++ inside the iTowns structure, but in a more generic way so it can be re-used and re-adapted more easily.
   
+### Definition of a style
+  
+TODO : what is a style (definition in litterature), specificities in 3D, definition of 'generic' styles (discrete, typical, sketchy)...
+  
 **[Back to the top](#summary)** 
   
   
@@ -129,7 +156,9 @@ The architecture of our project must be included in iTowns. The following schema
 
 ![archi_itowns](VIBES/itowns_archi2.png)
 
-The goal is to make this tool as general as possible, which means it must not depend on just one example. On the contrary, it should be usable on any example containing a 3D object on an instance of the globe, as a full-fledged functionality of iTowns. Therefore, we will create a new class Symbolizer, which will manage the menu and the 3D render. We will also extend the loading functionalities of iTowns in order to handle .obj files and other formats, using a new class called ModelLoader.
+The goal is to make this tool as general as possible, which means it must not depend on just one example. On the contrary, it should be usable on any example containing a 3D object on an instance of the globe, as a full-fledged functionality of iTowns. Therefore, we will create a new class Symbolizer, which will manage the 3D render. We will also extend the loading functionalities of iTowns in order to handle .obj files and other formats, using a new class called ModelLoader.
+  
+(image architecture with our functionalities)
   
 ### 3D stylization process
 
@@ -138,8 +167,16 @@ The 3D stylization will be done according to the following activity diagram :
 ![ActivityDiagram](VIBES/3DStylizationProcess.png)  
   
 ### Style format
-
-Generic style, applicable to any mesh :
+  
+In order to save and re-use the style of an object, we need to find a way to store this information so it can be accessed easily. The obvious solution, in a JavaScript project, is JSON.  
+  
+The next question is : what do we stylize ? Does the stylization concern a single mesh, or a complex object with several styles at once ? A concertation with the client led us to implement both alternatives. Two stylization methods will be created :
+  
+(schema explicatif)
+  
+Therefore, there will also be two types of style formats :
+  
+* Generic style, applicable to any mesh :
 
 ```json
 {
@@ -162,7 +199,7 @@ Generic style, applicable to any mesh :
 }
 ```  
   
-Style format for a complex object with several meshes, all defined by a name :
+* Style format for a complex object with several meshes, all defined by a name :
 
 ```json
 {
@@ -245,10 +282,8 @@ The basic implemented parameters are : **color**, **opacity**, **emissive color*
 ### Creating a user interface to dynamically modify the stylization
   
 The Javascript library [dat.GUI](https://github.com/dataarts/dat.gui) allows to create a user simple interface with buttons, sliders, checkboxes, etc. It is already used in iTowns, in the GuiTools class, to handle color and elevation layers on the globe. Thus, we will re-use this menu and add our own stylization parameters on it. Each element of the menu has an event listener with a callback function that performs the corresponding stylization on the mesh.  
-  
-The elements of the menu will be organized as follow :
-  
-(image du menu)  
+   
+(menu dat.GUI basic stylization)  
   
 ### Saving and loading a style
   
@@ -256,9 +291,10 @@ Our tool must also allow to save the current style in a *.vibes* file (see [abov
   
 We used the Javascript object FileReader to load a file and get the data in it. This data can then be parsed in JSON and read directly to be applied to the meshes.  
 When a stylesheet is loaded, the values of the GUI are updated to match the current stylisation of the object.
-
+  
 **[Back to the top](#summary)** 
-
+  
+  
 ## Architecture set-up
 
 Although the first version is functional, it did not respond to the main issue of the project, which is created a generic tool, included in iTowns. Therefore, in a second step, we divided the functionalities described in the previous paragraph into four files :
@@ -266,6 +302,8 @@ Although the first version is functional, it did not respond to the main issue o
 * **Symbolizer.js** : the class that carries all the stylization functionalities.
 * **LayerManager.js** : the class that manages the user interface.
 * **VibesTest.js** : the example file (linked to the HTML document) where we call the previous classes.
+  
+(class diagram)
 
 ### Class ModelLoader
 
@@ -275,12 +313,19 @@ This class has 2 attributes :
   
 It contains one public method for each format. These functions convert the 3D object into a group of meshes adapted to the symbolizer, and call an internal method to load the object in iTowns. The final object (and its edges) are stored in the attribute *model*.  
 
-The implemented formats are :
-* OBJ : done.
-* BATI3D : almost done (we just need to integrate it with the Symbolizer but it works).
-* BDTOPO WFS extruded : soon.
-  
 A callback function should be passed in the parameters of the public method, to specify what should be done when the loading is complete.  
+  
+#### OBJ Loader
+  
+TODO : describe how we load OBJ data.
+  
+#### BATI3D Loader
+  
+TODO : describe how we load BATI3D data.
+  
+#### BDTOPO Loader
+  
+TODO : describe how we load BDTOPO data (WFS extruded).
   
 ### Class Symbolizer
 
@@ -304,7 +349,7 @@ The 'add' functions create buttons and sliders to the menu with dat.GUI, and def
 The 'change' functions perform the concrete stylization on the object/edges.  
 (TODO : replace this paragraph by a schema)
 
-(here describe what the Symbolizer actually does, with images and everything...)
+(TODO : describe what the Symbolizer actually does, with images and everything...)
   
 ### Class LayerManager
   
