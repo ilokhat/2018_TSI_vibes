@@ -4,14 +4,15 @@
 
 import * as OBJLoader from 'three-obj-loader';
 import * as THREE from 'three';
-// import TDSLoader from './TDSLoader';
+import Cartography3D from '../B3Dreader/Cartography3D';
 
 OBJLoader(THREE);
 
 function ModelLoader(view) {
     // Constructor
     this.view = view;
-    this.model = null;
+    this.model = [new THREE.Group(), new THREE.Group()];
+    this.obj = new THREE.Group();
 }
 
 ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale, callback, menu) {
@@ -77,22 +78,43 @@ ModelLoader.prototype._placeModel = function placeModel(obj, coord, rotateX, rot
     return obj;
 };
 
-/*
-ModelLoader.prototype.load3DS = function load3DS(url) {
-    var loader = new TDSLoader();
-    loader.load(url, (object) => {
-        console.log('on load');
-        */
-        /* object.traverse((child) => {
-            if (child instanceof THREE.Mesh) child.material.normalMap = 'normal';
-        });
-        */
-        /*
-        this.view.scene.add(object);
-        this.view.notifyChange(true);
-        console.log(object);
-    });
+ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
+    if (obj != null) {
+        for (var i = 0; i < obj.children.length; i++) {
+            // Material initialization
+            obj.children[i].material.transparent = true;
+            obj.children[i].castShadow = true;
+            self.model[0].add(obj);
+            // Extract edges
+            var edges = new THREE.EdgesGeometry(obj.children[i].geometry);
+            var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true }));
+            self.model[1].add(line);
+        }
+    }
+    // pour le dernier :
+    if (islast) {
+        var objID = self.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
+        self.model[0].traverse(obj => obj.layers.set(objID));
+        self.view.camera.camera3D.layers.enable(objID);
+        self.model[0].updateMatrixWorld();
+        self.view.scene.add(self.model[0]);
+        var linesID = self.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
+        self.model[1].traverse(lines => lines.layers.set(linesID));
+        self.view.camera.camera3D.layers.enable(linesID);
+        self.model[1].updateMatrixWorld();
+        self.view.scene.add(self.model[1]);
+        self.view.notifyChange(true);
+        console.log('bati3D Loaded');
+    }
 };
-*/
+
+ModelLoader.prototype.loadBati3D = function loadBati3D() {
+    var options = {
+        buildings: { url: './models/Buildings3D/', visible: true },
+    };
+    if (!Cartography3D.isCartoInitialized()) {
+        Cartography3D.initCarto3D(options.buildings, this.doAfter, this);
+    }
+};
 
 export default ModelLoader;

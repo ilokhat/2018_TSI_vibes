@@ -1,33 +1,15 @@
 import * as THREE from 'three';
 import clipMap from './clipMap';
-import gfxEngine from './gfxEngine';
-import dalleClasse from './dalleClasse';
-
-/*
- * To manage Bati 3D layer
- * quocdinh dot nguyen at gmail dot com
- */
 
 // GLOBAL VARIABLE
-
 var _textureType = '.dds';
 
-var requestAnimSelectionAlpha = (function select() {
-    return window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame ||
-    window.oRequestAnimationFrame ||
-    window.msRequestAnimationFrame ||
-    function defaultFunction(callback, element) {
-        window.setTimeout(callback, 1000 / 60);
-    };
-}());
-
-// zone de travail; (EPSG:2153 = lambert94 ) / 500
-var bbox = { xmin: 1286,
-    xmax: 1315, // +1
-    ymin: 13715,
-    ymax: 13734, // +1
+// END OF OBJECT CLASSS
+var bbox = {
+    xmin: 1302,
+    xmax: 1304,
+    ymin: 13722,
+    ymax: 13724,
 };
 const Cartography3D = {
     intialized: false,
@@ -37,8 +19,6 @@ const Cartography3D = {
     dalleSet: {},
     listDalles: [],
     scale: 500,
-    zero: null,
-    // zone de travail; EPSG:2153 = lambert94
     limitZone: {
         xmin: bbox.xmin * 500,
         xmax: bbox.xmax * 500,
@@ -61,16 +41,17 @@ const Cartography3D = {
     // grillMap
     gmap: null,
 
+    // ____________ fonctions __________________
+
+
+    // création d'une grille pour toutes les dalles de la limiteZone
     generateGrid: function generateGrid() {
         this.grid = [];
-        var nbdallesX = bbox.xmax - bbox.xmin + 1;
-        var nbdallesY = bbox.ymax - bbox.ymin + 1;
-        var i;
-        for (i = 0; i < nbdallesX; i++) {
-            this.grid[i] = [];
-        }
+        var nbdallesX = bbox.xmax - bbox.xmin;
+        var nbdallesY = bbox.ymax - bbox.ymin;
         // on parcourt les lignes...
-        for (i = 0; i < nbdallesX; i++) {
+        for (var i = 0; i < nbdallesX; i++) {
+            this.grid[i] = [];
             // ... et dans chaque ligne, on parcourt les cellules
             for (var j = 0; j < nbdallesY; j++) {
                 this.grid[i][j] = null;
@@ -78,18 +59,37 @@ const Cartography3D = {
         }
     },
 
-    isDataAvailable: function isDataAvailable(p) {
-        /*
-        console.log('isDataAvailable', (p.x > this.limitZone.xmin) && (p.x < this.limitZone.xmax) && (p.z > this.limitZone.ymin) && (p.z < this.limitZone.ymax));
-        return (p.x > this.limitZone.xmin) && (p.x < this.limitZone.xmax) && (p.z > this.limitZone.ymin) && (p.z < this.limitZone.ymax);
-        */
-       return true;
+    // initialisation de la visualisation
+    initCarto3D: function initCarto3D(options, doAfter, modelLoader) {
+        this.dataURL = options.url;
+        this.textureType = '.dds';
+        this.doAfter = doAfter;
+        this.modelLoader = modelLoader;
+        _textureType = this.textureType;
+        this.generateGrid();
+        for (var i = 0; i < this.grid.length; i++) {
+            for (var j = 0; j < this.grid[i].length; j++) {
+                var pos = new THREE.Vector3((i + bbox.xmin) * 500 + 250, 0, (j + bbox.ymin) * 500 + 250);
+                if (this.isDataAvailable(pos)) {
+                    this.loadDallesAroundPosition(pos, (i == this.grid.length - 1 && j == this.grid[i].length - 1));
+                    this.setInitStatus(true);
+                }
+            }
+        }
+        this.setVisibility(!!options.visible);
     },
 
+    // change variable test initialisation
     setInitStatus: function setInitStatus(v) {
         this.intialized = v;
-    }, 
+    },
 
+    // return variable test initialisation
+    isCartoInitialized: function isCartoInitialized() {
+        return this.intialized;
+    },
+
+    // change visibilité des dalles
     setVisibility: function setVisibility(v) {
         for (var dalle in this.listDalles) {
             if (Object.prototype.hasOwnProperty.call(this.listDalles, dalle)) {
@@ -98,50 +98,32 @@ const Cartography3D = {
         }
     },
 
-    loadAllDalles: function loadAllDalles() {
-        for (var i = 0; i < this.grid.length; i++) {
-            for (var j = 0; j < this.grid[i].length; j++) {
-                var lat = (i + bbox.xmin) * 500;
-                var lon = (j + bbox.ymin) * 500;
-                var name = (i + bbox.xmin).toString().concat('-', (j + bbox.ymin).toString());
-                var dalle = new dalleClasse();
-                dalle.dataURL = this.dataURL;
-                dalle.textureType = this.textureType;
-                dalle.setDalleZeroPivot(new THREE.Vector3(lat + 250, lon + 250, 0));
-                dalle.setNamePath(name);
-                dalle.setLoDLevel(2);
-                dalle.load();
-                this.grid[i][j] = dalle;
-                // empty texture cache
-                this.dalleSet[name] = dalle;
-                // add to Global listDalles
-                this.listDalles.push(dalle);
+    // chargement des dalles autout d'une position
+    loadDallesAroundPosition: function loadDallesAroundPosition(p, islast) {
+        var lon = Math.floor(p.x / this.scale);
+        var lat = Math.floor(p.z / this.scale);
+        var map = new clipMap(lon, lat, 1, 1, _textureType, this.dataURL);
+        this.listDalles = map.getListTiles();
+        for (var i = 0; i < this.listDalles.length; i++) {
+            if (this.dalleSet[this.listDalles[i].name] === undefined) {
+                var currentDalle = this.listDalles[i];
+                var currentDalleNameSplit = this.listDalles[i].name.split('-');
+                var currentDalleXinGrid = currentDalleNameSplit[0] - bbox.xmin;
+                var currentDalleYinGrid = currentDalleNameSplit[1] - bbox.ymin;
+                this.grid[currentDalleXinGrid][currentDalleYinGrid] = currentDalle;
+                if (!this.using3DS) {
+                    this.listDalles[i].doAfter = this.doAfter;
+                    this.listDalles[i].modelLoader = this.modelLoader;
+                    this.listDalles[i].isLast = islast;
+                    this.listDalles[i].load();
+                }
             }
         }
     },
-    initCarto3D: function initCarto3D(options) {
-        this.dataURL = options.url;
-        this.textureType = '.dds';
-        console.log('this.textureType', this.textureType);
-        _textureType = this.textureType;
-        /*
-        var pos = gfxEngine.getCameraPosition();
-        console.log('pos', pos);
-        */
-        this.generateGrid();
-        /*
-        if (this.isDataAvailable(pos)) {
-            this.loadDallesAroundPosition(pos);
-            this.setInitStatus(true);
-        }
-        */
-        // chargement de toutes les dalles possibles
-        this.loadAllDalles();
-        this.setInitStatus(true);
-        this.setVisibility(!!options.visible);
-    },
-    isCartoInitialized: function isCartoInitialized() {
-        return this.intialized;
+
+    // donne si le point p est dans la zone de travail
+    isDataAvailable: function isDataAvailable(p) {
+        return (p.x > this.limitZone.xmin) && (p.x < this.limitZone.xmax) && (p.z > this.limitZone.ymin) && (p.z < this.limitZone.ymax);
     },
 };
 
