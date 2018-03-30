@@ -872,7 +872,7 @@ function getMethod(shader) {
 
 var valXplus = 0;
 Symbolizer.prototype._xplus = function xplus() {
-    valXplus += 10;
+    valXplus += 1;
     for (var i = 0; i < this.obj.length; i++) {
         this.obj[i].translateX(valXplus);
         this.edges[i].translateX(valXplus);
@@ -886,7 +886,7 @@ Symbolizer.prototype._xplus = function xplus() {
 
 var valXmoins = 0;
 Symbolizer.prototype._xmoins = function _xmoins() {
-  valXmoins -= 10;
+  valXmoins -= 1;
     for (var i = 0; i < this.obj.length; i++) {
         this.obj[i].translateX(valXmoins);
         this.edges[i].translateX(valXmoins);
@@ -899,7 +899,7 @@ Symbolizer.prototype._xmoins = function _xmoins() {
 };
 var valYplus = 0;
 Symbolizer.prototype._yplus = function yplus() {
-  valYplus += 10;
+  valYplus += 1;
     for (var i = 0; i < this.obj.length; i++) {
         this.obj[i].translateZ(valYplus);
         this.edges[i].translateZ(valYplus);
@@ -913,7 +913,7 @@ Symbolizer.prototype._yplus = function yplus() {
 
 var valYmoins = 0;
 Symbolizer.prototype._ymoins = function _ymoins() {
-    valYmoins -= 10;
+    valYmoins -= 1;
     for (var i = 0; i < this.obj.length; i++) {
       this.obj[i].translateZ(valYmoins);
       this.edges[i].translateZ(valYmoins);
@@ -926,7 +926,7 @@ Symbolizer.prototype._ymoins = function _ymoins() {
 };
 var valZplus = 0;
 Symbolizer.prototype._zplus = function zplus() {
-    valZplus += 10;
+    valZplus += 1;
     for (var i = 0; i < this.obj.length; i++) {
         this.obj[i].translateY(valZplus);
         this.edges[i].translateY(valZplus);
@@ -940,7 +940,7 @@ Symbolizer.prototype._zplus = function zplus() {
 
 var valZmoins = 0;
 Symbolizer.prototype._zmoins = function _zmoins() {
-    valZmoins -= 10;
+    valZmoins -= 1;
     for (var i = 0; i < this.obj.length; i++) {
         this.obj[i].translateY(valZmoins);
         this.edges[i].translateY(valZmoins);
