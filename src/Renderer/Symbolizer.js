@@ -429,8 +429,13 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
 
 Symbolizer.prototype._readVibes = function readVibes(file, folder) {
     var reader = new FileReader();
-    reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
-    reader.readAsText(file);
+    if (file.name.endsWith('.vibes')) {
+        reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
+        reader.readAsText(file);
+        return 0;
+    } else {
+        throw new loadFileException('Unvalid format');
+    }
 };
 
 // Menu management
@@ -844,6 +849,10 @@ Symbolizer.prototype._checkStructure = function checkStructure() {
     return true;
 };
 
+function loadFileException(message) {
+    this.message = message;
+    this.name = 'loadFileException';
+}
 
 function getRandomColor() {
     var letters = '0123456789ABCDEF';

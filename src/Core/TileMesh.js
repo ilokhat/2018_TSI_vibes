@@ -9,6 +9,7 @@ import LayeredMaterial from '../Renderer/LayeredMaterial';
 import { l_ELEVATION } from '../Renderer/LayeredMaterialConstants';
 import RendererConstant from '../Renderer/RendererConstant';
 import OGCWebServiceHelper, { SIZE_TEXTURE_TILE } from './Scheduler/Providers/OGCWebServiceHelper';
+import Sphere from './Math/Sphere';
 
 function TileMesh(geometry, params) {
     // Constructor
@@ -28,7 +29,7 @@ function TileMesh(geometry, params) {
 
     this.obb = this.geometry.OBB.clone();
 
-    this.boundingSphere = this.OBB().box3D.getBoundingSphere();
+    this.boundingSphere = this.OBB().box3D.getBoundingSphere(new Sphere());
 
     this.material = new LayeredMaterial(params.materialOptions);
 
