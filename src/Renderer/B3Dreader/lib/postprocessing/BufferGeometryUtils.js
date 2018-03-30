@@ -1,11 +1,8 @@
 import * as THREE from 'three';
-import proj4 from 'proj4';
 import Coordinates from '../../../../Core/Geographic/Coordinates';
 
 const BufferGeometryUtils = {
-
     fromGeometry: function geometryToBufferGeometry(geometry, settings) {
-        proj4.defs('EPSG:2154', '+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
         if (geometry instanceof THREE.BufferGeometry) {
             return geometry;
         }
@@ -34,21 +31,18 @@ const BufferGeometryUtils = {
             var a = vertices[face.a];
             var b = vertices[face.b];
             var c = vertices[face.c];
-            var coords = new Coordinates('EPSG:2154', a.x, a.y, a.z);
-            var coordsA = coords.as('EPSG:4978');
-            coords = new Coordinates('EPSG:2154', b.x, b.y, b.z);
-            var coordsB = coords.as('EPSG:4978');
-            coords = new Coordinates('EPSG:2154', c.x, c.y, c.z);
-            var coordsC = coords.as('EPSG:4978');
-            positions[i3] = coordsA.x();
-            positions[i3 + 1] = coordsA.y();
-            positions[i3 + 2] = coordsA.z();
-            positions[i3 + 3] = coordsB.x();
-            positions[i3 + 4] = coordsB.y();
-            positions[i3 + 5] = coordsB.z();
-            positions[i3 + 6] = coordsC.x();
-            positions[i3 + 7] = coordsC.y();
-            positions[i3 + 8] = coordsC.z();
+            var coordA = new Coordinates('EPSG:2154', a.x, a.y, a.z).as('EPSG:4978');
+            var coordB = new Coordinates('EPSG:2154', b.x, b.y, b.z).as('EPSG:4978');
+            var coordC = new Coordinates('EPSG:2154', c.x, c.y, c.z).as('EPSG:4978');
+            positions[i3 + 0] = coordA.x();
+            positions[i3 + 1] = coordA.y();
+            positions[i3 + 2] = coordA.z();
+            positions[i3 + 3] = coordB.x();
+            positions[i3 + 4] = coordB.y();
+            positions[i3 + 5] = coordB.z();
+            positions[i3 + 6] = coordC.x();
+            positions[i3 + 7] = coordC.y();
+            positions[i3 + 8] = coordC.z();
             if (vertexColors === THREE.FaceColors) {
                 var fc = face.color;
                 colors[i3] = fc.r;
@@ -92,7 +86,7 @@ const BufferGeometryUtils = {
         bufferGeometry.addAttribute('materialindice', new THREE.BufferAttribute(materialindice, 1));
         if (vertexColors !== THREE.NoColors) bufferGeometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
         if (hasFaceVertexUv === true) bufferGeometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-        bufferGeometry.computeBoundingSphere();
+        // bufferGeometry.computeBoundingSphere();
         return bufferGeometry;
     },
 };
