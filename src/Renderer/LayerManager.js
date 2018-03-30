@@ -42,10 +42,10 @@ LayerManager.prototype.initListener = function initListener() {
 LayerManager.prototype.documentDrop = function documentDrop(e) {
     e.preventDefault();
     var file = e.dataTransfer.files[0];
-    _this.readFile(file);
+    _this._readFile(file);
 };
 
-LayerManager.prototype.readFile = function readFile(file) {
+LayerManager.prototype._readFile = function readFile(file) {
     // Read the file dropped and actually load the object
     var reader = new FileReader();
     // Load .OBJ file
@@ -78,6 +78,8 @@ LayerManager.prototype.readFile = function readFile(file) {
             });
         });
         reader.readAsText(file);
+        return 0;
+
     }
     // Other format
     else {

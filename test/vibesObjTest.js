@@ -1,9 +1,13 @@
+var manager = itowns.LayerManager.prototype ;
 var symbolizer = itowns.Symbolizer.prototype ;
+
+console.log(manager);
+
 var f = new File([""], "filename.text", {type: "text/plain"})
 
 describe('readFile()', function () {
   it('fichier de type .obj attendu', function () {
-    chai.expect( function(){ readFile(f); } ).to.throw("fichier de type .obj attendu");
+    chai.expect( function(){ manager._readFile(f); } ).to.throw("Unvalid format");
 
   });
 });
@@ -17,23 +21,18 @@ var f1 = new File(parts, 'sample.obj') ;
 
 describe('readFile()', function () {
   it("chargement d'un fichier obj", function () {
-    chai.expect(  readFile(f1) ).to.equal(0);
+    chai.expect(  manager._readFile(f1) ).to.equal(0);
 
   });
 });
 
 
-describe("symbolizer.zero()",function() {
-  console.log("eeeeeeeeeeee", itowns.Symbolizer);
-it("example test unitaire symbolizer",function() {
-  chai.expect(  symbolizer.zero(5) ).to.equal(0);
-});
-});
+
 var mesh ;
 
 describe('symbolizer.readVibes()', function () {
   it("fichier de style de type .vibes attendu", function () {
-    chai.expect( function(){ symbolizer._readVibes(f,mesh); } ).to.throw("fichier de type .vibes attendu");
+    chai.expect( function(){ symbolizer._readVibes(f,mesh); } ).to.throw("Unvalid format");
 
   });
 });
