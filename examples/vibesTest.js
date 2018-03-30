@@ -88,10 +88,11 @@ function picking(event) {
         source = getParent(intersects[0].object);
         if (source.name != 'globe') {
             console.log(source.name);
+
             for (var i = 0; i < source.children.length; i++) {
                 source.children[i].material = new THREE.MeshPhongMaterial({ color: 0x2194ce, emissive: 0x000000, specular: 0x111111, side: THREE.DoubleSide });
                 source.children[i].material.needUpdate = true;
-                // source.children[i].obj[i].position.x += 200;
+                source.children[i].position.y+=500;
             }
         }
     }
