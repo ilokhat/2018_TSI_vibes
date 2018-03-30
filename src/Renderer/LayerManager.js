@@ -80,7 +80,6 @@ LayerManager.prototype._readFile = function readFile(file) {
         });
         reader.readAsText(file);
         return 0;
-
     }
     // Other format
     else {
