@@ -56,7 +56,7 @@ var rotateZ = 0;
 var scale = 150;
 
 // Symbolizer
-var initSymbolizer = function initSymbolizer(menuGlobe, complex) {sgdfgfgdgdfgdfgdfgf
+var initSymbolizer = function initSymbolizer(menuGlobe, complex) {
     // Merge elements of the list as one group
     var listObj = [];
     var listEdge = [];
@@ -69,6 +69,31 @@ var initSymbolizer = function initSymbolizer(menuGlobe, complex) {sgdfgfgdgdfgdf
     // Call Symbolizer
     nbSymbolizer++;
     var symbolizer = new itowns.Symbolizer(globeView, listObj, listEdge, menuGlobe, nbSymbolizer);
+    window.addEventListener("keypress",checkKeyPress,false);
+    function checkKeyPress(key){
+
+        if ((key.keyCode == "56")||(key.keyCode == "113")) {
+          symbolizer._xplus();
+        }
+        if ((key.keyCode == "50")||(key.keyCode == "115")){
+          symbolizer._xmoins();
+        }
+
+        if ((key.keyCode == "52")||(key.keyCode == "97")){
+          symbolizer._yplus();
+        }
+        if ((key.keyCode == "54")||(key.keyCode == "122")){
+          symbolizer._ymoins();
+        }
+
+        if ((key.keyCode == "55")||(key.keyCode == "119")){
+          symbolizer._zplus();
+        }
+        if ((key.keyCode == "51")||(key.keyCode == "120")){
+          symbolizer._zmoins();
+        }
+      }
+
     if (complex) {
         symbolizer.initGui();
     }
@@ -128,7 +153,7 @@ function readFile(file) {
 function handleLayer(model, menuGlobe) {
     // Add a checkbox to the GUI, named after the layer
     console.log("gui ", menuGlobe.gui.__folders.Layers);
-    
+
     var lFolder,lFolder1,deleteBtn;
     if(!guiInitialized){
        lFolder =  layerFolder.add({ symbolizer: () => {initSymbolizer(menuGlobe, false);    console.log("gui 2", menuGlobe.gui.__folders.Layers);
@@ -143,22 +168,22 @@ function handleLayer(model, menuGlobe) {
             listControllers.push(controller);
             if ( !listLayerDelete.includes(model)){
             listLayerDelete.push(model);
-             deleteBtn=  layerFolder.add({ "delete": function(){             
+             deleteBtn=  layerFolder.add({ "delete": function(){
                 var i = listLayers.indexOf(model);
                 if(i != -1) {
                     listLayers.splice(i, 1);
                 }
                 menuGlobe.gui.__folders.Layers.remove(controller);
                 menuGlobe.gui.__folders.Layers.remove(deleteBtn)
-    
+
                 globeView.scene.remove(model[0]);
                 globeView.scene.remove(model[1]);
-                globeView.notifyChange(true); 
-           
+                globeView.notifyChange(true);
+
             }}, 'delete').name("delete "+name);
         }
-        
-        
+
+
         }
         else{
             var i = listLayerDelete.indexOf(model);
@@ -166,22 +191,22 @@ function handleLayer(model, menuGlobe) {
                 listLayerDelete.splice(i, 1);
             }
             // Remove layer and controller from the list
-            
+
             menuGlobe.gui.__folders.Layers.remove(deleteBtn);
             var i = listLayers.indexOf(model);
             if(i != -1) {
                 listLayers.splice(i, 1);
-            } 
+            }
             var j = listControllers.indexOf(controller);
             if(j != -1) {
                 listControllers.splice(j, 1);
-            } 
+            }
         }
-    }); 
-  
+    });
+
         guiInitialized = true;
 
-    
+
 }
 
 // Drag and drop
@@ -239,7 +264,7 @@ if (!itowns.Cartography3D.isCartoInitialized()){
     itowns.Cartography3D.initCarto3D(options.buildings);
 };
 
-*/ 
+*/
 
 /*
 globeView.controls.setCameraTargetGeoPosition({longitude:60, latitude:40}, true);

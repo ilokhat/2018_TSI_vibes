@@ -185,7 +185,7 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, i, j, folde
         this.obj[i].children[j].material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide, map: texture, color: meshcolor, emissive: meshemissive, specular: meshspecular, shininess: meshshininess, opacity: meshopacity, transparent: true });
         this.obj[i].children[j].material.needsUpdate = true;
         this.view.notifyChange(true);
-        
+
     } else {
         for (let k = 0; k < folder.__controllers.length; k++) {
             if (folder.__controllers[k].property == 'textureRepetition') {
@@ -210,7 +210,7 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, i, fo
         if (!isTextured) {
             folder.add({ textureRepetition: 1 }, 'textureRepetition', 0.1, 5).name('Texture Repetition').onChange((value) => {
                 for (let j = 0; j < this.obj[i].children.length; j++) {
-                    this._changetextureRepetition(value, i, j); 
+                    this._changetextureRepetition(value, i, j);
                 }
             });
         }
@@ -227,7 +227,7 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, i, fo
             this.obj[i].children[j].material.needsUpdate = true;
             this.view.notifyChange(true);
         }
-        
+
     } else {
         for (let k = 0; k < folder.__controllers.length; k++) {
             if (folder.__controllers[k].property == 'textureRepetition') {
@@ -421,8 +421,11 @@ Symbolizer.prototype.initGui = function addToGUI() {
         this._addSave(parentFolder);
         this._addLoad(parentFolder);
         var positionFolder = parentFolder.addFolder('Position');
-        this._addRotationsAll(positionFolder); 
+        this._addRotationsAll(positionFolder);
         this._addScaleAll(positionFolder);
+        this._addMoveobjcoordXAll(positionFolder);
+        //this._addMoveobjcoordYAll(positionFolder);
+        //this._addMoveobjcoordZAll(positionFolder);
         var edgesFolder = parentFolder.addFolder('Edges');
         this._addColorEdgeAll(edgesFolder);
         this._addOpacityEdgeAll(edgesFolder);
@@ -458,8 +461,45 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
     });
 };
 
+Symbolizer.prototype._addMoveobjcoordXAll = function addMoveobjcoordXAll(folder) {
+   folder.add({ MovecoordX: 0 }, 'MovecoordX', -100, 100, 1).name('MovecoordX').onChange((value) => {
+       for (var i = 0; i < this.obj.length; i++) {
+            console.log(value);
+            this.obj[i].position.x+=value;
+            this.edges[i].position.x+=value;
+            this.obj[i].updateMatrixWorld();
+            this.edges[i].updateMatrixWorld();
+
+         }
+      this.view.notifyChange(true);
+    });
+    folder.add({ MovecoordY: 0 }, 'MovecoordY', -100, 100, 1).name('MovecoordY').onChange((value) => {
+         for (var i = 0; i < this.obj.length; i++) {
+              console.log(value);
+              this.obj[i].translateX(value);
+              this.edges[i].translateX(value);
+              this.obj[i].updateMatrixWorld();
+              this.edges[i].updateMatrixWorld();
+
+           }
+        this.view.notifyChange(true);
+      });
+      folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -100, 100, 1).name('MovecoordZ').onChange((value) => {
+           for (var i = 0; i < this.obj.length; i++) {
+                console.log(value);
+                this.obj[i].position.z+=value;
+                this.edges[i].position.z+=value;
+                this.obj[i].updateMatrixWorld();
+                this.edges[i].updateMatrixWorld();
+
+             }
+          this.view.notifyChange(true);
+        });
+
+};
+
 Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
-    
+
     folder.add({ rotationX: 0 }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('rotationX').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
            this.obj[i].rotation.x = value;
@@ -615,8 +655,11 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addSaveAll(folder);
     this._addLoad(folder);
     var positionFolder = folder.addFolder('Position');
-    this._addRotationsAll(positionFolder); 
+    this._addRotationsAll(positionFolder);
     this._addScaleAll(positionFolder);
+    this._addMoveobjcoordXAll(positionFolder);
+    //this._addMoveobjcoordYAll(positionFolder);
+    //this._addMoveobjcoordZAll(positionFolder);
     var edgesFolder = folder.addFolder('Edges');
     this._addColorEdgeAll(edgesFolder);
     this._addOpacityEdgeAll(edgesFolder);
@@ -667,4 +710,83 @@ function getMethod(shader) {
     return method;
 }
 
+Symbolizer.prototype._xplus= function xplus() {
+  for (var i = 0; i < this.obj.length; i++) {
+     this.obj[i].position.x+=20;
+     this.obj[i].position.z-=18;
+     this.edges[i].position.x+=20;
+     this.edges[i].position.z-=18;
+     //this.obj[i].rotateY(value);
+    // this.edges[i].rotateY(value);
+     this.obj[i].updateMatrixWorld();
+     this.edges[i].updateMatrixWorld();
+  }
+    this.view.notifyChange(true);
+};
+
+Symbolizer.prototype._xmoins= function _xmoins() {
+  for (var i = 0; i < this.obj.length; i++) {
+     this.obj[i].position.x-=20;
+     this.obj[i].position.z+=18;
+     this.edges[i].position.x-=20;
+     this.edges[i].position.z+=18;
+     //this.obj[i].rotateY(value);
+    // this.edges[i].rotateY(value);
+     this.obj[i].updateMatrixWorld();
+     this.edges[i].updateMatrixWorld();
+  }
+    this.view.notifyChange(true);
+};
+
+Symbolizer.prototype._yplus= function yplus() {
+  for (var i = 0; i < this.obj.length; i++) {
+     this.obj[i].position.y+=20;
+     this.edges[i].position.y+=20;
+     //this.obj[i].rotateY(value);
+    // this.edges[i].rotateY(value);
+     this.obj[i].updateMatrixWorld();
+     this.edges[i].updateMatrixWorld();
+  }
+    this.view.notifyChange(true);
+};
+
+Symbolizer.prototype._ymoins= function _ymoins() {
+  for (var i = 0; i < this.obj.length; i++) {
+     this.obj[i].position.y-=20;
+     this.edges[i].position.y-=20;
+     //this.obj[i].rotateY(value);
+    // this.edges[i].rotateY(value);
+     this.obj[i].updateMatrixWorld();
+     this.edges[i].updateMatrixWorld();
+  }
+    this.view.notifyChange(true);
+};
+
+Symbolizer.prototype._zplus= function zplus() {
+  for (var i = 0; i < this.obj.length; i++) {
+    this.obj[i].position.z+=20;
+    this.obj[i].position.x+=18;
+    this.edges[i].position.z+=20;
+    this.edges[i].position.x+=18;
+     //this.obj[i].rotateY(value);
+    // this.edges[i].rotateY(value);
+     this.obj[i].updateMatrixWorld();
+     this.edges[i].updateMatrixWorld();
+  }
+    this.view.notifyChange(true);
+};
+
+Symbolizer.prototype._zmoins= function _zmoins() {
+  for (var i = 0; i < this.obj.length; i++) {
+     this.obj[i].position.z-=20;
+     this.obj[i].position.x-=18;
+     this.edges[i].position.z-=20;
+     this.edges[i].position.x-=18;
+     //this.obj[i].rotateY(value);
+    // this.edges[i].rotateY(value);
+     this.obj[i].updateMatrixWorld();
+     this.edges[i].updateMatrixWorld();
+  }
+    this.view.notifyChange(true);
+};
 export default Symbolizer;
