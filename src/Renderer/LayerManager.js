@@ -33,6 +33,7 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
 
 LayerManager.prototype.initListener = function initListener() {
     this.document.addEventListener('keypress', _this.checkKeyPress, false);
+    this.document.addEventListener('click', _this.picking, false);
     this.document.addEventListener('drop', _this.documentDrop, false);
     var prevDefault = e => e.preventDefault();
     this.document.addEventListener('dragenter', prevDefault, false);
@@ -90,7 +91,7 @@ LayerManager.prototype._readFile = function readFile(file) {
 LayerManager.prototype.handleLayer = function handleLayer(model) {
     // Add a checkbox to the GUI, named after the layer
     var name = model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4);
-    var controller = _this.layerFolder.add({ Layer: false }, 'Layer').name(name).onChange((checked) => {
+    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name(name).onChange((checked) => {
         if (checked) {
             // Add layer and controller to the list
             _this.listLayers.push(model);
@@ -244,5 +245,30 @@ LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
         }
     }
 };
+
+LayerManager.prototype.picking = function picking(event) {
+    // Pick an object with batch id
+    var mouse = _this.view.eventToNormalizedCoords(event);
+    var raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, _this.view.camera.camera3D);
+    // calculate objects intersecting the picking ray
+    var intersects = raycaster.intersectObjects(_this.view.scene.children, true);
+    if (intersects.length > 0) {
+        var source = getParent(intersects[0].object);
+        if (source.name != 'globe' && source.name != '') {
+            console.log(source.name.split('_'));
+            _this.menu.gui.__folders.Layers.__controllers.forEach((element) => {
+                console.log(element.object.Name); 
+                if (element.__checkbox && element.object.Name == source.name.split('_')[0]) element.setValue(!element.__prev);
+                return element;
+            });
+        }
+    }
+};
+
+function getParent(obj) {
+    if (obj.parent.parent != null) return getParent(obj.parent);
+    return obj;
+}
 
 export default LayerManager;
