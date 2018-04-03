@@ -224,26 +224,110 @@ function loadFileException(message) {
 }
 
 LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
-    if (_this.symbolizerInit) {
-        if ((key.keyCode == '56') || (key.keyCode == '113')) {
-            _this.symbolizerInit._xplus();
+    if (_this.listLayers.length == 1) {
+        /* if ((key.keyCode == '56') || (key.keyCode == '113')) {
+            _this._xplus();
         }
-        if ((key.keyCode == '50') || (key.keyCode == '115')) {
-            _this.symbolizerInit._xmoins();
+        /* if ((key.keyCode == '50') || (key.keyCode == '115')) {
+            _this._xmoins();
         }
         if ((key.keyCode == '52') || (key.keyCode == '97')) {
-            _this.symbolizerInit._yplus();
+            _this._yplus();
         }
         if ((key.keyCode == '54') || (key.keyCode == '122')) {
-            _this.symbolizerInit._ymoins();
+            _this._ymoins();
         }
         if ((key.keyCode == '55') || (key.keyCode == '119')) {
-            _this.symbolizerInit._zplus();
+            _this._zplus();
         }
         if ((key.keyCode == '51') || (key.keyCode == '120')) {
-            _this.symbolizerInit._zmoins();
-        }
+            _this._zmoins();
+        } */
     }
 };
 
+LayerManager.prototype._xplus = function xplus() {
+    console.log(_this.listLayers);
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        for (var i = 0; i < obj.length; i++) {
+            obj[i].position.x += 20;
+            obj[i].position.z -= 18;
+            edges[i].position.x += 20;
+            edges[i].position.z -= 18;
+            // obj[i].rotateY(value);
+            // edges[i].rotateY(value);
+            obj[i].updateMatrixWorld();
+            edges[i].updateMatrixWorld();
+        }
+        this.view.notifyChange(true);
+    }
+};
+
+LayerManager.prototype._xmoins = function _xmoins() {
+  for (var i = 0; i < this.obj.length; i++) {
+        this.obj[i].position.x -= 20;
+        this.obj[i].position.z += 18;
+        this.edges[i].position.x -= 20;
+        this.edges[i].position.z += 18;
+        // this.obj[i].rotateY(value);
+        // this.edges[i].rotateY(value);
+        this.obj[i].updateMatrixWorld();
+        this.edges[i].updateMatrixWorld();
+    }
+    this.view.notifyChange(true);
+};
+
+LayerManager.prototype._yplus = function yplus() {
+  for (var i = 0; i < this.obj.length; i++) {
+        this.obj[i].position.y += 20;
+        this.edges[i].position.y += 20;
+        // this.obj[i].rotateY(value);
+        // this.edges[i].rotateY(value);
+        this.obj[i].updateMatrixWorld();
+        this.edges[i].updateMatrixWorld();
+    }
+    this.view.notifyChange(true);
+};
+
+LayerManager.prototype._ymoins = function _ymoins() {
+  for (var i = 0; i < this.obj.length; i++) {
+        this.obj[i].position.y -= 20;
+        this.edges[i].position.y -= 20;
+        // this.obj[i].rotateY(value);
+        // this.edges[i].rotateY(value);
+        this.obj[i].updateMatrixWorld();
+        this.edges[i].updateMatrixWorld();
+    }
+    this.view.notifyChange(true);
+};
+
+LayerManager.prototype._zplus = function zplus() {
+  for (var i = 0; i < this.obj.length; i++) {
+        this.obj[i].position.z += 20;
+        this.obj[i].position.x += 18;
+        this.edges[i].position.z += 20;
+        this.edges[i].position.x += 18;
+        // this.obj[i].rotateY(value);
+        // this.edges[i].rotateY(value);
+        this.obj[i].updateMatrixWorld();
+        this.edges[i].updateMatrixWorld();
+    }
+    this.view.notifyChange(true);
+};
+
+LayerManager.prototype._zmoins = function _zmoins() {
+  for (var i = 0; i < this.obj.length; i++) {
+        this.obj[i].position.z -= 20;
+        this.obj[i].position.x -= 18;
+        this.edges[i].position.z -= 20;
+        this.edges[i].position.x -= 18;
+        // this.obj[i].rotateY(value);
+        // this.edges[i].rotateY(value);
+        this.obj[i].updateMatrixWorld();
+        this.edges[i].updateMatrixWorld();
+    }
+    this.view.notifyChange(true);
+};
 export default LayerManager;

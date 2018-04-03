@@ -600,7 +600,7 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
 };
 
 Symbolizer.prototype._addMoveobjcoordXAll = function addMoveobjcoordXAll(folder) {
-   folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 1).name('MovecoordX').onChange((value) => {
+   folder.add({ MovecoordX: 0 }, 'MovecoordX', -10, 10, 1).name('MovecoordX').onChange((value) => {
        for (var i = 0; i < this.obj.length; i++) {
             console.log(value);
             this.obj[i].translateX(value);
@@ -611,7 +611,7 @@ Symbolizer.prototype._addMoveobjcoordXAll = function addMoveobjcoordXAll(folder)
          }
       this.view.notifyChange(true);
     });
-    folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('MovecoordY').onChange((value) => {
+    folder.add({ MovecoordY: 0 }, 'MovecoordY', -10, 10, 1).name('MovecoordY').onChange((value) => {
          for (var i = 0; i < this.obj.length; i++) {
               console.log(value);
               this.obj[i].translateY(value);
@@ -622,7 +622,7 @@ Symbolizer.prototype._addMoveobjcoordXAll = function addMoveobjcoordXAll(folder)
            }
         this.view.notifyChange(true);
       });
-      folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('MovecoordZ').onChange((value) => {
+      folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -10, 10, 1).name('MovecoordZ').onChange((value) => {
            for (var i = 0; i < this.obj.length; i++) {
                 console.log(value);
                 this.obj[i].translateZ(value);
@@ -854,7 +854,7 @@ function loadFileException(message) {
     this.name = 'loadFileException';
 }
 
-function getRandomColor() {
+export function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
     for (var i = 0; i < 6; i++) {

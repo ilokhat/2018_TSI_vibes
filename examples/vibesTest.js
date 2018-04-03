@@ -91,10 +91,11 @@ function picking(event) {
             for (var i = 0; i < source.children.length; i++) {
                 source.children[i].material = new THREE.MeshPhongMaterial({ color: 0x2194ce, emissive: 0x000000, specular: 0x111111, side: THREE.DoubleSide });
                 source.children[i].material.needUpdate = true;
-                // source.children[i].obj[i].position.x += 200;
+                
             }
         }
     }
+    // LayerManager.prototype.checkKeyPress;
     globeView.notifyChange(true);
 }
 
