@@ -250,6 +250,7 @@ function coordinateToPolygonExtruded(coordinates, properties, options) {
     let nbVertices = 0;
     let minAltitude = Infinity;
     var pos = [];
+    const wall = new Uint16Array(2 * coordinates.coordinates.length);
     /* eslint-disable-next-line */
     for (const id in coordinates.featureVertices) {
         // extract contour coodinates and properties of one feature
@@ -266,6 +267,7 @@ function coordinateToPolygonExtruded(coordinates, properties, options) {
         nbVertices = contour.length * 3;
         const verticesTopFace = vertices.slice(offset2, offset2 + nbVertices);
         const triangles = Earcut(verticesTopFace, null, 3);
+        var temp = [indices.length / 3, triangles.length / 3];
         for (const indice of triangles) {
             indices.push(offset + indice);
         }
@@ -274,6 +276,10 @@ function coordinateToPolygonExtruded(coordinates, properties, options) {
             ids[i] = property._idx;
             zmins[i] = property.z_min;
             pos[i] = contour[i - ofid];
+            wall[i] = 1;
+        }
+        for (var i = temp[0]; i < temp[0] + temp[1]; i++) {
+            wall[i] = 0;
         }
         offset2 += nbVertices * 2;
         addFaces(indices, contour.length, offset);
@@ -292,6 +298,7 @@ function coordinateToPolygonExtruded(coordinates, properties, options) {
     const result = new THREE.Mesh(geometry);
     result.minAltitude = minAltitude;
     result.pos = pos;
+    result.wall = wall;
     return result;
 }
 

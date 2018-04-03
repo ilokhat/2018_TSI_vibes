@@ -5,7 +5,7 @@
 import * as OBJLoader from 'three-obj-loader';
 import * as THREE from 'three';
 import Cartography3D from '../B3Dreader/Cartography3D';
-import Feature2Mesh from './Feature2Mesh';
+import Feature2MeshStyle from './Feature2MeshStyle';
 import FeatureProcessing from '../../Process/FeatureProcessing';
 
 OBJLoader(THREE);
@@ -145,7 +145,7 @@ ModelLoader.prototype.loadBati3D = function loadBati3D() {
 };
 
 function colorBuildings(properties) {
-    return new THREE.Color(0xeeeeee);
+    return new THREE.Color(0x00eeee);
 }
 
 function altitudeBuildings(properties) {
@@ -164,7 +164,7 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
     this.view.addLayer({
         type: 'geometry',
         update: FeatureProcessing.update,
-        convert: Feature2Mesh.convert({
+        convert: Feature2MeshStyle.convert({
             color: colorBuildings,
             altitude: altitudeBuildings,
             extrude: extrudeBuildings }),
@@ -182,6 +182,45 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
             mimetype: 'json',
         },
     }, this.view.tileLayer);
+    var self = this;
+    setTimeout(self.ForBuildings(self.view), 50000);
+};
+
+ModelLoader.prototype.ForBuildings = function ForBuildings() {
+    // For all globe tile meshes we look for tile at level 14 on which building meshes are attached.
+    for (var i = 0; i < this.view.wgs84TileLayer.level0Nodes.length; ++i) {
+        this.view.wgs84TileLayer.level0Nodes[i].traverse(element => this.traverseElement(element));
+    }
+    this.view.notifyChange(true);
+    console.log('fin');
+};
+
+ModelLoader.prototype.traverseElement = function traverseElement(element) {
+    if (element.level != undefined && element.level <= 14 /* && element.visible */) {
+        // console.log(element);
+        for (var c = 0; c < element.children.length; ++c) {
+            if (element.children[c].type == 'Group') {
+                var parent = element.children[c];
+                var mesh = element.children[c].children[0];
+                // change couleur toit
+                /* for (var j = 0; j < mesh.wall.length; j++) {
+                    if (mesh.wall[j] == 1) {
+                        // impossible couleur d'un point et non d'une face ...
+                        mesh.geometry.attributes.color.array[j * 3] = 0;
+                        mesh.geometry.attributes.color.array[j * 3 + 1] = 0;
+                        mesh.geometry.attributes.color.array[j * 3 + 2] = 0;
+                        mesh.geometry.attributes.color.needsUpdate = true;
+                    }
+                } */
+                mesh.material = new THREE.MeshPhongMaterial({ color: 0xffffff });
+                mesh.material.transparent = true;
+                mesh.castShadow = true;
+                mesh.material.side = THREE.DoubleSide;
+                mesh.material.needsUpdate = true;
+                console.log(mesh);
+            }
+        }
+    }
 };
 
 export default ModelLoader;
