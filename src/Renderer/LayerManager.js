@@ -73,7 +73,8 @@ LayerManager.prototype._readFile = function readFile(file) {
                 // Moving object
                 var crs = _this.coord.crs;
                 var vectCoord = new THREE.Vector3().set(coordX, coordY, coordZ);
-                _this.coord.set(crs, vectCoord);
+                _this.coord.set('EPSG:4978', vectCoord);
+                _this.coord.as(crs);
                 _this.loader._loadModel(layer[0], layer[1], _this.coord, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
             });
         });

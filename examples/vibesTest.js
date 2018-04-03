@@ -34,12 +34,12 @@ function addLayerCb(layer) {
 // This layer is defined in a json file but it could be defined as a plain js
 // object. See Layer* for more info.
 // itowns.Fetcher.json('./layers/JSONLayers/Ortho.json').then(addLayerCb);
-itowns.Fetcher.json('./layers/JSONLayers/Ortho.json').then(addLayerCb);
+itowns.Fetcher.json('./layers/JSONLayers/Ortho.json').then(result => addLayerCb(result));
 
 // Add two elevation layers.
 // These will deform iTowns globe geometry to represent terrain elevation.
-promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/WORLD_DTM.json').then(addLayerCb));
-promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/IGN_MNT_HIGHRES.json').then(addLayerCb));
+promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/WORLD_DTM.json').then(result => addLayerCb(result)));
+promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/IGN_MNT_HIGHRES.json').then(result => addLayerCb(result)));
 
 // Geolocation default parameters
 var coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 50);
@@ -63,6 +63,9 @@ window.onload = () => manager.initListener();
 // Listen for globe full initialisation event
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
     globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
+    document.getElementById('viewerDiv').addEventListener('mousemove', function() { 
+        document.getElementById('result').innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + ", Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
+    }) 
 });
 
 function loadFileException(message) {

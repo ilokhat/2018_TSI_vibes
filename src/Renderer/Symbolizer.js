@@ -429,6 +429,21 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
     FILE.saveAs(blob, this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4).concat('.vibes'));
 };
 
+Symbolizer.prototype._saveGibesAll = function saveGibesAll() {
+    var gibes = {
+        name: this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4),
+        coordX: this.obj[0].position.x,
+        coordY: this.obj[0].position.y,
+        coordZ: this.obj[0].position.z,
+        rotateX: this.obj[0].rotation.x,
+        rotateY: this.obj[0].rotation.y,
+        rotateZ: this.obj[0].rotation.z,
+        scale: this.obj[0].scale.x,
+    };
+    var blob = new Blob([JSON.stringify(gibes)], { type: 'text/plain; charset=utf-8' });
+    FILE.saveAs(blob, this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4).concat('.gibes'));
+};
+
 Symbolizer.prototype._readVibes = function readVibes(file, folder) {
     var reader = new FileReader();
     if (file.name.endsWith('.vibes')) {
@@ -562,6 +577,9 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
     var initialRotateY = this.obj[0].rotation.y;
     var initialRotateZ = this.obj[0].rotation.z;
     var initialScale = this.obj[0].scale.x;
+    var initialX = this.obj[0].position.x;
+    var initialY = this.obj[0].position.y;
+    var initialZ = this.obj[0].position.z;
     // Add a button to reset all initial parameters
     folder.add({ resetPosition: () => {
         // Reset GUI
@@ -569,6 +587,9 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
         folder.__controllers[2].setValue(initialRotateY);
         folder.__controllers[3].setValue(initialRotateZ);
         folder.__controllers[4].setValue(initialScale);
+        folder.__controllers[5].setValue(initialX);
+        folder.__controllers[6].setValue(initialY);
+        folder.__controllers[7].setValue(initialZ);
         // Reset parameters
         for (var i = 0; i < this.obj.length; i++) {
             this.obj[i].rotation.x = initialRotateX;
@@ -577,6 +598,12 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
             this.edges[i].rotation.y = initialRotateY;
             this.obj[i].rotation.z = initialRotateZ;
             this.edges[i].rotation.z = initialRotateZ;
+            this.obj[i].position.x = initialX;
+            this.edges[i].position.x = initialX;
+            this.obj[i].position.y = initialY;
+            this.edges[i].position.y = initialY;
+            this.obj[i].position.z = initialZ;
+            this.edges[i].position.z = initialZ;
             this.obj[i].scale.set(initialScale, initialScale, initialScale);
             this.edges[i].scale.set(initialScale, initialScale, initialScale);
             this.obj[i].updateMatrixWorld();
@@ -640,6 +667,47 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
         }
         this.view.notifyChange(true);
     });
+};
+
+Symbolizer.prototype._addPositionAll = function addPositionAll(folder) {
+    var initialX = this.obj[0].position.x;
+    var initialY = this.obj[0].position.y;
+    var initialZ = this.obj[0].position.z;
+    let X = initialX; 
+    let Y = initialY;
+    let Z = initialZ;
+    var vectCoord = new THREE.Vector3();
+        folder.add({ longitude: initialX }, 'longitude').name('X').onChange((value) => {
+            X = value;
+            if (Y != initialY || Z != initialZ) {
+                vectCoord.set(X, Y, Z);
+                this._changeCoordinates(vectCoord);
+            }
+        });
+    folder.add({ latitude: initialY }, 'latitude').name('Y').onChange((value) => {
+        Y = value;
+        if (X != initialX || Z != initialZ) {
+            vectCoord.set(X, Y, Z);
+            this._changeCoordinates(vectCoord);
+        }
+    });
+    folder.add({ altitude: initialZ }, 'altitude').name('Z').onChange((value) => {
+        Z = value;
+        if (Y != initialY || X != initialX) {
+            vectCoord.set(X, Y, Z);
+            this._changeCoordinates(vectCoord);
+        }
+    });
+ };
+
+Symbolizer.prototype._changeCoordinates = function changeCoordinates(vectCoord) {
+    for (var i = 0; i < this.obj.length; i++) {
+        this.obj[i].position.copy(vectCoord);
+        this.edges[i].position.copy(vectCoord);
+        this.obj[i].updateMatrixWorld();
+        this.edges[i].updateMatrixWorld();
+    }
+    this.view.notifyChange(true);
 };
 
 Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
@@ -770,6 +838,7 @@ Symbolizer.prototype._addEdgeTextureAll = function addEdgeTextureAll(folder, ind
 
 Symbolizer.prototype._addSaveAll = function addSave(folder) {
     folder.add({ save: () => this._saveVibesAll() }, 'save').name('Save style');
+    folder.add({ saveGibe: () => this._saveGibesAll() }, 'saveGibe').name('Save position');
 };
 
 Symbolizer.prototype.initGuiAll = function addToGUI() {
@@ -785,6 +854,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addResetPosition(positionFolder);
     this._addRotationsAll(positionFolder);
     this._addScaleAll(positionFolder);
+    this._addPositionAll(positionFolder);
     var edgesFolder = folder.addFolder('Edges');
     this._addColorEdgeAll(edgesFolder);
     this._addOpacityEdgeAll(edgesFolder);
