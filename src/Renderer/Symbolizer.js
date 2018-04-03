@@ -600,40 +600,36 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
 };
 
 Symbolizer.prototype._addMoveobjcoordXAll = function addMoveobjcoordXAll(folder) {
-   folder.add({ MovecoordX: 0 }, 'MovecoordX', -10, 10, 1).name('MovecoordX').onChange((value) => {
-       for (var i = 0; i < this.obj.length; i++) {
+    folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 1).name('MovecoordX').onChange((value) => {
+        for (var i = 0; i < this.obj.length; i++) {
             console.log(value);
             this.obj[i].translateX(value);
             this.edges[i].translateX(value);
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
-
-         }
-      this.view.notifyChange(true);
-    });
-    folder.add({ MovecoordY: 0 }, 'MovecoordY', -10, 10, 1).name('MovecoordY').onChange((value) => {
-         for (var i = 0; i < this.obj.length; i++) {
-              console.log(value);
-              this.obj[i].translateY(value);
-              this.edges[i].translateY(value);
-              this.obj[i].updateMatrixWorld();
-              this.edges[i].updateMatrixWorld();
-
-           }
+        }
         this.view.notifyChange(true);
-      });
-      folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -10, 10, 1).name('MovecoordZ').onChange((value) => {
-           for (var i = 0; i < this.obj.length; i++) {
-                console.log(value);
-                this.obj[i].translateZ(value);
-                this.edges[i].translateZ(value);
-                this.obj[i].updateMatrixWorld();
-                this.edges[i].updateMatrixWorld();
-
-             }
-          this.view.notifyChange(true);
-        });
-
+    });
+    folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('MovecoordY').onChange((value) => {
+        for (var i = 0; i < this.obj.length; i++) {
+            console.log(value);
+            this.obj[i].translateY(value);
+            this.edges[i].translateY(value);
+            this.obj[i].updateMatrixWorld();
+            this.edges[i].updateMatrixWorld();
+        }
+        this.view.notifyChange(true);
+    });
+    folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('MovecoordZ').onChange((value) => {
+        for (var i = 0; i < this.obj.length; i++) {
+            console.log(value);
+            this.obj[i].translateZ(value);
+            this.edges[i].translateZ(value);
+            this.obj[i].updateMatrixWorld();
+            this.edges[i].updateMatrixWorld();
+        }
+        this.view.notifyChange(true);
+    });
 };
 
 Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
@@ -645,7 +641,6 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     var prevValueZ = 0;
     folder.add({ rotationX: initialRotateX }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('rotationX').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-
             this.obj[i].rotateX(value - prevValueX);
             this.edges[i].rotateX(value - prevValueX);
             prevValueX = value;
@@ -656,7 +651,6 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     });
     folder.add({ rotationY: initialRotateY }, 'rotationY', -Math.PI, Math.PI, Math.PI / 100).name('rotationY').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-
             this.obj[i].rotateY(value - prevValueY);
             this.edges[i].rotateY(value - prevValueY);
             prevValueY = value;
@@ -667,7 +661,6 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     });
     folder.add({ rotationZ: initialRotateZ }, 'rotationZ', -Math.PI, Math.PI, Math.PI / 100).name('rotationZ').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-
             this.obj[i].rotateZ(value - prevValueZ);
             this.edges[i].rotateZ(value - prevValueZ);
             prevValueZ = value;
@@ -877,13 +870,12 @@ function getMethod(shader) {
     return method;
 }
 
-
+var valXplus = 0;
 Symbolizer.prototype._xplus = function xplus() {
-  for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.x += 20;
-        this.obj[i].position.z -= 18;
-        this.edges[i].position.x += 20;
-        this.edges[i].position.z -= 18;
+    valXplus += 1;
+    for (var i = 0; i < this.obj.length; i++) {
+        this.obj[i].translateX(valXplus);
+        this.edges[i].translateX(valXplus);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();
@@ -892,12 +884,12 @@ Symbolizer.prototype._xplus = function xplus() {
     this.view.notifyChange(true);
 };
 
+var valXmoins = 0;
 Symbolizer.prototype._xmoins = function _xmoins() {
-  for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.x -= 20;
-        this.obj[i].position.z += 18;
-        this.edges[i].position.x -= 20;
-        this.edges[i].position.z += 18;
+  valXmoins -= 1;
+    for (var i = 0; i < this.obj.length; i++) {
+        this.obj[i].translateX(valXmoins);
+        this.edges[i].translateX(valXmoins);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();
@@ -905,11 +897,12 @@ Symbolizer.prototype._xmoins = function _xmoins() {
     }
     this.view.notifyChange(true);
 };
-
+var valYplus = 0;
 Symbolizer.prototype._yplus = function yplus() {
-  for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.y += 20;
-        this.edges[i].position.y += 20;
+  valYplus += 1;
+    for (var i = 0; i < this.obj.length; i++) {
+        this.obj[i].translateZ(valYplus);
+        this.edges[i].translateZ(valYplus);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();
@@ -918,10 +911,12 @@ Symbolizer.prototype._yplus = function yplus() {
     this.view.notifyChange(true);
 };
 
+var valYmoins = 0;
 Symbolizer.prototype._ymoins = function _ymoins() {
-  for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.y -= 20;
-        this.edges[i].position.y -= 20;
+    valYmoins -= 1;
+    for (var i = 0; i < this.obj.length; i++) {
+      this.obj[i].translateZ(valYmoins);
+      this.edges[i].translateZ(valYmoins);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();
@@ -929,13 +924,12 @@ Symbolizer.prototype._ymoins = function _ymoins() {
     }
     this.view.notifyChange(true);
 };
-
+var valZplus = 0;
 Symbolizer.prototype._zplus = function zplus() {
-  for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.z += 20;
-        this.obj[i].position.x += 18;
-        this.edges[i].position.z += 20;
-        this.edges[i].position.x += 18;
+    valZplus += 1;
+    for (var i = 0; i < this.obj.length; i++) {
+        this.obj[i].translateY(valZplus);
+        this.edges[i].translateY(valZplus);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();
@@ -944,12 +938,12 @@ Symbolizer.prototype._zplus = function zplus() {
     this.view.notifyChange(true);
 };
 
+var valZmoins = 0;
 Symbolizer.prototype._zmoins = function _zmoins() {
-  for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.z -= 20;
-        this.obj[i].position.x -= 18;
-        this.edges[i].position.z -= 20;
-        this.edges[i].position.x -= 18;
+    valZmoins -= 1;
+    for (var i = 0; i < this.obj.length; i++) {
+        this.obj[i].translateY(valZmoins);
+        this.edges[i].translateY(valZmoins);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();

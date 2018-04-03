@@ -75,34 +75,3 @@ function loadFileException(message) {
 
 var loader2 = new itowns.ModelLoader(globeView);
 loader2.loadBati3D();
-
-function picking(event) {
-    console.log(event);
-    // Pick an object with batch id
-    var mouse = globeView.eventToNormalizedCoords(event);
-    var raycaster = new itowns.THREE.Raycaster();
-    raycaster.setFromCamera(mouse, globeView.camera.camera3D);
-    // calculate objects intersecting the picking ray
-    var intersects = raycaster.intersectObjects(globeView.scene.children, true);
-    if (0 < intersects.length /*&& intersects[0].object instanceof itowns.THREE.Mesh*/) {
-        source = getParent(intersects[0].object);
-        if (source.name != 'globe') {
-            console.log(source.name);
-            for (var i = 0; i < source.children.length; i++) {
-                source.children[i].material = new THREE.MeshPhongMaterial({ color: 0x2194ce, emissive: 0x000000, specular: 0x111111, side: THREE.DoubleSide });
-                source.children[i].material.needUpdate = true;
-                
-            }
-        }
-    }
-    // LayerManager.prototype.checkKeyPress;
-    globeView.notifyChange(true);
-}
-
-function getParent(obj){
-    if (obj.parent.parent != null) return getParent(obj.parent);
-    return obj;
-
-}
-
-window.addEventListener('click', picking, false);

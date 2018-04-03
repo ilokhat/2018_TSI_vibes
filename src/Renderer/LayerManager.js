@@ -32,7 +32,8 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
 }
 
 LayerManager.prototype.initListener = function initListener() {
-    this.document.addEventListener('keypress', this.checkKeyPress, false);
+    this.document.addEventListener('keypress', _this.checkKeyPress, false);
+    this.document.addEventListener('click', _this.picking, false);
     this.document.addEventListener('drop', _this.documentDrop, false);
     var prevDefault = e => e.preventDefault();
     this.document.addEventListener('dragenter', prevDefault, false);
@@ -80,7 +81,6 @@ LayerManager.prototype._readFile = function readFile(file) {
         });
         reader.readAsText(file);
         return 0;
-
     }
     // Other format
     else {
@@ -90,8 +90,8 @@ LayerManager.prototype._readFile = function readFile(file) {
 
 LayerManager.prototype.handleLayer = function handleLayer(model) {
     // Add a checkbox to the GUI, named after the layer
-    var name = model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4);
-    var controller = _this.layerFolder.add({ Layer: false }, 'Layer').name(name).onChange((checked) => {
+    var name = model[0].name.split('_')[0];
+    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name(name.split('-').join(' ')).onChange((checked) => {
         if (checked) {
             // Add layer and controller to the list
             _this.listLayers.push(model);
@@ -225,10 +225,10 @@ function loadFileException(message) {
 
 LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
     if (_this.listLayers.length == 1) {
-        /* if ((key.keyCode == '56') || (key.keyCode == '113')) {
+        if ((key.keyCode == '56') || (key.keyCode == '113')) {
             _this._xplus();
         }
-        /* if ((key.keyCode == '50') || (key.keyCode == '115')) {
+        if ((key.keyCode == '50') || (key.keyCode == '115')) {
             _this._xmoins();
         }
         if ((key.keyCode == '52') || (key.keyCode == '97')) {
@@ -242,25 +242,25 @@ LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
         }
         if ((key.keyCode == '51') || (key.keyCode == '120')) {
             _this._zmoins();
-        } */
+        }
     }
 };
 
 LayerManager.prototype._xplus = function xplus() {
-    console.log(_this.listLayers);
     if (_this.listLayers.length == 1) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
-        for (var i = 0; i < obj.length; i++) {
-            obj[i].position.x += 20;
-            obj[i].position.z -= 18;
-            edges[i].position.x += 20;
-            edges[i].position.z -= 18;
-            // obj[i].rotateY(value);
-            // edges[i].rotateY(value);
-            obj[i].updateMatrixWorld();
-            edges[i].updateMatrixWorld();
-        }
+        console.log(obj, edges);
+        // for (var i = 0; i < obj.length; i++) {
+        obj.position.x += 20;
+        obj.position.z -= 18;
+        edges.position.x += 20;
+        edges.position.z -= 18;
+        // obj[i].rotateY(value);
+        // edges[i].rotateY(value);
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        // }
         this.view.notifyChange(true);
     }
 };
@@ -330,4 +330,27 @@ LayerManager.prototype._zmoins = function _zmoins() {
     }
     this.view.notifyChange(true);
 };
+LayerManager.prototype.picking = function picking(event) {
+    // Pick an object with batch id
+    var mouse = _this.view.eventToNormalizedCoords(event);
+    var raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, _this.view.camera.camera3D);
+    // calculate objects intersecting the picking ray
+    var intersects = raycaster.intersectObjects(_this.view.scene.children, true);
+    if (intersects.length > 0) {
+        var source = getParent(intersects[0].object);
+        if (source.name != 'globe' && source.name != '') {
+            _this.layerFolder.__controllers.forEach((element) => {
+                if (element.__checkbox && element.object.Name == source.name.split('_')[0]) element.setValue(!element.__prev);
+                return element;
+            });
+        }
+    }
+};
+
+function getParent(obj) {
+    if (obj.parent.parent != null) return getParent(obj.parent);
+    return obj;
+}
+
 export default LayerManager;
