@@ -573,6 +573,9 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
     var initialRotateY = this.obj[0].rotation.y;
     var initialRotateZ = this.obj[0].rotation.z;
     var initialScale = this.obj[0].scale.x;
+    var initialX = this.obj[0].position.x;
+    var initialY = this.obj[0].position.y;
+    var initialZ = this.obj[0].position.z;
     // Add a button to reset all initial parameters
     folder.add({ resetPosition: () => {
         // Reset GUI
@@ -580,6 +583,9 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
         folder.__controllers[2].setValue(initialRotateY);
         folder.__controllers[3].setValue(initialRotateZ);
         folder.__controllers[4].setValue(initialScale);
+        folder.__controllers[5].setValue(initialX);
+        folder.__controllers[6].setValue(initialY);
+        folder.__controllers[7].setValue(initialZ);
         // Reset parameters
         for (var i = 0; i < this.obj.length; i++) {
             this.obj[i].rotation.x = initialRotateX;
@@ -588,6 +594,12 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
             this.edges[i].rotation.y = initialRotateY;
             this.obj[i].rotation.z = initialRotateZ;
             this.edges[i].rotation.z = initialRotateZ;
+            this.obj[i].position.x = initialX;
+            this.edges[i].position.x = initialX;
+            this.obj[i].position.y = initialY;
+            this.edges[i].position.y = initialY;
+            this.obj[i].position.z = initialZ;
+            this.edges[i].position.z = initialZ;
             this.obj[i].scale.set(initialScale, initialScale, initialScale);
             this.edges[i].scale.set(initialScale, initialScale, initialScale);
             this.obj[i].updateMatrixWorld();
