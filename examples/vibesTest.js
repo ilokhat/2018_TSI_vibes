@@ -75,3 +75,5 @@ function loadFileException(message) {
 
 var loader2 = new itowns.ModelLoader(globeView);
 loader2.loadBati3D();
+
+loader2.loadBDTopo();

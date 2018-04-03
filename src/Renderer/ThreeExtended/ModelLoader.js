@@ -5,6 +5,8 @@
 import * as OBJLoader from 'three-obj-loader';
 import * as THREE from 'three';
 import Cartography3D from '../B3Dreader/Cartography3D';
+import Feature2Mesh from './Feature2Mesh';
+import FeatureProcessing from '../../Process/FeatureProcessing';
 
 OBJLoader(THREE);
 
@@ -140,6 +142,46 @@ ModelLoader.prototype.loadBati3D = function loadBati3D() {
     if (!Cartography3D.isCartoInitialized()) {
         Cartography3D.initCarto3D(options.buildings, this.doAfter, this);
     }
+};
+
+function colorBuildings(properties) {
+    return new THREE.Color(0xeeeeee);
+}
+
+function altitudeBuildings(properties) {
+    return properties.z_min - properties.hauteur;
+}
+
+function extrudeBuildings(properties) {
+    return properties.hauteur;
+}
+
+function acceptFeature(properties) {
+    return !!properties.hauteur;
+}
+
+ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
+    this.view.addLayer({
+        type: 'geometry',
+        update: FeatureProcessing.update,
+        convert: Feature2Mesh.convert({
+            color: colorBuildings,
+            altitude: altitudeBuildings,
+            extrude: extrudeBuildings }),
+        filter: acceptFeature,
+        url: 'http://wxs.ign.fr/72hpsel8j8nhb5qgdh07gcyp/geoportail/wfs?',
+        networkOptions: { crossOrigin: 'anonymous' },
+        protocol: 'wfs',
+        version: '2.0.0',
+        id: 'WFS Buildings',
+        typeName: 'BDTOPO_BDD_WLD_WGS84G:bati_remarquable,BDTOPO_BDD_WLD_WGS84G:bati_indifferencie,BDTOPO_BDD_WLD_WGS84G:bati_industriel',
+        level: 14,
+        projection: 'EPSG:4326',
+        ipr: 'IGN',
+        options: {
+            mimetype: 'json',
+        },
+    }, this.view.tileLayer);
 };
 
 export default ModelLoader;
