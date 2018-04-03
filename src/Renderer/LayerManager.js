@@ -156,7 +156,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         });
         // Call Symbolizer
         _this.nbSymbolizer++;
-        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, _this.menu, _this.nbSymbolizer);
+        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, _this.menu, _this.nbSymbolizer, _this.listLayers[0][2], _this.listLayers[0][3]);
         // Open symbolizer with 'stylize parts'
         if (complex) {
             symbolizer.initGui();

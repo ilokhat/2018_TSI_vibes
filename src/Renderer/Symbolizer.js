@@ -9,7 +9,7 @@ import Fetcher from '../Core/Scheduler/Providers/Fetcher';
 
 // Class Symbolizer
 
-function Symbolizer(view, obj, edges, menu, nb) {
+function Symbolizer(view, obj, edges, menu, nb, light, plane) {
     // Constructor
     this.obj = obj;
     this.edges = edges;
@@ -18,6 +18,8 @@ function Symbolizer(view, obj, edges, menu, nb) {
     this.menu.view = this.view;
     this.nb = nb;
     this.folder = null;
+    this.light = light;
+    this.plane = plane;
     this.applyStyle();
 }
 
@@ -517,6 +519,8 @@ Symbolizer.prototype._addLoad = function addLoad(folder) {
 };
 
 Symbolizer.prototype.initGui = function addToGUI() {
+    console.log(this.plane);
+    console.log(this.light);
     // We check if the objects of the list have the same structure
     if (this._checkStructure()) {
         // If the structure is similar, we create a folder for the symbolizer
@@ -769,11 +773,14 @@ Symbolizer.prototype._addSaveAll = function addSave(folder) {
 };
 
 Symbolizer.prototype.initGuiAll = function addToGUI() {
+    console.log(this.plane);
+    console.log(this.light);
     // var folder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     var folder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
     this.folder = folder;
     this._addSaveAll(folder);
     this._addLoad(folder);
+    this._addShades(folder);
     var positionFolder = folder.addFolder('Position');
     this._addResetPosition(positionFolder);
     this._addRotationsAll(positionFolder);
@@ -792,6 +799,15 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addSpecularAll(facesFolder);
     this._addShininessAll(facesFolder);
 };
+
+
+Symbolizer.prototype._addShades = function addShades(folder) {
+    folder.add({ shades: this.plane.visible }, 'shades').name('Display shades').onChange((checked) => {
+        this.plane.visible = checked;
+        this.view.notifyChange(true);
+    });
+};
+    
 
 Symbolizer.prototype._checkStructure = function checkStructure() {
     var i;

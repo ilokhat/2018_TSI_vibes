@@ -57,12 +57,47 @@ ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX
     lines.traverse(lines => lines.layers.set(linesID));
     this.view.camera.camera3D.layers.enable(linesID);
 
+    // Create a PointLight and turn on shadows for the light
+    var plight = new THREE.PointLight(0xffffff, 1, 0, 1);
+    var coordLight = coord.clone();
+    coordLight.setAltitude(coordLight.altitude() + 350);
+    plight.position.copy(coordLight.as(this.view.referenceCrs).xyz());
+    plight.position.y += 70;
+    plight.updateMatrixWorld();
+    plight.castShadow = true;            // default false
+  
+    // Set up shadow properties for the light
+    plight.shadow.mapSize.width = 512;  // default
+    plight.shadow.mapSize.height = 512; // default
+    plight.shadow.camera.near = 0.5;       // default
+    plight.shadow.camera.far = 5000;      
+
+    this.view.scene.add(plight);
+
+    // Create a plane that receives shadows (but does not cast them)
+    var planeID = this.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
+    var planeGeometry = new THREE.PlaneBufferGeometry(20, 20, 32, 32);
+    // var planeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, specular: 0xffffff, shininess: 0 });
+    var planeMaterial = new THREE.ShadowMaterial({ side: THREE.DoubleSide, depthTest: false });
+    planeMaterial.transparent = true;
+    planeMaterial.opacity = 0.5;
+    var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane = this._placeModel(plane, coord, 0, 0, 0, scale);
+    plane.position.y += 200;
+    plane.receiveShadow = true;
+
+    plane.traverse((obj) => { obj.layers.set(planeID); });
+    this.view.camera.camera3D.layers.enable(planeID);
+
+    plane.updateMatrixWorld();
+    this.view.scene.add(plane);
+
     // Update coordinate of the object
     obj.updateMatrixWorld();
     this.view.scene.add(obj);
     this.view.scene.add(lines);
     this.view.notifyChange(true);
-    this.model = [obj, lines];
+    this.model = [obj, lines, plight, plane];
 };
 
 ModelLoader.prototype._placeModel = function placeModel(obj, coord, rotateX, rotateY, rotateZ, scale) {

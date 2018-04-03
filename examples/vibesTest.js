@@ -52,8 +52,8 @@ var scale = 300;
 var loader = new itowns.ModelLoader(globeView);
 
 // Symbolizer
-var symbolizer = function(view, listObj, listEdge, menu, nbSymbolizer) {
-    return new itowns.Symbolizer(view, listObj, listEdge, menu, nbSymbolizer);
+var symbolizer = function(view, listObj, listEdge, menu, nbSymbolizer, light, plane) {
+    return new itowns.Symbolizer(view, listObj, listEdge, menu, nbSymbolizer, light, plane);
 }
 
 // Layer management
