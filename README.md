@@ -515,7 +515,7 @@ the pictures below show the results of the test units:
 
 
   
-We made some.
+
 
 ### CI/CD
   
