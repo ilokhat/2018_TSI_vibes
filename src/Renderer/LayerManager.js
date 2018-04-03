@@ -32,7 +32,7 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
 }
 
 LayerManager.prototype.initListener = function initListener() {
-    this.document.addEventListener('keypress', this.checkKeyPress, false);
+    this.document.addEventListener('keypress', _this.checkKeyPress, false);
     this.document.addEventListener('drop', _this.documentDrop, false);
     var prevDefault = e => e.preventDefault();
     this.document.addEventListener('dragenter', prevDefault, false);

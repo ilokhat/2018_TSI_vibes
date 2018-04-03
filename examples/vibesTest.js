@@ -76,22 +76,37 @@ function loadFileException(message) {
 var loader2 = new itowns.ModelLoader(globeView);
 loader2.loadBati3D();
 
+var selected = [];
+
 function picking(event) {
-    console.log(event);
+    // console.log(event);
     // Pick an object with batch id
     var mouse = globeView.eventToNormalizedCoords(event);
     var raycaster = new itowns.THREE.Raycaster();
     raycaster.setFromCamera(mouse, globeView.camera.camera3D);
     // calculate objects intersecting the picking ray
     var intersects = raycaster.intersectObjects(globeView.scene.children, true);
-    if (0 < intersects.length /*&& intersects[0].object instanceof itowns.THREE.Mesh*/) {
+    if (0 < intersects.length) {
         source = getParent(intersects[0].object);
-        if (source.name != 'globe') {
+        console.log(selected.copyWithin());
+        // console.log(selected.length != 0, selected[0] != source, selected[0] selected[0].children[0] instanceof itowns.THREE.Mesh)
+        if (selected.length != 0 && selected[0] != source && selected[0].children[0] instanceof itowns.THREE.Mesh){
+            console.log('clean');
+            // clean
+            for (var i = 0; i < selected[0].children.length; i++) {
+                selected[0].children[i].material = new THREE.MeshPhongMaterial({ color: selected[1][i][0], emissive: selected[1][i][1], specular: selected[1][i][2], side: selected[1][i][3] });
+                selected[0].children[i].material.needUpdate = true;
+            }
+            selected = [];
+        }
+        if (source.name != 'globe' && source.name!='' && source.children[0] instanceof itowns.THREE.Mesh) {
             console.log(source.name);
+            selected[0] = source;
+            selected[1] = [];
             for (var i = 0; i < source.children.length; i++) {
+                selected[1][i] = [source.children[i].material.color, source.children[i].material.emissive, source.children[i].material.specular, source.children[i].material.side]
                 source.children[i].material = new THREE.MeshPhongMaterial({ color: 0x2194ce, emissive: 0x000000, specular: 0x111111, side: THREE.DoubleSide });
                 source.children[i].material.needUpdate = true;
-                // source.children[i].obj[i].position.x += 200;
             }
         }
     }
