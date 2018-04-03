@@ -246,31 +246,37 @@ LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
     }
 };
 
+var valXplus = 0;
 LayerManager.prototype._xplus = function xplus() {
+    valXplus += 1;
     if (_this.listLayers.length == 1) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         console.log(obj, edges);
-        obj.position.x += 20;
-        obj.position.z -= 18;
-        edges.position.x += 20;
-        edges.position.z -= 18;
+        obj.translateX(valXplus);
+        //obj.position.z -= 18;
+        edges.translateX(valXplus);
+        //edges.position.z -= 18;
         obj.updateMatrixWorld();
         edges.updateMatrixWorld();
         this.view.notifyChange(true);
     }
 };
 
+var valXmoins = 0;
 LayerManager.prototype._xmoins = function _xmoins() {
-  for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.x -= 20;
-        this.obj[i].position.z += 18;
-        this.edges[i].position.x -= 20;
-        this.edges[i].position.z += 18;
-        // this.obj[i].rotateY(value);
-        // this.edges[i].rotateY(value);
-        this.obj[i].updateMatrixWorld();
-        this.edges[i].updateMatrixWorld();
+    valXmoins -= 1;
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        console.log(obj, edges);
+        obj.translateX(valXmoins);
+        //obj.position.z -= 18;
+        edges.translateX(valXmoins);
+        //edges.position.z -= 18;
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        this.view.notifyChange(true);
     }
     this.view.notifyChange(true);
 };
