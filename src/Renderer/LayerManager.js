@@ -225,55 +225,48 @@ function loadFileException(message) {
 
 LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
     if (_this.listLayers.length == 1) {
-        if ((key.keyCode == '56') || (key.keyCode == '113')) {
-            _this._xplus();
-        }
-        if ((key.keyCode == '50') || (key.keyCode == '115')) {
-            _this._xmoins();
-        }
+        console.log(key);
         if ((key.keyCode == '52') || (key.keyCode == '97')) {
-            _this._yplus();
+            _this._xplus(10);
         }
         if ((key.keyCode == '54') || (key.keyCode == '122')) {
-            _this._ymoins();
+            _this._xmoins(-10);
+        }
+        if ((key.keyCode == '56') || (key.keyCode == '113')) {
+            _this._yplus(10);
+        }
+        if ((key.keyCode == '50') || (key.keyCode == '115')) {
+            _this._ymoins(-10);
         }
         if ((key.keyCode == '55') || (key.keyCode == '119')) {
-            _this._zplus();
+            _this._zplus(10);
         }
         if ((key.keyCode == '51') || (key.keyCode == '120')) {
-            _this._zmoins();
+            _this._zmoins(-10);
         }
     }
 };
 
-var valXplus = 0;
-LayerManager.prototype._xplus = function xplus() {
-    valXplus += 1;
-    if (_this.listLayers.length == 1) {
+LayerManager.prototype._xplus = function xplus(a) {
+      if (_this.listLayers.length == 1) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         console.log(obj, edges);
-        obj.translateX(valXplus);
-        //obj.position.z -= 18;
-        edges.translateX(valXplus);
-        //edges.position.z -= 18;
+        obj.translateX(a);
+        edges.translateX(a);
         obj.updateMatrixWorld();
         edges.updateMatrixWorld();
         this.view.notifyChange(true);
     }
 };
 
-var valXmoins = 0;
-LayerManager.prototype._xmoins = function _xmoins() {
-    valXmoins -= 1;
-    if (_this.listLayers.length == 1) {
+LayerManager.prototype._xmoins = function _xmoins(a) {
+      if (_this.listLayers.length == 1) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         console.log(obj, edges);
-        obj.translateX(valXmoins);
-        //obj.position.z -= 18;
-        edges.translateX(valXmoins);
-        //edges.position.z -= 18;
+        obj.translateX(a);
+        edges.translateX(a);
         obj.updateMatrixWorld();
         edges.updateMatrixWorld();
         this.view.notifyChange(true);
@@ -281,54 +274,58 @@ LayerManager.prototype._xmoins = function _xmoins() {
     this.view.notifyChange(true);
 };
 
-LayerManager.prototype._yplus = function yplus() {
-  for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.y += 20;
-        this.edges[i].position.y += 20;
-        // this.obj[i].rotateY(value);
-        // this.edges[i].rotateY(value);
-        this.obj[i].updateMatrixWorld();
-        this.edges[i].updateMatrixWorld();
+LayerManager.prototype._yplus = function yplus(a) {
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        console.log(obj, edges);
+        obj.translateY(a);
+        edges.translateY(a);
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        this.view.notifyChange(true);
     }
     this.view.notifyChange(true);
 };
 
-LayerManager.prototype._ymoins = function _ymoins() {
-  for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.y -= 20;
-        this.edges[i].position.y -= 20;
-        // this.obj[i].rotateY(value);
-        // this.edges[i].rotateY(value);
-        this.obj[i].updateMatrixWorld();
-        this.edges[i].updateMatrixWorld();
+LayerManager.prototype._ymoins = function _ymoins(a) {
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        console.log(obj, edges);
+        obj.translateY(a);
+        edges.translateY(a);
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        this.view.notifyChange(true);
     }
     this.view.notifyChange(true);
 };
 
-LayerManager.prototype._zplus = function zplus() {
-  for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.z += 20;
-        this.obj[i].position.x += 18;
-        this.edges[i].position.z += 20;
-        this.edges[i].position.x += 18;
-        // this.obj[i].rotateY(value);
-        // this.edges[i].rotateY(value);
-        this.obj[i].updateMatrixWorld();
-        this.edges[i].updateMatrixWorld();
+LayerManager.prototype._zplus = function zplus(a) {
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        console.log(obj, edges);
+        obj.translateZ(a);
+        edges.translateZ(a);
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        this.view.notifyChange(true);
     }
     this.view.notifyChange(true);
 };
 
-LayerManager.prototype._zmoins = function _zmoins() {
-  for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.z -= 20;
-        this.obj[i].position.x -= 18;
-        this.edges[i].position.z -= 20;
-        this.edges[i].position.x -= 18;
-        // this.obj[i].rotateY(value);
-        // this.edges[i].rotateY(value);
-        this.obj[i].updateMatrixWorld();
-        this.edges[i].updateMatrixWorld();
+LayerManager.prototype._zmoins = function _zmoins(a) {
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        console.log(obj, edges);
+        obj.translateZ(a);
+        edges.translateZ(a);
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        this.view.notifyChange(true);
     }
     this.view.notifyChange(true);
 };
