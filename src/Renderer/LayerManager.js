@@ -251,16 +251,12 @@ LayerManager.prototype._xplus = function xplus() {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         console.log(obj, edges);
-        // for (var i = 0; i < obj.length; i++) {
         obj.position.x += 20;
         obj.position.z -= 18;
         edges.position.x += 20;
         edges.position.z -= 18;
-        // obj[i].rotateY(value);
-        // edges[i].rotateY(value);
         obj.updateMatrixWorld();
         edges.updateMatrixWorld();
-        // }
         this.view.notifyChange(true);
     }
 };
