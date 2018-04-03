@@ -870,13 +870,12 @@ function getMethod(shader) {
     return method;
 }
 
-
+var valXplus = 0;
 Symbolizer.prototype._xplus = function xplus() {
+    valXplus += 1;
     for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.x += 20;
-        this.obj[i].position.z -= 18;
-        this.edges[i].position.x += 20;
-        this.edges[i].position.z -= 18;
+        this.obj[i].translateX(valXplus);
+        this.edges[i].translateX(valXplus);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();
@@ -885,12 +884,12 @@ Symbolizer.prototype._xplus = function xplus() {
     this.view.notifyChange(true);
 };
 
+var valXmoins = 0;
 Symbolizer.prototype._xmoins = function _xmoins() {
+  valXmoins -= 1;
     for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.x -= 20;
-        this.obj[i].position.z += 18;
-        this.edges[i].position.x -= 20;
-        this.edges[i].position.z += 18;
+        this.obj[i].translateX(valXmoins);
+        this.edges[i].translateX(valXmoins);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();
@@ -898,11 +897,12 @@ Symbolizer.prototype._xmoins = function _xmoins() {
     }
     this.view.notifyChange(true);
 };
-
+var valYplus = 0;
 Symbolizer.prototype._yplus = function yplus() {
+  valYplus += 1;
     for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.y += 20;
-        this.edges[i].position.y += 20;
+        this.obj[i].translateZ(valYplus);
+        this.edges[i].translateZ(valYplus);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();
@@ -911,10 +911,12 @@ Symbolizer.prototype._yplus = function yplus() {
     this.view.notifyChange(true);
 };
 
+var valYmoins = 0;
 Symbolizer.prototype._ymoins = function _ymoins() {
+    valYmoins -= 1;
     for (var i = 0; i < this.obj.length; i++) {
-        this.obj[i].position.y -= 20;
-        this.edges[i].position.y -= 20;
+      this.obj[i].translateZ(valYmoins);
+      this.edges[i].translateZ(valYmoins);
         // this.obj[i].rotateY(value);
         // this.edges[i].rotateY(value);
         this.obj[i].updateMatrixWorld();
@@ -924,7 +926,7 @@ Symbolizer.prototype._ymoins = function _ymoins() {
 };
 var valZplus = 0;
 Symbolizer.prototype._zplus = function zplus() {
-    valZplus += 10;
+    valZplus += 1;
     for (var i = 0; i < this.obj.length; i++) {
         this.obj[i].translateY(valZplus);
         this.edges[i].translateY(valZplus);
@@ -938,7 +940,7 @@ Symbolizer.prototype._zplus = function zplus() {
 
 var valZmoins = 0;
 Symbolizer.prototype._zmoins = function _zmoins() {
-    valZmoins -= 10;
+    valZmoins -= 1;
     for (var i = 0; i < this.obj.length; i++) {
         this.obj[i].translateY(valZmoins);
         this.edges[i].translateY(valZmoins);
