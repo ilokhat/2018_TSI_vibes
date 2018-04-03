@@ -27,6 +27,23 @@ ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, r
     promise.then(() => callback(this.model, menu));
 };
 
+function controleName(name, view) {
+    var i = 1;
+    var verif;
+    var j;
+    do {
+        verif = true;
+        for (j = 0; j < view.scene.children.length; j++) {
+            var element = view.scene.children[j];
+            if (element.name.split('_')[0] == name) {
+                verif = false;
+                name = name.split('-')[0].concat('-', ++i);
+            }
+        }
+    } while (!verif);
+    return name;
+}
+
 ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX, rotateY, rotateZ, scale) {
     var objID = this.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
     obj = this._placeModel(obj, coord, rotateX, rotateY, rotateZ, scale);
@@ -59,8 +76,10 @@ ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX
     // Update coordinate of the object
     obj.updateMatrixWorld();
     // set name
-    obj.name = obj.materialLibraries[0].substring(0, obj.materialLibraries[0].length - 4).concat('_faces');
-    lines.name = obj.materialLibraries[0].substring(0, obj.materialLibraries[0].length - 4).concat('_lines');
+    // check name
+    var name = controleName(obj.materialLibraries[0].substring(0, obj.materialLibraries[0].length - 4), this.view);
+    obj.name = name.concat('_faces');
+    lines.name = name.concat('_lines');
     // add to scene
     this.view.scene.add(obj);
     this.view.scene.add(lines);

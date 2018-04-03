@@ -90,8 +90,8 @@ LayerManager.prototype._readFile = function readFile(file) {
 
 LayerManager.prototype.handleLayer = function handleLayer(model) {
     // Add a checkbox to the GUI, named after the layer
-    var name = model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4);
-    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name(name).onChange((checked) => {
+    var name = model[0].name.split('_')[0];
+    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name(name.split('-').join(' ')).onChange((checked) => {
         if (checked) {
             // Add layer and controller to the list
             _this.listLayers.push(model);
@@ -256,9 +256,7 @@ LayerManager.prototype.picking = function picking(event) {
     if (intersects.length > 0) {
         var source = getParent(intersects[0].object);
         if (source.name != 'globe' && source.name != '') {
-            console.log(source.name.split('_'));
-            _this.menu.gui.__folders.Layers.__controllers.forEach((element) => {
-                console.log(element.object.Name); 
+            _this.layerFolder.__controllers.forEach((element) => {
                 if (element.__checkbox && element.object.Name == source.name.split('_')[0]) element.setValue(!element.__prev);
                 return element;
             });
