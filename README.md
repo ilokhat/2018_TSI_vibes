@@ -512,7 +512,7 @@ The page loads Mocha, the testing libraries and our test file(/tests/vibesObjTes
 the pictures below show the results of the test units:
 
 <img src="VIBES/mochaTest.png" style="width: 400px;"/>
-<img src="VIBES/unit_test_randomcolor.png" style="width: 400px;"/>
+<img src="VIBES/test_unit_console.png" style="width: 400px;"/>
 
   
 
