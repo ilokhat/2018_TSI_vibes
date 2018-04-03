@@ -26,6 +26,19 @@
                 margin-left: 0px;
             }
 
+            #result {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                width: 20rem;
+                box-shadow: 1px 1px 10px #555;
+                font: 11px Lucida Grande,sans-serif;
+                color: #eee;
+                padding: 0.5rem;
+                background-color: black;
+                opacity:0.8;
+            }
+
             @media (max-width: 600px) {
                 #menuDiv {
                     display: none;
@@ -38,7 +51,10 @@
         <script src="GUI/dat.gui/dat.gui.min.js"></script>
     </head>
     <body>
-        <div id="viewerDiv"></div>
+        <div id="viewerDiv">
+            <div id="result">
+            </div>
+        </div>
         <script src="GUI/GuiTools.js"></script>
         <script src="../dist/itowns.js"></script>
         <script src="../dist/debug.js"></script>
