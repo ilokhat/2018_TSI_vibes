@@ -33,16 +33,23 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
 
 LayerManager.prototype.initListener = function initListener() {
      // bati3D visibility 
-     var bati3d = _this.menu.gui.add({ bati3D: () => { 
-       if (this.loader.checked) {
-           this.loader._setVisibility(this.view, false);
-           this.loader.checked = false;
-       } else {
-           this.loader._setVisibility(this.view, true);
-           this.loader.checked = true;
-       }
-        },
-        }, 'bati3D').name('bati3D');
+     var bati3d = _this.layerFolder.add({ Layer: false }, 'Layer').name('bati3D').onChange((checked) => { 
+        if (!checked) {
+            this.loader._setVisibility(this.view, false);
+            this.loader.checked = false;
+        } else {
+ 
+            this.loader._setVisibility(this.view, true);
+            this.loader.checked = true;
+            var model = [_this.view.scene.children[2], _this.view.scene.children[3]];
+             // model[0].materialLibraries[0] = ;
+            console.log('bati', model);
+            
+            // _this.handleLayer(model);
+        }
+         });
+    this.document.addEventListener('keypress', _this.checkKeyPress, false);
+    this.document.addEventListener('click', _this.picking, false);
     this.document.addEventListener('drop', _this.documentDrop, false);
     var prevDefault = e => e.preventDefault();
     this.document.addEventListener('dragenter', prevDefault, false);
@@ -53,10 +60,10 @@ LayerManager.prototype.initListener = function initListener() {
 LayerManager.prototype.documentDrop = function documentDrop(e) {
     e.preventDefault();
     var file = e.dataTransfer.files[0];
-    _this.readFile(file);
+    _this._readFile(file);
 };
 
-LayerManager.prototype.readFile = function readFile(file) {
+LayerManager.prototype._readFile = function readFile(file) {
     // Read the file dropped and actually load the object
     var reader = new FileReader();
     // Load .OBJ file
@@ -84,11 +91,13 @@ LayerManager.prototype.readFile = function readFile(file) {
                 // Moving object
                 var crs = _this.coord.crs;
                 var vectCoord = new THREE.Vector3().set(coordX, coordY, coordZ);
-                _this.coord.set(crs, vectCoord);
+                _this.coord.set('EPSG:4978', vectCoord);
+                _this.coord.as(crs);
                 _this.loader._loadModel(layer[0], layer[1], _this.coord, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
             });
         });
         reader.readAsText(file);
+        return 0;
     }
     // Other format
     else {
@@ -98,13 +107,16 @@ LayerManager.prototype.readFile = function readFile(file) {
 
 LayerManager.prototype.handleLayer = function handleLayer(model) {
     // Add a checkbox to the GUI, named after the layer
-    var name = model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4);
-    var controller = _this.layerFolder.add({ Layer: false }, 'Layer').name(name).onChange((checked) => {
-        if (checked) {           
+    var name = model[0].name.split('_')[0];
+    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name(name.split('-').join(' ')).onChange((checked) => {
+        if (checked) {
+            // Add layer and controller to the list
+            _this.listLayers.push(model);
+            _this.listControllers.push(controller);
             // Creates buttons to start symbolizers
             if (!_this.guiInitialized) {
                 _this.stylizeObjectBtn = _this.layerFolder.add({ symbolizer: () => {
-                    _this.initSymbolizer(false); 
+                    _this.initSymbolizer(false);
                 },
                 }, 'symbolizer').name('Stylize object...');
                 _this.stylizePartsBtn = _this.layerFolder.add({ symbolizer: () => {
@@ -118,56 +130,30 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
                             _this.menu.gui.__folders.Layers.remove(controller);
                         });
                     }
-                    var j = _this.listControllers.indexOf(controller);
-                    if (j != -1) {
-                        _this.listControllers.splice(j, 1);
-                    }
+                    _this.listControllers = [];
                     // Actually remove the model from the scene
-                    console.log(_this.listLayers);
                     _this.listLayers.forEach((layer) => {
-                        console.log(layer);
                         _this.view.scene.remove(layer[0]);
                         _this.view.scene.remove(layer[1]);
                     });
                     _this.view.notifyChange(true);
-                    // Remove the layer from the list of layers to stylize
-                    var i = _this.listLayers.indexOf(model);
-                    if (i != -1) {
-                        _this.listLayers.splice(i, 1);
-                    }
+                    // Remove the layers from the list of layers to stylize
+                    _this.listLayers = [];
                     // If there is no more layers, remove 'Open symbolizer' and 'Delete Layer' buttons
-                    if (_this.listLayers.length == 0) {
-                        _this.menu.gui.__folders.Layers.remove(_this.stylizeObjectBtn);
-                        _this.menu.gui.__folders.Layers.remove(_this.stylizePartsBtn);
-                        _this.menu.gui.__folders.Layers.remove(_this.deleteBtn);
-                        _this.guiInitialized = false;
-                    }
-            },
-            }, 'delete').name('Delete layer');
+                    _this._cleanGUI();
+                },
+                }, 'delete').name('Delete layer');
             }
-            // Add layer and controller to the list
-            _this.listLayers.push(model);
-            _this.listControllers.push(controller);
             // GUI initialized
             _this.guiInitialized = true;
         }
         else {
             // Remove layer controller from the list
-            // _this.menu.gui.__folders.Layers.remove(deleteBtn);
-            var i = _this.listLayers.indexOf(model);
-            if (i != -1) {
-                _this.listLayers.splice(i, 1);
-            }
-            var j = _this.listControllers.indexOf(controller);
-            if (j != -1) {
-                _this.listControllers.splice(j, 1);
-            }
-            // If there is no more layers, remove 'Open symbolizer' buttons
+            removeFromList(_this.listLayers, model);
+            removeFromList(_this.listControllers, controller);
+            // If there is no more layers, clean the GUI
             if (_this.listLayers.length == 0) {
-                _this.menu.gui.__folders.Layers.remove(_this.stylizeObjectBtn);
-                _this.menu.gui.__folders.Layers.remove(_this.stylizePartsBtn);
-                _this.menu.gui.__folders.Layers.remove(_this.deleteBtn);
-                _this.guiInitialized = false;
+                _this._cleanGUI();
             }
         }
     });
@@ -176,6 +162,7 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
 LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
     var i;
     var deleteSymbolizerBtn;
+    _this._cleanGUI();
     // Checks if a layer is selected (if not, nothing happens)
     if (_this.listLayers.length != 0) {
         // Merge elements of the list as one group
@@ -188,6 +175,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         // Call Symbolizer
         _this.nbSymbolizer++;
         var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, _this.menu, _this.nbSymbolizer);
+        _this.symbolizerInit = symbolizer;
         // Open symbolizer with 'stylize parts'
         if (complex) {
             symbolizer.initGui();
@@ -204,7 +192,6 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
                 _this.menu.gui.remove(deleteSymbolizerBtn);
             },
             }, 'deleteSymbolizer').name('Close Symbolizer '.concat(_this.nbSymbolizer));
-
         }
         // Open symbolizer with 'stylize object'
         else {
@@ -227,16 +214,152 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         _this.listControllers.forEach((controller) => {
             _this.menu.gui.__folders.Layers.remove(controller);
         });
-
         // Empty layer and controllers list;
         _this.listLayers = [];
         _this.listControllers = [];
     }
 };
 
+LayerManager.prototype._cleanGUI = function cleanGUI() {
+    // Remove the layer management buttons
+    _this.menu.gui.__folders.Layers.remove(_this.stylizeObjectBtn);
+    _this.menu.gui.__folders.Layers.remove(_this.stylizePartsBtn);
+    _this.menu.gui.__folders.Layers.remove(_this.deleteBtn);
+    _this.guiInitialized = false;
+};
+
+function removeFromList(list, elmt) {
+    var i = list.indexOf(elmt);
+    if (i != -1) {
+        list.splice(i, 1);
+    }
+}
+
 function loadFileException(message) {
     this.message = message;
     this.name = 'loadFileException';
+}
+
+LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
+    if (_this.listLayers.length == 1) {
+        if ((key.key == 'a') || (key.key == '4')) {
+            _this._xmoins(-10);
+        }
+        if ((key.key == 's') || (key.key == '6')) {
+            _this._xplus(10);
+        }
+        if ((key.key == 'w') || (key.key == '7')) {
+            _this._yplus(10);
+        }
+        if ((key.key == 'x') || (key.key == '3')) {
+            _this._ymoins(-10);
+        }
+        if ((key.key == 'q') || (key.key == '8')) {
+            _this._zmoins(-10);
+        }
+        if ((key.key == 's') || (key.key == '2')) {
+            _this._zplus(10);
+        }
+    }
+};
+
+LayerManager.prototype._xplus = function xplus(a) {
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        obj.translateX(a);
+        edges.translateX(a);
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        this.view.notifyChange(true);
+    }
+};
+
+LayerManager.prototype._xmoins = function _xmoins(a) {
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        obj.translateX(a);
+        edges.translateX(a);
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        this.view.notifyChange(true);
+    }
+    this.view.notifyChange(true);
+};
+
+LayerManager.prototype._yplus = function yplus(a) {
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        obj.translateY(a);
+        edges.translateY(a);
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        this.view.notifyChange(true);
+    }
+    this.view.notifyChange(true);
+};
+
+LayerManager.prototype._ymoins = function _ymoins(a) {
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        obj.translateY(a);
+        edges.translateY(a);
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        this.view.notifyChange(true);
+    }
+    this.view.notifyChange(true);
+};
+
+LayerManager.prototype._zplus = function zplus(a) {
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        obj.translateZ(a);
+        edges.translateZ(a);
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        this.view.notifyChange(true);
+    }
+    this.view.notifyChange(true);
+};
+
+LayerManager.prototype._zmoins = function _zmoins(a) {
+    if (_this.listLayers.length == 1) {
+        var obj = _this.listLayers[0][0];
+        var edges = _this.listLayers[0][1];
+        obj.translateZ(a);
+        edges.translateZ(a);
+        obj.updateMatrixWorld();
+        edges.updateMatrixWorld();
+        this.view.notifyChange(true);
+    }
+    this.view.notifyChange(true);
+};
+LayerManager.prototype.picking = function picking(event) {
+    // Pick an object with batch id
+    var mouse = _this.view.eventToNormalizedCoords(event);
+    var raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, _this.view.camera.camera3D);
+    // calculate objects intersecting the picking ray
+    var intersects = raycaster.intersectObjects(_this.view.scene.children, true);
+    if (intersects.length > 0) {
+        var source = getParent(intersects[0].object);
+        if (source.name != 'globe' && source.name != '') {
+            _this.layerFolder.__controllers.forEach((element) => {
+                if (element.__checkbox && element.object.Name == source.name.split('_')[0]) element.setValue(!element.__prev);
+                return element;
+            });
+        }
+    }
+};
+
+function getParent(obj) {
+    if (obj.parent.parent != null) return getParent(obj.parent);
+    return obj;
 }
 
 export default LayerManager;
