@@ -5,6 +5,8 @@
 import * as OBJLoader from 'three-obj-loader';
 import * as THREE from 'three';
 import Cartography3D from '../B3Dreader/Cartography3D';
+import Feature2MeshStyle from './Feature2MeshStyle';
+import FeatureProcessing from '../../Process/FeatureProcessing';
 
 var _this;
 OBJLoader(THREE);
@@ -188,5 +190,83 @@ ModelLoader.prototype._setVisibility = function _setVisibility(self, v) {
     }
    
 };
+
+function colorBuildings(properties) {
+    return new THREE.Color(0x00eeee);
+}
+
+function altitudeBuildings(properties) {
+    return properties.z_min - properties.hauteur;
+}
+
+function extrudeBuildings(properties) {
+    return properties.hauteur;
+}
+
+function acceptFeature(properties) {
+    return !!properties.hauteur;
+}
+
+ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
+    this.view.addLayer({
+        type: 'geometry',
+        update: FeatureProcessing.update,
+        convert: Feature2MeshStyle.convert({
+            color: colorBuildings,
+            altitude: altitudeBuildings,
+            extrude: extrudeBuildings }),
+        filter: acceptFeature,
+        url: 'http://wxs.ign.fr/72hpsel8j8nhb5qgdh07gcyp/geoportail/wfs?',
+        networkOptions: { crossOrigin: 'anonymous' },
+        protocol: 'wfs',
+        version: '2.0.0',
+        id: 'WFS Buildings',
+        typeName: 'BDTOPO_BDD_WLD_WGS84G:bati_remarquable,BDTOPO_BDD_WLD_WGS84G:bati_indifferencie,BDTOPO_BDD_WLD_WGS84G:bati_industriel',
+        level: 14,
+        projection: 'EPSG:4326',
+        ipr: 'IGN',
+        options: {
+            mimetype: 'json',
+        },
+    }, this.view.tileLayer);
+    var self = this;
+    setTimeout(() => self.ForBuildings(calleback), 1000);
+};
+
+ModelLoader.prototype.ForBuildings = function ForBuildings(calleback) {
+    // For all globe tile meshes we look for tile at level 14 on which building meshes are attached.
+    for (var i = 0; i < this.view.wgs84TileLayer.level0Nodes.length; ++i) {
+        this.view.wgs84TileLayer.level0Nodes[i].traverse(element => this.traverseElement(element, calleback));
+    }
+    this.view.notifyChange(true);
+};
+
+ModelLoader.prototype.traverseElement = function traverseElement(element, calleback) {
+    if (element.level != undefined && element.level <= 14) {
+        // console.log(element);
+        for (var c = 0; c < element.children.length; ++c) {
+            if (element.children[c].type == 'Group') {
+                var parent = element.children[c];
+                calleback(parent);
+            }
+        }
+    }
+};
+
+function calleback(group) {
+    var mesh;
+    var i;
+    for (i = 0; i < group.children.length; i++) {
+        mesh = group.children[i];
+        // change couleur toit
+        if (mesh.name == 'roof_faces') {
+            mesh.material = new THREE.MeshPhongMaterial({ color: 0x2240d1, emissive: 0x2240d1, specular: 0x2240d1, shininess: 30 });
+            mesh.material.transparent = true;
+            mesh.castShadow = true;
+            mesh.material.side = THREE.DoubleSide;
+            mesh.material.needsUpdate = true;
+        }
+    }
+}
 
 export default ModelLoader;
