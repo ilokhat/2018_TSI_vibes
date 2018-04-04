@@ -183,7 +183,7 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
         },
     }, this.view.tileLayer);
     var self = this;
-    setTimeout(self.ForBuildings(self.view), 50000);
+    setTimeout(() => self.ForBuildings(self.view), 1000);
 };
 
 ModelLoader.prototype.ForBuildings = function ForBuildings() {
