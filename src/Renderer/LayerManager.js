@@ -32,6 +32,17 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
 }
 
 LayerManager.prototype.initListener = function initListener() {
+     // bati3D visibility 
+     var bati3d = _this.menu.gui.add({ bati3D: () => { 
+       if (this.loader.checked) {
+           this.loader._setVisibility(this.view, false);
+           this.loader.checked = false;
+       } else {
+           this.loader._setVisibility(this.view, true);
+           this.loader.checked = true;
+       }
+        },
+        }, 'bati3D').name('bati3D');
     this.document.addEventListener('drop', _this.documentDrop, false);
     var prevDefault = e => e.preventDefault();
     this.document.addEventListener('dragenter', prevDefault, false);
@@ -89,7 +100,7 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
     // Add a checkbox to the GUI, named after the layer
     var name = model[0].materialLibraries[0].substring(0, model[0].materialLibraries[0].length - 4);
     var controller = _this.layerFolder.add({ Layer: false }, 'Layer').name(name).onChange((checked) => {
-        if (checked) {
+        if (checked) {           
             // Creates buttons to start symbolizers
             if (!_this.guiInitialized) {
                 _this.stylizeObjectBtn = _this.layerFolder.add({ symbolizer: () => {

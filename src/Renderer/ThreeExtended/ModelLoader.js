@@ -6,6 +6,7 @@ import * as OBJLoader from 'three-obj-loader';
 import * as THREE from 'three';
 import Cartography3D from '../B3Dreader/Cartography3D';
 
+var _this;
 OBJLoader(THREE);
 
 function ModelLoader(view) {
@@ -13,6 +14,8 @@ function ModelLoader(view) {
     this.view = view;
     this.model = [new THREE.Group(), new THREE.Group()];
     this.obj = new THREE.Group();
+    this.checked = false;
+    _this = this;
 }
 
 ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale, callback, menu) {
@@ -63,6 +66,7 @@ ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX
     this.view.scene.add(lines);
     this.view.notifyChange(true);
     this.model = [obj, lines];
+    _this.model = [obj, lines];
 };
 
 ModelLoader.prototype._placeModel = function placeModel(obj, coord, rotateX, rotateY, rotateZ, scale) {
@@ -84,12 +88,14 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
             // Material initialization
             obj.children[i].material.transparent = true;
             obj.children[i].castShadow = true;
+            obj.children[i].visible = false;
             self.model[0].add(obj);
             // Extract edges
             var edges = new THREE.EdgesGeometry(obj.children[i].geometry);
             var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true }));
             self.model[1].add(line);
         }
+        _this.obj = obj;
     }
     // pour le dernier :
     if (islast) {
@@ -103,8 +109,10 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
         self.view.camera.camera3D.layers.enable(linesID);
         self.model[1].updateMatrixWorld();
         self.view.scene.add(self.model[1]);
+        self.model[1].visible = false; 
         self.view.notifyChange(true);
         console.log('bati3D Loaded');
+       
     }
 };
 
@@ -115,6 +123,16 @@ ModelLoader.prototype.loadBati3D = function loadBati3D() {
     if (!Cartography3D.isCartoInitialized()) {
         Cartography3D.initCarto3D(options.buildings, this.doAfter, this);
     }
+};
+
+ModelLoader.prototype._setVisibility = function _setVisibility(self, v) {
+    for (var i = 0; i < _this.model.length; i++) {
+         _this.model[i].visible = v;
+    } 
+    for (var j = 0; j < _this.obj.children.length; j++) {
+             _this.obj.children[j].visible = v;
+        }
+    self.notifyChange(true);
 };
 
 export default ModelLoader;
