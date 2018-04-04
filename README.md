@@ -52,7 +52,7 @@ The seven members of the team are :
 Given the number of people in the team, it is crucial to apply an efficient orgnization so everyone can be involved. To that end, we chose to work mostly in variable pairs, and to divide the tasks each week among these pairs (one person would be working alone since we are an uneven number).  
     
 ### Backlog 
-  
+  
 The previsional planning is the following :
 * **Sprint 1** : analysis, conception, first version of the tool, CI/CD.
 * **Sprint 2** : architecture set-up, definition of the 3D style with basic parameters + texture on faces, saving and loading.
@@ -184,7 +184,7 @@ Therefore, there will also be two types of style formats :
         "opacity": 1,
         "color": "#ffffff",
         "width": 1
-    }
+    },
     "faces" : [
         {
             "opacity": 1,
@@ -353,30 +353,41 @@ The 'change' functions perform the concrete stylization on the object/edges.
   
 ### Class LayerManager
   
-At this step, our tool is able to stylize one object. But what if the user wants to apply a style to several objects ? To answer this issue, we need to add a layer management functionality.  
+In the first version, our tool was only able to stylize one object. But what if the user wants to apply a style to several objects ?   
   
-We have developed a first, simple version of this management. It is a simple function, passed as callback of the loading function. It just creates a folder in the GUI and adds a checkbox with the name of the layer. To stylize several layer, the user just has to check the layer he wants and click on *Open Symbolizer*.  
+To answer this issue, we needed to add a layer management functionality : instead of opening a symbolizer directly after the loading, the layer is added to a list of checkboxes, similar to those we can find in GIS, where the user can manipulate it. 
   
-From this step, the Symbolizer works with a list of objects and a list of edges, instead of just one.
+(image menu layer)  
+        
+#### Layer management
     
-(image menu)  
+When one layer (or more) is checked, three buttons appear :
+* **Stylize object** : open a symbolizer to stylize all the meshes of the objects at once.
+* **Stylize parts** : open a symbolizer to stylize the meshes of the objects independently (the objects must have the same number of meshes).
+* **Delete layers** : delete the objects. 
   
-This layer manager should be improved in the next week, with ameliorations such as :
-* Deleting a layer.
-* Hiding a layer.
-* Closing a symbolizer.
-* Making impossible to open the same layer in different symbolizers.  
+These buttons disappear when there is no more layers checked (if they are all unchecked or deleted).
+    
+(diagramme d'activité)
+  
+#### Geolocation
   
 An important issue concerning the layers is how to **geolocalize** them. This is easy when the data itself is georeferenced, but formats like .OBJ do not provide this information. Therefore, in this case, the user should tell where the object is located, but the question is how.  
   
 The answer to this issue is twofold :
 * The user should be able to enter (somehow) the parameters to locate the object he wants to stylize.
 * He also should be able to adjust the position he chose (slight translations, rotations, scaling) later.  
-  
+
+##### Adjustments
+
 The second problem can be solved thanks to the GUI, with a few more sliders to move the objects, just like it is done in PLU++.  
   
 (image of the GUI - position)  
   
+TODO : click on a building and move it with keyboard keys.
+  
+##### Absolute positionning
+     
 But this method cannot be used to georeference an object completely - we cannot use a slider to move a mesh from one end of the world to the other. Until this step, the coordinates were hard-coded in the example, which is not satisfying.  
   
 We could open a window for the user to enter the coordinates between the drag and drop and the actual loading of the object, but it seems pretty heavy. Plus, the user may not care about where the object is located, and just want to use the stylization tool.  
@@ -453,11 +464,58 @@ Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), 
 **[Back to the top](#summary)** 
   
   
+## Results
+  
+### Presentation of the final tool
+  
+...
+  
+### How it works
+  
+...
+   
+### Limits and perspectives
+  
+...
+  
+**[Back to the top](#summary)** 
+  
+  
+## Review
+  
+### Problems met during the project
+  
+...
+  
+### Personal reviews
+  
+...
+  
+### Conclusion
+  
+...
+  
+**[Back to the top](#summary)** 
+  
+  
 ## Tests
   
 ### Unit tests
+
+In order to write our unit tests we rely on the mocha framework which was used in the previous unit tests of Itowns project. This framework is a feature-rich JavaScript test that can be used for both Node.js and browser-based testing,it's 
+interfaces system such as BDD, TDD, Exports, QUnit and Require-style allows developers to choose their style of DSL.
+
+In our project we choose to continue working with the BDD (Behavior Driven Development ) interface which provide a syntax including describe() , context(), it(), specify(), before(), after(), beforeEach(), and afterEach(), it focus on what the application should do, and on how it will do it.
+
+As we mentioned above we continued working and adding some tests to the previous test folder of the Itowns project, a part of these unit tests run using the CLI (commande line interface) and the others need the browser to be executed since our application uses the Dom element,and the nodeJs server does not have access to the Dom,we had to run these kind of tests on the browser. to do that we made a simple HTML page which our test runner page (/mochaTest.html). 
+The page loads Mocha, the testing libraries and our test file(/tests/vibesObjTest.js) and finally to run the tests, we simply needed to open the runner in a browser.
+the pictures below show the results of the test units:
+
+<img src="VIBES/mochaTest.png" style="width: 400px;"/>
+<img src="VIBES/unit_tests_console.png" style="width: 400px;"/>
+
   
-We made some.
+
 
 ### CI/CD
   
