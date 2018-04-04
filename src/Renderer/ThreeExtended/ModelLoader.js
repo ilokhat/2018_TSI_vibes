@@ -183,44 +183,45 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
         },
     }, this.view.tileLayer);
     var self = this;
-    setTimeout(() => self.ForBuildings(self.view), 1000);
+    setTimeout(() => self.ForBuildings(calleback), 1000);
 };
 
-ModelLoader.prototype.ForBuildings = function ForBuildings() {
+ModelLoader.prototype.ForBuildings = function ForBuildings(calleback) {
     // For all globe tile meshes we look for tile at level 14 on which building meshes are attached.
     for (var i = 0; i < this.view.wgs84TileLayer.level0Nodes.length; ++i) {
-        this.view.wgs84TileLayer.level0Nodes[i].traverse(element => this.traverseElement(element));
+        this.view.wgs84TileLayer.level0Nodes[i].traverse(element => this.traverseElement(element, calleback));
     }
     this.view.notifyChange(true);
     console.log('fin');
 };
 
-ModelLoader.prototype.traverseElement = function traverseElement(element) {
-    if (element.level != undefined && element.level <= 14 /* && element.visible */) {
+ModelLoader.prototype.traverseElement = function traverseElement(element, calleback) {
+    if (element.level != undefined && element.level <= 14) {
         // console.log(element);
         for (var c = 0; c < element.children.length; ++c) {
             if (element.children[c].type == 'Group') {
                 var parent = element.children[c];
-                var mesh = element.children[c].children[0];
-                // change couleur toit
-                /* for (var j = 0; j < mesh.wall.length; j++) {
-                    if (mesh.wall[j] == 1) {
-                        // impossible couleur d'un point et non d'une face ...
-                        mesh.geometry.attributes.color.array[j * 3] = 0;
-                        mesh.geometry.attributes.color.array[j * 3 + 1] = 0;
-                        mesh.geometry.attributes.color.array[j * 3 + 2] = 0;
-                        mesh.geometry.attributes.color.needsUpdate = true;
-                    }
-                } */
-                mesh.material = new THREE.MeshPhongMaterial({ color: 0xffffff });
-                mesh.material.transparent = true;
-                mesh.castShadow = true;
-                mesh.material.side = THREE.DoubleSide;
-                mesh.material.needsUpdate = true;
-                console.log(mesh);
+                calleback(parent);
             }
         }
     }
 };
+
+function calleback(group) {
+    var mesh;
+    var i;
+    for (i = 0; i < group.children.length; i++) {
+        mesh = group.children[i];
+        // change couleur toit
+        if (mesh.name == 'roof_faces') {
+            mesh.material = new THREE.MeshPhongMaterial({ color: 0x2240d1, emissive: 0x2240d1, specular: 0x2240d1, shininess: 30 });
+            mesh.material.transparent = true;
+            mesh.castShadow = true;
+            mesh.material.side = THREE.DoubleSide;
+            mesh.material.needsUpdate = true;
+            console.log(mesh);
+        }
+    }
+}
 
 export default ModelLoader;

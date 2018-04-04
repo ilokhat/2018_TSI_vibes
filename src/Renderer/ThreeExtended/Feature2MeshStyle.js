@@ -240,17 +240,19 @@ function coordinateToPolygon(coordinates, properties, options) {
 
 function coordinateToPolygonExtruded(coordinates, properties, options) {
     const indices = [];
+    const indicesRoof = [];
+    const verticesRoof = new Float32Array(2 * 3 * coordinates.coordinates.length);
     const vertices = new Float32Array(2 * 3 * coordinates.coordinates.length);
     const colors = new Uint8Array(3 * 2 * coordinates.coordinates.length);
     const ids = new Uint16Array(2 * coordinates.coordinates.length);
     const zmins = new Uint16Array(2 * coordinates.coordinates.length);
-    const geometry = new THREE.BufferGeometry();
+    const geometryWall = new THREE.BufferGeometry();
+    const geometryRoof = new THREE.BufferGeometry();
     let offset = 0;
     let offset2 = 0;
     let nbVertices = 0;
     let minAltitude = Infinity;
     var pos = [];
-    const wall = new Uint16Array(2 * coordinates.coordinates.length);
     /* eslint-disable-next-line */
     for (const id in coordinates.featureVertices) {
         // extract contour coodinates and properties of one feature
@@ -267,39 +269,53 @@ function coordinateToPolygonExtruded(coordinates, properties, options) {
         nbVertices = contour.length * 3;
         const verticesTopFace = vertices.slice(offset2, offset2 + nbVertices);
         const triangles = Earcut(verticesTopFace, null, 3);
-        var temp = [indices.length / 3, triangles.length / 3];
         for (const indice of triangles) {
-            indices.push(offset + indice);
+            verticesRoof[(offset + indice) * 3] = vertices[(offset + indice) * 3];
+            verticesRoof[(offset + indice) * 3 + 1] = vertices[(offset + indice) * 3 + 1];
+            verticesRoof[(offset + indice) * 3 + 2] = vertices[(offset + indice) * 3 + 2];
+            indicesRoof.push(offset + indice);
         }
         const ofid = Math.floor(offset2 / 3);
         for (let i = ofid; i < contour.length + ofid; ++i) {
             ids[i] = property._idx;
             zmins[i] = property.z_min;
             pos[i] = contour[i - ofid];
-            wall[i] = 1;
-        }
-        for (var i = temp[0]; i < temp[0] + temp[1]; i++) {
-            wall[i] = 0;
         }
         offset2 += nbVertices * 2;
         addFaces(indices, contour.length, offset);
         // assign color to each point
         const color = getColor(options, property);
-        fillColorArray(colors, offset, contour.length, color.r * 255, color.g * 255, color.b * 255);
-        offset += contour.length;
-        fillColorArray(colors, offset, contour.length, color.r * 155, color.g * 155, color.b * 155);
-        offset += contour.length;
+        fillColorArray(colors, offset, contour.length * 2, color.r * 255, color.g * 255, color.b * 255);
+        offset += contour.length * 2;
     }
-    geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3, true));
-    geometry.addAttribute('id', new THREE.BufferAttribute(ids, 1));
-    geometry.addAttribute('zmin', new THREE.BufferAttribute(zmins, 1));
-    geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
-    const result = new THREE.Mesh(geometry);
-    result.minAltitude = minAltitude;
-    result.pos = pos;
-    result.wall = wall;
-    return result;
+    // wall
+    geometryWall.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    geometryWall.addAttribute('color', new THREE.BufferAttribute(colors, 3, true));
+    geometryWall.addAttribute('id', new THREE.BufferAttribute(ids, 1));
+    geometryWall.addAttribute('zmin', new THREE.BufferAttribute(zmins, 1));
+    geometryWall.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
+    const resultWall = new THREE.Mesh(geometryWall);
+    resultWall.name = 'wall_faces';
+    resultWall.minAltitude = minAltitude;
+    resultWall.pos = pos;
+    // roof
+    geometryRoof.addAttribute('position', new THREE.BufferAttribute(new Float32Array(verticesRoof), 3));
+    geometryRoof.addAttribute('color', new THREE.BufferAttribute(colors, 3, true));
+    geometryRoof.addAttribute('id', new THREE.BufferAttribute(ids, 1));
+    geometryRoof.addAttribute('zmin', new THREE.BufferAttribute(zmins, 1));
+    geometryRoof.setIndex(new THREE.BufferAttribute(new Uint16Array(indicesRoof), 1));
+    const resultRoof = new THREE.Mesh(geometryRoof);
+    resultRoof.name = 'roof_faces';
+    resultRoof.minAltitude = minAltitude;
+    resultRoof.pos = pos;
+    // wall edges
+    var edges = new THREE.EdgesGeometry(geometryWall);
+    var lineWall = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true }));
+    lineWall.name = 'wall_edges';
+    edges = new THREE.EdgesGeometry(geometryRoof);
+    var lineRoof = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true }));
+    lineWall.name = 'roof_edges';
+    return [resultWall, resultRoof, lineWall, lineRoof];
 }
 
 /*
@@ -318,6 +334,7 @@ function coordinatesToMesh(coordinates, properties, options) {
         return;
     }
     var mesh;
+    var meshes;
     switch (coordinates.type) {
         case 'point': {
             mesh = coordinateToPoints(coordinates, properties, options);
@@ -329,7 +346,12 @@ function coordinatesToMesh(coordinates, properties, options) {
         }
         case 'polygon': {
             if (options.extrude) {
-                mesh = coordinateToPolygonExtruded(coordinates, properties, options);
+                meshes = coordinateToPolygonExtruded(coordinates, properties, options);
+                meshes[0].material.vertexColors = THREE.VertexColors;
+                meshes[0].material.color = new THREE.Color(0xffffff);
+                meshes[1].material.vertexColors = THREE.VertexColors;
+                meshes[1].material.color = new THREE.Color(0xffffff);
+                return meshes;
             }
             else {
                 mesh = coordinateToPolygon(coordinates, properties, options);
@@ -357,7 +379,14 @@ function featureCollectionToThree(featureCollection, options) {
     for (const geometry of featureCollection.geometries) {
         const properties = featureCollection.features;
         const mesh = coordinatesToMesh(geometry, properties, options);
-        group.add(mesh);
+        if (mesh instanceof THREE.Mesh) {
+            group.add(mesh);
+        } else if (mesh.length > 0) {
+            for (var i = 0; i < mesh.length; i++) {
+                group.add(mesh[i]);
+            }
+        }
+        group.name = 'bdTopo';
         group.minAltitude = Math.min(mesh.minAltitude, group.minAltitude);
     }
     group.features = featureCollection.features;
