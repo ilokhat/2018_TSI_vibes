@@ -23,31 +23,39 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.layerFolder = this.menu.gui.addFolder('Layers');
     this.loader = loader;
     this.symbolizer = symbolizer;
-
     this.stylizeObjectBtn = null;
     this.stylizePartsBtn = null;
     this.deleteBtn = null;
-
     _this = this;
 }
 
 LayerManager.prototype.initListener = function initListener() {
-     // bati3D visibility 
-     var bati3d = _this.layerFolder.add({ Layer: false }, 'Layer').name('bati3D').onChange((checked) => { 
+    // bati3D visibility 
+    var bati3d = _this.layerFolder.add({ Layer: false }, 'Layer').name('bati3D').onChange((checked) => { 
         if (!checked) {
             this.loader._setVisibility(this.view, false);
             this.loader.checked = false;
         } else {
- 
             this.loader._setVisibility(this.view, true);
             this.loader.checked = true;
             var model = [_this.view.scene.children[2], _this.view.scene.children[3]];
              // model[0].materialLibraries[0] = ;
             console.log('bati', model);
-            
             // _this.handleLayer(model);
         }
-         });
+    });
+    var showBDTopo = (parent) => { parent.visible = true; };
+    var hideBDTopo = (parent) => { parent.visible = false; };
+    // BDTopo visibility 
+    var bDTopo = _this.layerFolder.add({ Layer: false }, 'Layer').name('BDTopo').onChange((checked) => { 
+        if (!checked && this.loader.bDTopoLoaded) {
+            // hide
+            this.loader.ForBuildings(hideBDTopo);
+        } else if (checked && this.loader.bDTopoLoaded) {
+            // show
+            this.loader.ForBuildings(showBDTopo);
+        }
+    });
     this.document.addEventListener('keypress', _this.checkKeyPress, false);
     this.document.addEventListener('click', _this.picking, false);
     this.document.addEventListener('drop', _this.documentDrop, false);
@@ -55,6 +63,17 @@ LayerManager.prototype.initListener = function initListener() {
     this.document.addEventListener('dragenter', prevDefault, false);
     this.document.addEventListener('dragover', prevDefault, false);
     this.document.addEventListener('dragleave', prevDefault, false);
+    // camera move
+    this.view.addFrameRequester('after_layer_update', () => { 
+        var checked = bDTopo.__checkbox.checked;
+        if (!checked && this.loader.bDTopoLoaded) {
+            // hide
+            this.loader.ForBuildings(hideBDTopo);
+        } else if (checked && this.loader.bDTopoLoaded) {
+            // show
+            this.loader.ForBuildings(showBDTopo);
+        }
+    });
 };
 
 LayerManager.prototype.documentDrop = function documentDrop(e) {

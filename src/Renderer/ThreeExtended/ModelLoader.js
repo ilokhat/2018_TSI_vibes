@@ -140,12 +140,11 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
             // Material initialization
             obj.children[i].material.transparent = true;
             obj.children[i].castShadow = true;
-            obj.children[i].visible = false;
-            self.model[0].add(obj);
             // Extract edges
             var edges = new THREE.EdgesGeometry(obj.children[i].geometry);
             var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true }));
             //
+            console.log(line);
             self.model[0].add(obj.children[i]);
             self.model[1].add(line);
         }
@@ -168,7 +167,6 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
         self.model[1].visible = false; 
         self.view.notifyChange(true);
         console.log('bati3D Loaded');
-       
     }
 };
 
@@ -205,7 +203,8 @@ function acceptFeature(properties) {
 }
 
 ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
-    this.view.addLayer({
+    var self = this;
+    var a = this.view.addLayer({
         type: 'geometry',
         update: FeatureProcessing.update,
         convert: Feature2MeshStyle.convert({
@@ -226,7 +225,7 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
             mimetype: 'json',
         },
     }, this.view.tileLayer);
-    var self = this;
+    a.then(this.bDTopoLoaded = true);
     setTimeout(() => self.ForBuildings(calleback), 1000);
 };
 
@@ -253,7 +252,7 @@ ModelLoader.prototype.traverseElement = function traverseElement(element, calleb
 function calleback(group) {
     var mesh;
     var i;
-    for (i = 0; i < group.children.length; i++) {
+    /* for (i = 0; i < group.children.length; i++) {
         mesh = group.children[i];
         // change couleur toit
         if (mesh.name == 'roof_faces') {
@@ -264,6 +263,8 @@ function calleback(group) {
             mesh.material.needsUpdate = true;
         }
     }
+    */
+    group.visible = true;
 }
 
 export default ModelLoader;

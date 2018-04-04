@@ -399,6 +399,7 @@ function featureCollectionToThree(featureCollection, options) {
         group.minAltitude = Math.min(mesh.minAltitude, group.minAltitude);
     }
     group.name = 'bdTopo';
+    group.visible = false;
     group.features = featureCollection.features;
     return group;
 }
