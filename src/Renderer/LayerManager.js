@@ -27,27 +27,31 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.stylizeObjectBtn = null;
     this.stylizePartsBtn = null;
     this.deleteBtn = null;
+    this.bati3dBtn = null;
 
     _this = this;
 }
 
 LayerManager.prototype.initListener = function initListener() {
      // bati3D visibility 
-     var bati3d = _this.layerFolder.add({ Layer: false }, 'Layer').name('bati3D').onChange((checked) => { 
-        if (!checked) {
-            this.loader._setVisibility(this.view, false);
-            this.loader.checked = false;
-        } else {
- 
-            this.loader._setVisibility(this.view, true);
-            this.loader.checked = true;
-            var model = [_this.view.scene.children[2], _this.view.scene.children[3]];
-             // model[0].materialLibraries[0] = ;
-            console.log('bati', model);
-            
-            // _this.handleLayer(model);
-        }
-         });
+        _this.bati3dBtn = _this.menu.gui.add({ bati3D: () => {
+        var bati3D_faces = _this.view.scene.getObjectByName('bati3D_faces');
+        var bati3D_lines = _this.view.scene.getObjectByName('bati3D_lines');
+        if (bati3D_faces != undefined && bati3D_lines != undefined) { 
+               if (this.loader.checked) {
+                   this.loader._setVisibility(this.view, false);
+                   this.loader.checked = false;
+               } else {
+                   this.loader._setVisibility(this.view, true);
+                   this.loader.checked = true;
+                   var model = [bati3D_faces, bati3D_lines];
+                   _this.handleLayer(model);
+                   _this.menu.gui.remove(_this.bati3dBtn);
+
+               }
+            }   
+        },
+    }, 'bati3D').name('bati3D');
     this.document.addEventListener('keypress', _this.checkKeyPress, false);
     this.document.addEventListener('click', _this.picking, false);
     this.document.addEventListener('drop', _this.documentDrop, false);
@@ -174,8 +178,10 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         });
         // Call Symbolizer
         _this.nbSymbolizer++;
+       // console.log('list Edge', listEdge);
         var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, _this.menu, _this.nbSymbolizer);
         _this.symbolizerInit = symbolizer;
+       
         // Open symbolizer with 'stylize parts'
         if (complex) {
             symbolizer.initGui();

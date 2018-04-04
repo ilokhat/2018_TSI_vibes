@@ -138,8 +138,6 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
             // Material initialization
             obj.children[i].material.transparent = true;
             obj.children[i].castShadow = true;
-            obj.children[i].visible = false;
-            self.model[0].add(obj);
             // Extract edges
             var edges = new THREE.EdgesGeometry(obj.children[i].geometry);
             var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true }));
@@ -156,6 +154,7 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
         self.view.camera.camera3D.layers.enable(objID);
         self.model[0].updateMatrixWorld();
         self.model[0].name = 'bati3D_faces';
+        self.model[0].visible = false; 
         self.view.scene.add(self.model[0]);
         var linesID = self.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
         self.model[1].traverse(lines => lines.layers.set(linesID));
@@ -180,10 +179,14 @@ ModelLoader.prototype.loadBati3D = function loadBati3D() {
 };
 
 ModelLoader.prototype._setVisibility = function _setVisibility(self, v) {
-    
-    self.scene.getObjectByName('bati3D_faces').visible = v;
-    self.scene.getObjectByName('bati3D_lines').visible = v;
-    self.notifyChange(true);
+    var bati3D_faces = self.scene.getObjectByName('bati3D_faces');
+    var bati3D_lines = self.scene.getObjectByName('bati3D_lines');
+    if (bati3D_faces != undefined && bati3D_lines != undefined) {
+       self.scene.getObjectByName('bati3D_faces').visible = v;
+       self.scene.getObjectByName('bati3D_lines').visible = v;
+       self.notifyChange(true);
+    }
+   
 };
 
 export default ModelLoader;
