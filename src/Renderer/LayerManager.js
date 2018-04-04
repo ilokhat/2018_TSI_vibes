@@ -232,16 +232,16 @@ LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
         if ((key.keyCode == '54') || (key.keyCode == '122')) {
             _this._xmoins(-10);
         }
-        if ((key.keyCode == '56') || (key.keyCode == '113')) {
+        if ((key.keyCode == '55') || (key.keyCode == '119')) {
             _this._yplus(10);
         }
-        if ((key.keyCode == '50') || (key.keyCode == '115')) {
+        if ((key.keyCode == '51') || (key.keyCode == '120')) {
             _this._ymoins(-10);
         }
-        if ((key.keyCode == '55') || (key.keyCode == '119')) {
+        if ((key.keyCode == '56') || (key.keyCode == '113')) {
             _this._zplus(10);
         }
-        if ((key.keyCode == '51') || (key.keyCode == '120')) {
+        if ((key.keyCode == '50') || (key.keyCode == '115')) {
             _this._zmoins(-10);
         }
     }
