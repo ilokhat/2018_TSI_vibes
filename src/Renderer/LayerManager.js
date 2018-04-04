@@ -229,7 +229,7 @@ LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
         if ((key.key == 'a') || (key.key == '4')) {
             _this._xmoins(-10);
         }
-        if ((key.key == 's') || (key.key == '6')) {
+        if ((key.key == 'z') || (key.key == '6')) {
             _this._xplus(10);
         }
         if ((key.key == 'w') || (key.key == '7')) {
