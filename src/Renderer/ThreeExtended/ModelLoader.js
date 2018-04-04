@@ -192,7 +192,6 @@ ModelLoader.prototype.ForBuildings = function ForBuildings(calleback) {
         this.view.wgs84TileLayer.level0Nodes[i].traverse(element => this.traverseElement(element, calleback));
     }
     this.view.notifyChange(true);
-    console.log('fin');
 };
 
 ModelLoader.prototype.traverseElement = function traverseElement(element, calleback) {
@@ -219,7 +218,6 @@ function calleback(group) {
             mesh.castShadow = true;
             mesh.material.side = THREE.DoubleSide;
             mesh.material.needsUpdate = true;
-            console.log(mesh);
         }
     }
 }

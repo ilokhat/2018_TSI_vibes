@@ -369,8 +369,18 @@ function coordinatesToMesh(coordinates, properties, options) {
 
 function featureToThree(feature, options) {
     const mesh = coordinatesToMesh(feature.geometry, feature.properties, options);
-    mesh.properties = feature.properties;
-    return mesh;
+    if (mesh instanceof THREE.Mesh) {
+        mesh.properties = feature.properties;
+        return mesh;
+    } else if (mesh.length > 0) {
+        const group = new THREE.Group();
+        for (var i = 0; i < mesh.length; i++) {
+            group.add(mesh[i]);
+        }
+        group.features = feature.properties;
+        return group;
+    }
+   
 }
 
 function featureCollectionToThree(featureCollection, options) {
@@ -386,9 +396,9 @@ function featureCollectionToThree(featureCollection, options) {
                 group.add(mesh[i]);
             }
         }
-        group.name = 'bdTopo';
         group.minAltitude = Math.min(mesh.minAltitude, group.minAltitude);
     }
+    group.name = 'bdTopo';
     group.features = featureCollection.features;
     return group;
 }
