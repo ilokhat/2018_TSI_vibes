@@ -609,8 +609,8 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
     });
     folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('MovecoordY').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-            this.obj[i].translateY(value);
-            this.edges[i].translateY(value);
+            this.obj[i].translateZ(-value);
+            this.edges[i].translateZ(-value);
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
         }
@@ -618,8 +618,8 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
     });
     folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('MovecoordZ').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-            this.obj[i].translateZ(value);
-            this.edges[i].translateZ(value);
+            this.obj[i].translateY(value);
+            this.edges[i].translateY(value);
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
         }

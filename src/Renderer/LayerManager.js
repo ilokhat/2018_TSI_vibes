@@ -226,33 +226,31 @@ function loadFileException(message) {
 
 LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
     if (_this.listLayers.length == 1) {
-        console.log(key);
-        if ((key.keyCode == '52') || (key.keyCode == '97')) {
-            _this._xplus(10);
-        }
-        if ((key.keyCode == '54') || (key.keyCode == '122')) {
+        if ((key.key == 'a') || (key.key == '4')) {
             _this._xmoins(-10);
         }
-        if ((key.keyCode == '55') || (key.keyCode == '119')) {
+        if ((key.key == 's') || (key.key == '6')) {
+            _this._xplus(10);
+        }
+        if ((key.key == 'w') || (key.key == '7')) {
             _this._yplus(10);
         }
-        if ((key.keyCode == '51') || (key.keyCode == '120')) {
+        if ((key.key == 'x') || (key.key == '3')) {
             _this._ymoins(-10);
         }
-        if ((key.keyCode == '56') || (key.keyCode == '113')) {
-            _this._zplus(10);
-        }
-        if ((key.keyCode == '50') || (key.keyCode == '115')) {
+        if ((key.key == 'q') || (key.key == '8')) {
             _this._zmoins(-10);
+        }
+        if ((key.key == 's') || (key.key == '2')) {
+            _this._zplus(10);
         }
     }
 };
 
 LayerManager.prototype._xplus = function xplus(a) {
-      if (_this.listLayers.length == 1) {
+    if (_this.listLayers.length == 1) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
-        console.log(obj, edges);
         obj.translateX(a);
         edges.translateX(a);
         obj.updateMatrixWorld();
@@ -262,10 +260,9 @@ LayerManager.prototype._xplus = function xplus(a) {
 };
 
 LayerManager.prototype._xmoins = function _xmoins(a) {
-      if (_this.listLayers.length == 1) {
+    if (_this.listLayers.length == 1) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
-        console.log(obj, edges);
         obj.translateX(a);
         edges.translateX(a);
         obj.updateMatrixWorld();
@@ -279,7 +276,6 @@ LayerManager.prototype._yplus = function yplus(a) {
     if (_this.listLayers.length == 1) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
-        console.log(obj, edges);
         obj.translateY(a);
         edges.translateY(a);
         obj.updateMatrixWorld();
@@ -293,7 +289,6 @@ LayerManager.prototype._ymoins = function _ymoins(a) {
     if (_this.listLayers.length == 1) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
-        console.log(obj, edges);
         obj.translateY(a);
         edges.translateY(a);
         obj.updateMatrixWorld();
@@ -307,7 +302,6 @@ LayerManager.prototype._zplus = function zplus(a) {
     if (_this.listLayers.length == 1) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
-        console.log(obj, edges);
         obj.translateZ(a);
         edges.translateZ(a);
         obj.updateMatrixWorld();
@@ -321,7 +315,6 @@ LayerManager.prototype._zmoins = function _zmoins(a) {
     if (_this.listLayers.length == 1) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
-        console.log(obj, edges);
         obj.translateZ(a);
         edges.translateZ(a);
         obj.updateMatrixWorld();

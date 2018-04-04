@@ -81,15 +81,12 @@ ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX
     plight.position.y += 70;
     plight.updateMatrixWorld();
     plight.castShadow = true;            // default false
-  
     // Set up shadow properties for the light
     plight.shadow.mapSize.width = 512;  // default
     plight.shadow.mapSize.height = 512; // default
     plight.shadow.camera.near = 0.5;       // default
-    plight.shadow.camera.far = 5000;      
-
+    plight.shadow.camera.far = 5000;
     this.view.scene.add(plight);
-
     // Create a plane that receives shadows (but does not cast them)
     var planeID = this.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
     var planeGeometry = new THREE.PlaneBufferGeometry(20, 20, 32, 32);
@@ -101,17 +98,13 @@ ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX
     plane = this._placeModel(plane, coord, 0, 0, 0, scale);
     plane.position.y += 200;
     plane.receiveShadow = true;
-
     plane.traverse((obj) => { obj.layers.set(planeID); });
     this.view.camera.camera3D.layers.enable(planeID);
-
     plane.updateMatrixWorld();
     this.view.scene.add(plane);
-
     // Update coordinate of the object
     obj.updateMatrixWorld();
-    // set name
-    // check name
+    // set & check name
     var name = controleName(obj.materialLibraries[0].substring(0, obj.materialLibraries[0].length - 4), this.view);
     obj.name = name.concat('_faces');
     lines.name = name.concat('_lines');
