@@ -23,12 +23,7 @@ describe('readFile()', function () {
 });
 
 
-describe("symbolizer.zero()",function() {
-  console.log("eeeeeeeeeeee", itowns.Symbolizer);
-it("example test unitaire symbolizer",function() {
-  chai.expect(  symbolizer.zero(5) ).to.equal(0);
-});
-});
+
 var mesh ;
 
 describe('symbolizer.readVibes()', function () {

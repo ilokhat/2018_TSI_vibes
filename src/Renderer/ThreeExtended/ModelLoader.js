@@ -126,12 +126,21 @@ ModelLoader.prototype.loadBati3D = function loadBati3D() {
 };
 
 ModelLoader.prototype._setVisibility = function _setVisibility(self, v) {
-    for (var i = 0; i < _this.model.length; i++) {
+  /*  for (var i = 0; i < 2; i++) {
          _this.model[i].visible = v;
     } 
-    for (var j = 0; j < _this.obj.children.length; j++) {
+    console.log(_this.model);
+    for (var j = 0; j < 5; j++) {
              _this.obj.children[j].visible = v;
         }
+        console.log('view', _this.view);
+        console.log('model', _this.model);
+       */
+      for (var j = 0; j < 5; j++) {
+        _this.obj.children[j].visible = v;
+   }
+    self.scene.children[2].visible = v;
+    self.scene.children[3].visible = v;
     self.notifyChange(true);
 };
 
