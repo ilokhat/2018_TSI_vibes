@@ -21,8 +21,6 @@ function Symbolizer(view, obj, edges, menu, nb, light, plane) {
     this.light = light;
     this.plane = plane;
     this.applyStyle();
-    console.log(light);
-    console.log(plane);
 }
 
 Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = null) {
@@ -886,6 +884,15 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addEmissiveAll(facesFolder);
     this._addSpecularAll(facesFolder);
     this._addShininessAll(facesFolder);
+    var lightFolder = folder.addFolder('Light');
+    this._addColorLight(lightFolder);
+};
+
+Symbolizer.prototype._addColorLight = function addColorLight(folder) {
+    folder.addColor({ color: 0xffffff }, 'color').name('Color').onChange((value) => {
+        this.light.color = new THREE.Color(value);
+        this.view.notifyChange(true);
+    });
 };
 
 Symbolizer.prototype._addShades = function addShades(folder) {
