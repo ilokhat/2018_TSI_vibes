@@ -9,7 +9,7 @@ import Fetcher from '../Core/Scheduler/Providers/Fetcher';
 
 // Class Symbolizer
 
-function Symbolizer(view, obj, edges, menu, nb) {
+function Symbolizer(view, obj, edges, menu, nb, light, plane) {
     // Constructor
     this.obj = obj;
     this.edges = edges;
@@ -18,7 +18,11 @@ function Symbolizer(view, obj, edges, menu, nb) {
     this.menu.view = this.view;
     this.nb = nb;
     this.folder = null;
+    this.light = light;
+    this.plane = plane;
     this.applyStyle();
+    console.log(light);
+    console.log(plane);
 }
 
 Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = null) {
@@ -862,6 +866,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this.folder = folder;
     this._addSaveAll(folder);
     this._addLoad(folder);
+    this._addShades(folder);
     var positionFolder = folder.addFolder('Position');
     this._addResetPosition(positionFolder);
     this._addRotationsAll(positionFolder);
@@ -881,6 +886,13 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addEmissiveAll(facesFolder);
     this._addSpecularAll(facesFolder);
     this._addShininessAll(facesFolder);
+};
+
+Symbolizer.prototype._addShades = function addShades(folder) {
+    folder.add({ shades: this.plane.visible }, 'shades').name('Display shades').onChange((checked) => {
+        this.plane.visible = checked;
+        this.view.notifyChange(true);
+    });
 };
 
 Symbolizer.prototype._checkStructure = function checkStructure() {
