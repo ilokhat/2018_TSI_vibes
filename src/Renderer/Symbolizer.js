@@ -10,7 +10,7 @@ import Fetcher from '../Core/Scheduler/Providers/Fetcher';
 // Class Symbolizer
 
 function Symbolizer(view, obj, edges, menu, nb) {
-    // Constructor
+    // Constructor  
     this.obj = obj;
     this.edges = edges;
     this.view = view;
@@ -19,6 +19,7 @@ function Symbolizer(view, obj, edges, menu, nb) {
     this.nb = nb;
     this.folder = null;
     this.applyStyle();
+  
 }
 
 Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = null) {
@@ -41,7 +42,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
             }
             count++;
         }
-        // Apply given style to each child
+        // Apply given style to each child        
         for (i = 0; i < this.edges.length; i++) {
             for (j = 0; j < this.edges[i].children.length; j++) {
                 this._changeOpacityEdge(style.edges.opacity, i, j);
@@ -96,6 +97,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
     }
     else {
         // Apply default style
+        
         for (i = 0; i < this.edges.length; i++) {
             for (j = 0; j < this.edges[i].children.length; j++) {
                 this._changeOpacityEdge(1, i, j);
@@ -106,6 +108,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
         var color = getRandomColor();
         for (i = 0; i < this.obj.length; i++) {
             for (j = 0; j < this.obj[i].children.length; j++) {
+                
                 this._changeOpacity(1, i, j);
                 this._changeColor(color, i, j);
                 this._changeEmissive(color, i, j);
@@ -113,6 +116,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                 this._changeShininess(30, i, j);
                 // No texture
             }
+
         }
     }
 };
@@ -121,6 +125,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
 
 Symbolizer.prototype._changeOpacity = function changeOpacity(value, i, j) {
     // Update opacity with selected value
+    
     this.obj[i].children[j].material.opacity = value;
     this.obj[i].children[j].material.needsUpdate = true;
     this.view.notifyChange(true);
@@ -429,13 +434,8 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
 
 Symbolizer.prototype._readVibes = function readVibes(file, folder) {
     var reader = new FileReader();
-    if (file.name.endsWith('.vibes')) {
-        reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
-        reader.readAsText(file);
-        return 0;
-    } else {
-        throw new loadFileException('Unvalid format');
-    }
+    reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
+    reader.readAsText(file);
 };
 
 // Menu management
@@ -528,7 +528,6 @@ Symbolizer.prototype.initGui = function addToGUI() {
         this._addResetPosition(positionFolder);
         this._addRotationsAll(positionFolder);
         this._addScaleAll(positionFolder);
-        this._addMoveobjcoordAll(positionFolder);
         var edgesFolder = parentFolder.addFolder('Edges');
         this._addColorEdgeAll(edgesFolder);
         this._addOpacityEdgeAll(edgesFolder);
@@ -597,36 +596,6 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
     });
 };
 
-Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
-    folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 0.1).name('MovecoordX').onChange((value) => {
-        for (var i = 0; i < this.obj.length; i++) {
-            this.obj[i].translateX(value);
-            this.edges[i].translateX(value);
-            this.obj[i].updateMatrixWorld();
-            this.edges[i].updateMatrixWorld();
-        }
-        this.view.notifyChange(true);
-    });
-    folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('MovecoordY').onChange((value) => {
-        for (var i = 0; i < this.obj.length; i++) {
-            this.obj[i].translateZ(-value);
-            this.edges[i].translateZ(-value);
-            this.obj[i].updateMatrixWorld();
-            this.edges[i].updateMatrixWorld();
-        }
-        this.view.notifyChange(true);
-    });
-    folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('MovecoordZ').onChange((value) => {
-        for (var i = 0; i < this.obj.length; i++) {
-            this.obj[i].translateY(value);
-            this.edges[i].translateY(value);
-            this.obj[i].updateMatrixWorld();
-            this.edges[i].updateMatrixWorld();
-        }
-        this.view.notifyChange(true);
-    });
-};
-
 Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     var initialRotateX = this.obj[0].rotation.x;
     var initialRotateY = this.obj[0].rotation.y;
@@ -636,6 +605,7 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     var prevValueZ = 0;
     folder.add({ rotationX: initialRotateX }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('rotationX').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
+
             this.obj[i].rotateX(value - prevValueX);
             this.edges[i].rotateX(value - prevValueX);
             prevValueX = value;
@@ -646,6 +616,7 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     });
     folder.add({ rotationY: initialRotateY }, 'rotationY', -Math.PI, Math.PI, Math.PI / 100).name('rotationY').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
+
             this.obj[i].rotateY(value - prevValueY);
             this.edges[i].rotateY(value - prevValueY);
             prevValueY = value;
@@ -656,6 +627,7 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     });
     folder.add({ rotationZ: initialRotateZ }, 'rotationZ', -Math.PI, Math.PI, Math.PI / 100).name('rotationZ').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
+
             this.obj[i].rotateZ(value - prevValueZ);
             this.edges[i].rotateZ(value - prevValueZ);
             prevValueZ = value;
@@ -806,7 +778,6 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addResetPosition(positionFolder);
     this._addRotationsAll(positionFolder);
     this._addScaleAll(positionFolder);
-    this._addMoveobjcoordAll(positionFolder);
     var edgesFolder = folder.addFolder('Edges');
     this._addColorEdgeAll(edgesFolder);
     this._addOpacityEdgeAll(edgesFolder);
@@ -835,12 +806,8 @@ Symbolizer.prototype._checkStructure = function checkStructure() {
     return true;
 };
 
-function loadFileException(message) {
-    this.message = message;
-    this.name = 'loadFileException';
-}
 
-export function getRandomColor() {
+function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
     for (var i = 0; i < 6; i++) {
@@ -849,7 +816,7 @@ export function getRandomColor() {
     return color;
 }
 
-
+/*
 function getSourceSynch(url) {
     var req = new XMLHttpRequest();
     req.open('GET', url, false);
@@ -862,5 +829,6 @@ function getMethod(shader) {
     var method = JSON.parse(text);
     return method;
 }
+*/
 
 export default Symbolizer;

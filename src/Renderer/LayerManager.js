@@ -26,27 +26,37 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.stylizeObjectBtn = null;
     this.stylizePartsBtn = null;
     this.deleteBtn = null;
+    this.bati3dBtn = null;
     _this = this;
 }
 
+var showBDTopo = (parent) => { parent.visible = true; };
+var hideBDTopo = (parent) => { parent.visible = false; };
+
 LayerManager.prototype.initListener = function initListener() {
-    // bati3D visibility 
-    var bati3d = _this.layerFolder.add({ Layer: false }, 'Layer').name('bati3D').onChange((checked) => { 
-        if (!checked) {
-            this.loader._setVisibility(this.view, false);
-            this.loader.checked = false;
-        } else {
-            this.loader._setVisibility(this.view, true);
-            this.loader.checked = true;
-            var model = [_this.view.scene.children[2], _this.view.scene.children[3]];
-             // model[0].materialLibraries[0] = ;
-            console.log('bati', model);
-            // _this.handleLayer(model);
-        }
-    });
+    // bati3D visibility
+    _this.bati3dBtn = _this.menu.gui.add({ bati3D: () => {
+        var bati3D_faces = _this.view.scene.getObjectByName('bati3D_faces');
+        var bati3D_lines = _this.view.scene.getObjectByName('bati3D_lines');
+        if (bati3D_faces != undefined && bati3D_lines != undefined) {
+            if (this.loader.checked) {
+                this.loader._setVisibility(this.view, false);
+                this.loader.checked = false;
+            } else {
+                this.loader._setVisibility(this.view, true);
+                this.loader.checked = true;
+                var model = [bati3D_faces, bati3D_lines];
+                _this.handleLayer(model);
+                _this.menu.gui.remove(_this.bati3dBtn);
+            }
+               
+        }   
+    },
+    }, 'bati3D').name('bati3D');
     var showBDTopo = (parent) => { parent.visible = true; };
     var hideBDTopo = (parent) => { parent.visible = false; };
     // BDTopo visibility 
+    /*
     var bDTopo = _this.layerFolder.add({ Layer: false }, 'Layer').name('BDTopo').onChange((checked) => { 
         if (!checked && this.loader.bDTopoLoaded) {
             // hide
@@ -56,6 +66,22 @@ LayerManager.prototype.initListener = function initListener() {
             this.loader.ForBuildings(showBDTopo);
         }
     });
+    */
+    _this.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
+        if (_this.loader.bDTopoLoaded) {
+            if (_this.loader.bdTopoVisibility) {
+                _this.loader.ForBuildings(hideBDTopo);
+                _this.loader.bdTopoVisibility = false;
+            } else {
+                _this.loader.ForBuildings(showBDTopo);
+                _this.loader.bdTopoVisibility = true;
+                _this.menu.gui.remove(_this.bdTopoBtn);
+                _this.handleBdTopo();
+            }
+               
+        }   
+    },
+    }, 'bdTopo').name('bdTopo');
     this.document.addEventListener('keypress', _this.checkKeyPress, false);
     this.document.addEventListener('click', _this.picking, false);
     this.document.addEventListener('drop', _this.documentDrop, false);
@@ -65,11 +91,10 @@ LayerManager.prototype.initListener = function initListener() {
     this.document.addEventListener('dragleave', prevDefault, false);
     // camera move
     this.view.addFrameRequester('after_layer_update', () => { 
-        var checked = bDTopo.__checkbox.checked;
-        if (!checked && this.loader.bDTopoLoaded) {
+        if (!_this.loader.bdTopoVisibility && this.loader.bDTopoLoaded) {
             // hide
             this.loader.ForBuildings(hideBDTopo);
-        } else if (checked && this.loader.bDTopoLoaded) {
+        } else if (_this.loader.bdTopoVisibility && this.loader.bDTopoLoaded) {
             // show
             this.loader.ForBuildings(showBDTopo);
         }
@@ -123,6 +148,58 @@ LayerManager.prototype._readFile = function readFile(file) {
         throw new loadFileException('Unvalid format');
     }
 };
+LayerManager.prototype.guiInitialize = function guiInitialize() {
+    _this.stylizeObjectBtn = _this.layerFolder.add({ symbolizer: () => {
+        _this.initSymbolizer(false);
+    },
+    }, 'symbolizer').name('Stylize object...');
+    _this.stylizePartsBtn = _this.layerFolder.add({ symbolizer: () => {
+        _this.initSymbolizer(true);
+    },
+    }, 'symbolizer').name('Stylize parts...');
+    _this.deleteBtn = _this.layerFolder.add({ delete: () => {
+        // Removes the controllers
+        if (_this.menu.gui.__folders.Layers != undefined) {
+            _this.listControllers.forEach((controller) => {
+                _this.menu.gui.__folders.Layers.remove(controller);
+            });
+        }
+        _this.listControllers = [];
+        // Actually remove the model from the scene
+        _this.listLayers.forEach((layer) => {
+            if (layer == 'BDTopo') {
+                this.loader.ForBuildings(hideBDTopo);
+                _this.loader.bdTopoVisibility = false;
+                _this.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
+                    if (_this.loader.bDTopoLoaded) {
+                        if (_this.loader.bdTopoVisibility) {
+                            _this.loader.ForBuildings(hideBDTopo);
+                            _this.loader.bdTopoVisibility = false;
+                        } else {
+                            _this.loader.ForBuildings(showBDTopo);
+                            _this.loader.bdTopoVisibility = true;
+                            _this.menu.gui.remove(_this.bdTopoBtn);
+                            _this.handleBdTopo();
+                        }
+                           
+                    }   
+                },
+                }, 'bdTopo').name('bdTopo');
+            } else {
+                _this.view.scene.remove(layer[0]);
+                _this.view.scene.remove(layer[1]);
+            }
+        });
+        _this.view.notifyChange(true);
+        // Remove the layers from the list of layers to stylize
+        _this.listLayers = [];
+        // If there is no more layers, remove 'Open symbolizer' and 'Delete Layer' buttons
+        _this._cleanGUI();
+    },
+    }, 'delete').name('Delete layer');
+    // GUI initialized
+    _this.guiInitialized = true;
+};
 
 LayerManager.prototype.handleLayer = function handleLayer(model) {
     // Add a checkbox to the GUI, named after the layer
@@ -134,41 +211,37 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
             _this.listControllers.push(controller);
             // Creates buttons to start symbolizers
             if (!_this.guiInitialized) {
-                _this.stylizeObjectBtn = _this.layerFolder.add({ symbolizer: () => {
-                    _this.initSymbolizer(false);
-                },
-                }, 'symbolizer').name('Stylize object...');
-                _this.stylizePartsBtn = _this.layerFolder.add({ symbolizer: () => {
-                    _this.initSymbolizer(true);
-                },
-                }, 'symbolizer').name('Stylize parts...');
-                _this.deleteBtn = _this.layerFolder.add({ delete: () => {
-                    // Removes the controllers
-                    if (_this.menu.gui.__folders.Layers != undefined) {
-                        _this.listControllers.forEach((controller) => {
-                            _this.menu.gui.__folders.Layers.remove(controller);
-                        });
-                    }
-                    _this.listControllers = [];
-                    // Actually remove the model from the scene
-                    _this.listLayers.forEach((layer) => {
-                        _this.view.scene.remove(layer[0]);
-                        _this.view.scene.remove(layer[1]);
-                    });
-                    _this.view.notifyChange(true);
-                    // Remove the layers from the list of layers to stylize
-                    _this.listLayers = [];
-                    // If there is no more layers, remove 'Open symbolizer' and 'Delete Layer' buttons
-                    _this._cleanGUI();
-                },
-                }, 'delete').name('Delete layer');
+                _this.guiInitialize();
             }
-            // GUI initialized
-            _this.guiInitialized = true;
         }
         else {
             // Remove layer controller from the list
             removeFromList(_this.listLayers, model);
+            removeFromList(_this.listControllers, controller);
+            // If there is no more layers, clean the GUI
+            if (_this.listLayers.length == 0) {
+                _this._cleanGUI();
+            }
+        }
+    });
+};
+
+LayerManager.prototype.handleBdTopo = function handleBdTopo() {
+    // Add a checkbox to the GUI, named after the layer
+    var name = 'BDTopo';
+    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name('BDTopo').onChange((checked) => {
+        if (checked) {
+            // Add layer and controller to the list
+            _this.listLayers.push('BDTopo');
+            _this.listControllers.push(controller);
+            // Creates buttons to start symbolizers
+            if (!_this.guiInitialized) {
+                _this.guiInitialize();
+            }
+        }
+        else {
+            // Remove layer controller from the list
+            removeFromList(_this.listLayers, 'BDTopo');
             removeFromList(_this.listControllers, controller);
             // If there is no more layers, clean the GUI
             if (_this.listLayers.length == 0) {
@@ -193,8 +266,10 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         });
         // Call Symbolizer
         _this.nbSymbolizer++;
+       // console.log('list Edge', listEdge);
         var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, _this.menu, _this.nbSymbolizer);
         _this.symbolizerInit = symbolizer;
+       
         // Open symbolizer with 'stylize parts'
         if (complex) {
             symbolizer.initGui();

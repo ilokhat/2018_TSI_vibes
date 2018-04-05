@@ -17,6 +17,7 @@ function ModelLoader(view) {
     this.model = [new THREE.Group(), new THREE.Group()];
     this.obj = new THREE.Group();
     this.checked = false;
+    this.bdTopoVisibility = false;
     _this = this;
 }
 
@@ -144,7 +145,6 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
             var edges = new THREE.EdgesGeometry(obj.children[i].geometry);
             var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true }));
             //
-            console.log(line);
             self.model[0].add(obj.children[i]);
             self.model[1].add(line);
         }
@@ -157,6 +157,7 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
         self.view.camera.camera3D.layers.enable(objID);
         self.model[0].updateMatrixWorld();
         self.model[0].name = 'bati3D_faces';
+        self.model[0].visible = false;
         self.view.scene.add(self.model[0]);
         var linesID = self.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
         self.model[1].traverse(lines => lines.layers.set(linesID));
@@ -164,7 +165,7 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
         self.model[1].updateMatrixWorld();
         self.model[1].name = 'bati3D_lines';
         self.view.scene.add(self.model[1]);
-        self.model[1].visible = false; 
+        self.model[1].visible = false;
         self.view.notifyChange(true);
         console.log('bati3D Loaded');
     }
@@ -180,10 +181,13 @@ ModelLoader.prototype.loadBati3D = function loadBati3D() {
 };
 
 ModelLoader.prototype._setVisibility = function _setVisibility(self, v) {
-    
-    self.scene.getObjectByName('bati3D_faces').visible = v;
-    self.scene.getObjectByName('bati3D_lines').visible = v;
-    self.notifyChange(true);
+    var bati3D_faces = self.scene.getObjectByName('bati3D_faces');
+    var bati3D_lines = self.scene.getObjectByName('bati3D_lines');
+    if (bati3D_faces != undefined && bati3D_lines != undefined) {
+        self.scene.getObjectByName('bati3D_faces').visible = v;
+        self.scene.getObjectByName('bati3D_lines').visible = v;
+        self.notifyChange(true);
+    }
 };
 
 function colorBuildings(properties) {
@@ -252,7 +256,7 @@ ModelLoader.prototype.traverseElement = function traverseElement(element, calleb
 function calleback(group) {
     var mesh;
     var i;
-    /* for (i = 0; i < group.children.length; i++) {
+    for (i = 0; i < group.children.length; i++) {
         mesh = group.children[i];
         // change couleur toit
         if (mesh.name == 'roof_faces') {
@@ -263,8 +267,6 @@ function calleback(group) {
             mesh.material.needsUpdate = true;
         }
     }
-    */
-    group.visible = true;
 }
 
 export default ModelLoader;
