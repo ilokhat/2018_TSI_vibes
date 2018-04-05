@@ -734,6 +734,7 @@ Symbolizer.prototype._changeCoordinates = function changeCoordinates(vectCoord) 
         this.obj[i].updateMatrixWorld();
         this.edges[i].updateMatrixWorld();
     }
+    this.view.controls.setCameraTargetPosition(this.obj[0].position, false);
     this.view.notifyChange(true);
 };
 
