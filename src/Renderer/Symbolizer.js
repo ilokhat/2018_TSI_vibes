@@ -566,6 +566,8 @@ Symbolizer.prototype.initGui = function addToGUI() {
             this._addShininess(folder, j);
             this._addTexture(folder, j);
         }
+        var lightFolder = parentFolder.addFolder('Light');
+        this._addColorLight(lightFolder);
     }
     else {
         this.initGuiAll();
@@ -617,10 +619,14 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
 };
 
 Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
+    var prevValueX = 0;
+    var prevValueY = 0;
+    var prevValueZ = 0;
     folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 0.1).name('MovecoordX').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-            this.obj[i].translateX(value);
-            this.edges[i].translateX(value);
+            this.obj[i].translateX(value - prevValueX);
+            this.edges[i].translateX(value - prevValueX);
+            prevValueX = value;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
         }
@@ -628,8 +634,9 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
     });
     folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('MovecoordY').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-            this.obj[i].translateZ(-value);
-            this.edges[i].translateZ(-value);
+            this.obj[i].translateZ(value - prevValueY);
+            this.edges[i].translateZ(value - prevValueY);
+            prevValueY = value;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
         }
@@ -637,8 +644,9 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
     });
     folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('MovecoordZ').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
-            this.obj[i].translateY(value);
-            this.edges[i].translateY(value);
+            this.obj[i].translateY(value - prevValueZ);
+            this.edges[i].translateY(value - prevValueZ);
+            prevValueZ = value;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
         }
