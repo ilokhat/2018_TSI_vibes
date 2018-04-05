@@ -207,6 +207,8 @@ function acceptFeature(properties) {
 }
 
 ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
+    console.log('coucou');
+    
     var self = this;
     var a = this.view.addLayer({
         type: 'geometry',

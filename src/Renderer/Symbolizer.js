@@ -395,7 +395,9 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
         });
     }
     var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
-    FILE.saveAs(blob, this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4).concat('.vibes'));
+    console.log(this.obj[0]);
+    // model[0].name.split('_')[0]
+    FILE.saveAs(blob, this.obj[0].name.concat('.vibes'));
 };
 
 Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
