@@ -71,13 +71,7 @@ globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function 
         document.getElementById('result').innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + ", Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
     }) 
     // globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
-    loader.loadBDTopo();
+   // loader.loadBDTopo();
 });
-
-function loadFileException(message) {
-    this.message = message;
-    this.name = "loadFileException";
- }
-
-var loader2 = new itowns.ModelLoader(globeView);
-loader2.loadBati3D();
+//var loader2 = new itowns.ModelLoader(globeView);
+ loader.loadBati3D();

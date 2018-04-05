@@ -33,18 +33,17 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
 var showBDTopo = (parent) => { parent.visible = true; };
 var hideBDTopo = (parent) => { parent.visible = false; };
 
-LayerManager.prototype.initListener = function initListener() {
-    // bati3D visibility
+function createBati3dBtn() {
     _this.bati3dBtn = _this.menu.gui.add({ bati3D: () => {
         var bati3D_faces = _this.view.scene.getObjectByName('bati3D_faces');
         var bati3D_lines = _this.view.scene.getObjectByName('bati3D_lines');
         if (bati3D_faces != undefined && bati3D_lines != undefined) {
-            if (this.loader.checked) {
-                this.loader._setVisibility(this.view, false);
-                this.loader.checked = false;
+            if (_this.loader.checked) {
+                _this.loader._setVisibility(_this.view, false);
+                _this.loader.checked = false;
             } else {
-                this.loader._setVisibility(this.view, true);
-                this.loader.checked = true;
+                _this.loader._setVisibility(_this.view, true);
+                _this.loader.checked = true;
                 var model = [bati3D_faces, bati3D_lines];
                 _this.handleLayer(model);
                 _this.menu.gui.remove(_this.bati3dBtn);
@@ -53,6 +52,10 @@ LayerManager.prototype.initListener = function initListener() {
         }   
     },
     }, 'bati3D').name('bati3D');
+}
+LayerManager.prototype.initListener = function initListener() {
+    // bati3D visibility
+    createBati3dBtn();
     var showBDTopo = (parent) => { parent.visible = true; };
     var hideBDTopo = (parent) => { parent.visible = false; };
     // BDTopo visibility 
@@ -167,6 +170,7 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
         _this.listControllers = [];
         // Actually remove the model from the scene
         _this.listLayers.forEach((layer) => {
+
             if (layer == 'BDTopo') {
                 this.loader.ForBuildings(hideBDTopo);
                 _this.loader.bdTopoVisibility = false;
@@ -185,6 +189,8 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                     }   
                 },
                 }, 'bdTopo').name('bdTopo');
+            } else if (layer[0].name === 'bati3D_faces' || layer[0].name === 'bati3D_lines') {
+               createBati3dBtn();               
             } else {
                 _this.view.scene.remove(layer[0]);
                 _this.view.scene.remove(layer[1]);

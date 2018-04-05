@@ -207,8 +207,10 @@ function acceptFeature(properties) {
 }
 
 ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
-    var self = _this;
-    var a = _this.view.addLayer({
+    console.log('coucou');
+    
+    var self = this;
+    var a = this.view.addLayer({
         type: 'geometry',
         update: FeatureProcessing.update, // fichier modifier à revoir !!! L50
         convert: Feature2MeshStyle.convert({
