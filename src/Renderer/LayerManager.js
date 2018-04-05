@@ -55,6 +55,7 @@ LayerManager.prototype._readFile = function readFile(file) {
         reader.addEventListener('load', () => {
             // Load object
             _this.loader.loadOBJ(reader.result, _this.coord, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale, _this.handleLayer, _this.menu);
+            _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: _this.coord.longitude(), latitude: _this.coord.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
         }, false);
         reader.readAsDataURL(file);
         return 0;
@@ -68,16 +69,17 @@ LayerManager.prototype._readFile = function readFile(file) {
                 var coordX = json.coordX;
                 var coordY = json.coordY;
                 var coordZ = json.coordZ;
-                _this.rotateX = Math.PI * json.rotateX;
-                _this.rotateY = Math.PI * json.rotateY;
-                _this.rotateZ = Math.PI * json.rotateZ;
+                _this.rotateX = json.rotateX + this.rotateX;
+                _this.rotateY = json.rotateY + this.rotateY;
+                _this.rotateZ = json.rotateZ + this.rotateZ;
                 _this.scale = json.scale;
                 // Moving object
                 var crs = _this.coord.crs;
                 var vectCoord = new THREE.Vector3().set(coordX, coordY, coordZ);
                 _this.coord.set('EPSG:4978', vectCoord);
-                _this.coord.as(crs);
-                _this.loader._loadModel(layer[0], layer[1], _this.coord, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
+                var coordCRS = _this.coord.as(crs);
+                _this.loader._loadModel(layer[0], layer[1], coordCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
+                _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: coordCRS.longitude(), latitude: coordCRS.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
             });
         });
         reader.readAsText(file);

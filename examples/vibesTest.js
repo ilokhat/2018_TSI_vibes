@@ -65,7 +65,8 @@ window.onload = () => manager.initListener();
 
 // Listen for globe full initialisation event
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
-    globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
+    globeView.controls.setOrbitalPosition({ heading: 30, tilt: 30 });
+    globeView.controls.setZoom(13, true);
     document.getElementById('viewerDiv').addEventListener('mousemove', function() { 
         document.getElementById('result').innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + ", Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
     }) 
