@@ -654,6 +654,31 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
     });
 };
 
+
+Symbolizer.prototype._addMoveLight = function addMoveLight(folder) {
+    var prevValueX = 0;
+    var prevValueY = 0;
+    var prevValueZ = 0;
+    folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 0.1).name('MovecoordX').onChange((value) => {
+        this.light.position.x += value - prevValueX;
+        prevValueX = value;
+        this.light.updateMatrixWorld();
+        this.view.notifyChange(true);
+    });
+    folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('MovecoordY').onChange((value) => {
+        this.light.position.y += value - prevValueY;
+        prevValueY = value;
+        this.light.updateMatrixWorld();
+        this.view.notifyChange(true);
+    });
+    folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('MovecoordZ').onChange((value) => {
+        this.light.position.z += value - prevValueZ;
+        prevValueZ = value;
+        this.light.updateMatrixWorld();
+        this.view.notifyChange(true);
+    });
+};
+
 Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     var initialRotateX = this.obj[0].rotation.x;
     var initialRotateY = this.obj[0].rotation.y;
@@ -894,6 +919,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addShininessAll(facesFolder);
     var lightFolder = folder.addFolder('Light');
     this._addColorLight(lightFolder);
+    this._addMoveLight(lightFolder);
 };
 
 Symbolizer.prototype._addColorLight = function addColorLight(folder) {
