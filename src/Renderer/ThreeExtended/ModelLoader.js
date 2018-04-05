@@ -207,10 +207,10 @@ function acceptFeature(properties) {
 }
 
 ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
-    var self = this;
-    var a = this.view.addLayer({
+    var self = _this;
+    var a = _this.view.addLayer({
         type: 'geometry',
-        update: FeatureProcessing.update,
+        update: FeatureProcessing.update, // fichier modifier à revoir !!! L50
         convert: Feature2MeshStyle.convert({
             color: colorBuildings,
             altitude: altitudeBuildings,
@@ -235,10 +235,11 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
 
 ModelLoader.prototype.ForBuildings = function ForBuildings(calleback) {
     // For all globe tile meshes we look for tile at level 14 on which building meshes are attached.
-    for (var i = 0; i < this.view.wgs84TileLayer.level0Nodes.length; ++i) {
-        this.view.wgs84TileLayer.level0Nodes[i].traverse(element => this.traverseElement(element, calleback));
+    var a = element => _this.traverseElement(element, calleback);
+    for (var i = 0; i < _this.view.wgs84TileLayer.level0Nodes.length; ++i) {
+        _this.view.wgs84TileLayer.level0Nodes[i].traverse(a);
     }
-    this.view.notifyChange(true);
+    _this.view.notifyChange(true);
 };
 
 ModelLoader.prototype.traverseElement = function traverseElement(element, calleback) {

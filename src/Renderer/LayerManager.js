@@ -260,16 +260,21 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         // Merge elements of the list as one group
         var listObj = [];
         var listEdge = [];
+        var bdTopo;
         _this.listLayers.forEach((layer) => {
-            listObj.push(layer[0]);
-            listEdge.push(layer[1]);
+            if (layer != 'BDTopo' && layer.length >= 2) {
+                listObj.push(layer[0]);
+                listEdge.push(layer[1]);
+            } else if (layer == 'BDTopo') {
+                bdTopo = _this.loader.ForBuildings;
+            }
+            console.log(layer);
         });
         // Call Symbolizer
         _this.nbSymbolizer++;
        // console.log('list Edge', listEdge);
-        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, _this.menu, _this.nbSymbolizer);
+        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer);
         _this.symbolizerInit = symbolizer;
-       
         // Open symbolizer with 'stylize parts'
         if (complex) {
             symbolizer.initGui();
@@ -335,7 +340,7 @@ function loadFileException(message) {
 }
 
 LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
-    if (_this.listLayers.length == 1) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length == 2) {
         if ((key.key == 'a') || (key.key == '4')) {
             _this._xmoins(-10);
         }
@@ -358,7 +363,7 @@ LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
 };
 
 LayerManager.prototype._xplus = function xplus(a) {
-    if (_this.listLayers.length == 1) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length == 2) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateX(a);
@@ -370,7 +375,7 @@ LayerManager.prototype._xplus = function xplus(a) {
 };
 
 LayerManager.prototype._xmoins = function _xmoins(a) {
-    if (_this.listLayers.length == 1) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length == 2) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateX(a);
@@ -383,7 +388,7 @@ LayerManager.prototype._xmoins = function _xmoins(a) {
 };
 
 LayerManager.prototype._yplus = function yplus(a) {
-    if (_this.listLayers.length == 1) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length == 2) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateY(a);
@@ -396,7 +401,7 @@ LayerManager.prototype._yplus = function yplus(a) {
 };
 
 LayerManager.prototype._ymoins = function _ymoins(a) {
-    if (_this.listLayers.length == 1) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length == 2) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateY(a);
@@ -409,7 +414,7 @@ LayerManager.prototype._ymoins = function _ymoins(a) {
 };
 
 LayerManager.prototype._zplus = function zplus(a) {
-    if (_this.listLayers.length == 1) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length == 2) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateZ(a);
@@ -422,7 +427,7 @@ LayerManager.prototype._zplus = function zplus(a) {
 };
 
 LayerManager.prototype._zmoins = function _zmoins(a) {
-    if (_this.listLayers.length == 1) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length == 2) {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateZ(a);
