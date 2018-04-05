@@ -568,6 +568,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
         }
         var lightFolder = parentFolder.addFolder('Light');
         this._addColorLight(lightFolder);
+        this._addMoveLight(lightFolder);
     }
     else {
         this.initGuiAll();
@@ -607,7 +608,7 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
 
 Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
     var initialScale = this.obj[0].scale.x;
-    folder.add({ scale: initialScale }, 'scale', 0.1, 1000, 0.01).name('scale').onChange((value) => {
+    folder.add({ scale: initialScale }, 'scale', 0.1, 1000, 0.01).name('Scale').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             this.obj[i].scale.set(value, value, value);
             this.edges[i].scale.set(value, value, value);
@@ -622,7 +623,7 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
     var prevValueX = 0;
     var prevValueY = 0;
     var prevValueZ = 0;
-    folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 0.1).name('MovecoordX').onChange((value) => {
+    folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 0.1).name('Translation X').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             this.obj[i].translateX(value - prevValueX);
             this.edges[i].translateX(value - prevValueX);
@@ -632,7 +633,7 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
         }
         this.view.notifyChange(true);
     });
-    folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('MovecoordY').onChange((value) => {
+    folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('Translation Y').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             this.obj[i].translateZ(value - prevValueY);
             this.edges[i].translateZ(value - prevValueY);
@@ -642,7 +643,7 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
         }
         this.view.notifyChange(true);
     });
-    folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('MovecoordZ').onChange((value) => {
+    folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('Translation Z').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             this.obj[i].translateY(value - prevValueZ);
             this.edges[i].translateY(value - prevValueZ);
@@ -659,19 +660,19 @@ Symbolizer.prototype._addMoveLight = function addMoveLight(folder) {
     var prevValueX = 0;
     var prevValueY = 0;
     var prevValueZ = 0;
-    folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 0.1).name('MovecoordX').onChange((value) => {
+    folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 0.1).name('Translation X').onChange((value) => {
         this.light.position.x += value - prevValueX;
         prevValueX = value;
         this.light.updateMatrixWorld();
         this.view.notifyChange(true);
     });
-    folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('MovecoordY').onChange((value) => {
+    folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('Translation Y').onChange((value) => {
         this.light.position.y += value - prevValueY;
         prevValueY = value;
         this.light.updateMatrixWorld();
         this.view.notifyChange(true);
     });
-    folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('MovecoordZ').onChange((value) => {
+    folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('Translation Z').onChange((value) => {
         this.light.position.z += value - prevValueZ;
         prevValueZ = value;
         this.light.updateMatrixWorld();
@@ -686,7 +687,7 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     var prevValueX = 0;
     var prevValueY = 0;
     var prevValueZ = 0;
-    folder.add({ rotationX: initialRotateX }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('rotationX').onChange((value) => {
+    folder.add({ rotationX: initialRotateX }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('Rotation X').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             this.obj[i].rotateX(value - prevValueX);
             this.edges[i].rotateX(value - prevValueX);
@@ -696,7 +697,7 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
         }
         this.view.notifyChange(true);
     });
-    folder.add({ rotationY: initialRotateY }, 'rotationY', -Math.PI, Math.PI, Math.PI / 100).name('rotationY').onChange((value) => {
+    folder.add({ rotationY: initialRotateY }, 'rotationY', -Math.PI, Math.PI, Math.PI / 100).name('Rotation Y').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             this.obj[i].rotateY(value - prevValueY);
             this.edges[i].rotateY(value - prevValueY);
@@ -706,7 +707,7 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
         }
         this.view.notifyChange(true);
     });
-    folder.add({ rotationZ: initialRotateZ }, 'rotationZ', -Math.PI, Math.PI, Math.PI / 100).name('rotationZ').onChange((value) => {
+    folder.add({ rotationZ: initialRotateZ }, 'rotationZ', -Math.PI, Math.PI, Math.PI / 100).name('Rotation Z').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
             this.obj[i].rotateZ(value - prevValueZ);
             this.edges[i].rotateZ(value - prevValueZ);
@@ -739,21 +740,21 @@ Symbolizer.prototype._addPositionAll = function addPositionAll(folder) {
     let Y = initialY;
     let Z = initialZ;
     var vectCoord = new THREE.Vector3();
-    folder.add({ longitude: initialX }, 'longitude').name('coordX').onChange((value) => {
+    folder.add({ longitude: initialX }, 'longitude').name('Position X').onChange((value) => {
         X = value;
         if (Y != initialY || Z != initialZ) {
             vectCoord.set(X, Y, Z);
             this._changeCoordinates(vectCoord);
         }
     });
-    folder.add({ latitude: initialY }, 'latitude').name('coordY').onChange((value) => {
+    folder.add({ latitude: initialY }, 'latitude').name('Position Y').onChange((value) => {
         Y = value;
         if (X != initialX || Z != initialZ) {
             vectCoord.set(X, Y, Z);
             this._changeCoordinates(vectCoord);
         }
     });
-    folder.add({ altitude: initialZ }, 'altitude').name('coordZ').onChange((value) => {
+    folder.add({ altitude: initialZ }, 'altitude').name('Position Z').onChange((value) => {
         Z = value;
         if (Y != initialY || X != initialX) {
             vectCoord.set(X, Y, Z);
