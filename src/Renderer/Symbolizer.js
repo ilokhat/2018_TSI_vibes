@@ -31,6 +31,9 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
         folder.__folders.Edges.__controllers[0].setValue(style.edges.color);
         folder.__folders.Edges.__controllers[1].setValue(style.edges.opacity);
         folder.__folders.Edges.__controllers[2].setValue(style.edges.width);
+        console.log(style.edges.opacity);
+        console.log(style.edges.color);
+        console.log(style.edges.width);
         for (k in folder.__folders.Faces.__folders) {
             if (Object.prototype.hasOwnProperty.call(folder.__folders.Faces.__folders, k)) {
                 folder.__folders.Faces.__folders[k].__controllers[0].setValue(style.faces[count].opacity);
@@ -94,16 +97,17 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
             }
         }
     }
+    /*
     else {
         // Apply default style
         for (i = 0; i < this.edges.length; i++) {
             for (j = 0; j < this.edges[i].children.length; j++) {
-                this._changeOpacityEdge(1, i, j);
-                this._changeColorEdge('#000000', i, j);
-                this._changeWidthEdge(1, i, j);
+                this._changeOpacityEdge(this.edges[i].children[j].material.opacity, i, j);
+                this._changeColorEdge(this.edges[i].children[j].material.color, i, j);
+                this._changeWidthEdge(this.edges[i].children[j].material.linewidth, i, j);
             }
         }
-        var color = getRandomColor();
+        /* var color = getRandomColor();
         for (i = 0; i < this.obj.length; i++) {
             for (j = 0; j < this.obj[i].children.length; j++) {
                 this._changeOpacity(1, i, j);
@@ -114,7 +118,9 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                 // No texture
             }
         }
+        
     }
+    */
 };
 
 // Callback functions (concrete stylization)
