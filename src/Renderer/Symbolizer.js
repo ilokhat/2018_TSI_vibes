@@ -33,9 +33,6 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
         folder.__folders.Edges.__controllers[0].setValue(style.edges.color);
         folder.__folders.Edges.__controllers[1].setValue(style.edges.opacity);
         folder.__folders.Edges.__controllers[2].setValue(style.edges.width);
-        console.log(style.edges.opacity);
-        console.log(style.edges.color);
-        console.log(style.edges.width);
         for (k in folder.__folders.Faces.__folders) {
             if (Object.prototype.hasOwnProperty.call(folder.__folders.Faces.__folders, k)) {
                 folder.__folders.Faces.__folders[k].__controllers[0].setValue(style.faces[count].opacity);
