@@ -99,7 +99,9 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
     }
     /*
     else {
-        // Apply default style
+        // Apply default style , we deleted this section in order to 
+        // Update GUI with current style when re-opening the Symbolizer 
+        // (instead of loading default style)
         for (i = 0; i < this.edges.length; i++) {
             for (j = 0; j < this.edges[i].children.length; j++) {
                 // this._changeOpacityEdge(1, i, j);
