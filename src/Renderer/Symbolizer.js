@@ -589,6 +589,9 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
     var initialRotateY = this.obj[0].rotation.y;
     var initialRotateZ = this.obj[0].rotation.z;
     var initialScale = this.obj[0].scale.x;
+    var initialPositionX = this.obj[0].position.x;
+    var initialPositionY = this.obj[0].position.y;
+    var initialPositionZ = this.obj[0].position.z;
     // Add a button to reset all initial parameters
     folder.add({ resetPosition: () => {
         // Reset GUI
@@ -596,6 +599,12 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
         folder.__controllers[2].setValue(initialRotateY);
         folder.__controllers[3].setValue(initialRotateZ);
         folder.__controllers[4].setValue(initialScale);
+        folder.__controllers[5].setValue(initialPositionX);
+        folder.__controllers[6].setValue(initialPositionY);
+        folder.__controllers[7].setValue(initialPositionZ);
+        folder.__controllers[8].setValue(initialPositionX);
+        folder.__controllers[9].setValue(initialPositionY);
+        folder.__controllers[10].setValue(initialPositionZ);
         // Reset parameters
         for (var i = 0; i < this.obj.length; i++) {
             this.obj[i].rotation.x = initialRotateX;
@@ -606,6 +615,12 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
             this.edges[i].rotation.z = initialRotateZ;
             this.obj[i].scale.set(initialScale, initialScale, initialScale);
             this.edges[i].scale.set(initialScale, initialScale, initialScale);
+            this.obj[i].position.x = initialPositionX;
+            this.edges[i].position.x = initialPositionX;
+            this.obj[i].position.y = initialPositionY;
+            this.edges[i].position.y = initialPositionY;
+            this.obj[i].position.z = initialPositionZ;
+            this.edges[i].position.z = initialPositionZ;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
         }

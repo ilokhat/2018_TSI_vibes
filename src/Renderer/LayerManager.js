@@ -143,6 +143,11 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
             }
         }
     });
+    _this.layerFolder.add({ resetCam: () => {
+        var coordCRS = _this.coord.as('EPSG:4326');
+        _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: coordCRS.longitude(), latitude: coordCRS.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
+    },
+    }, 'resetCam').name('Reset camera');
 };
 
 LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
