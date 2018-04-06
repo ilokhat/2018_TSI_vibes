@@ -4,9 +4,6 @@ RED='\033[0;31m'
 NC='\033[0m'
 GREEN='\033[0;32m'
 LPURPLE='\033[1;35m'
-echo -e "${BLUE}Clonage${NC} du ${GREEN}dépot ${RED}arnaudgregoire/vibes${NC} ..."
-git clone https://github.com/arnaudgregoire/vibes
-cd vibes
 echo -e "${LPURPLE}Copie${NC} des ${BLUE}fichiers ${RED}arnaudgregoire/vibes${NC} sur ${RED}itownsResearch/2018_TSI_vibes${NC} ..."
 git push -f https://github.com/itownsResearch/2018_TSI_vibes master:master
 cd ..
