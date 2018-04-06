@@ -1074,7 +1074,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
 };
 
 Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
-    if (this.obj.length > 0) {
+    if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
         // Get initial values
         var initialRotateX = this.obj[0].rotation.x;
         var initialRotateY = this.obj[0].rotation.y;
@@ -1089,16 +1089,18 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
             folder.__controllers[4].setValue(initialScale);
             // Reset parameters
             for (var i = 0; i < this.obj.length; i++) {
-                this.obj[i].rotation.x = initialRotateX;
-                this.edges[i].rotation.x = initialRotateX;
-                this.obj[i].rotation.y = initialRotateY;
-                this.edges[i].rotation.y = initialRotateY;
-                this.obj[i].rotation.z = initialRotateZ;
-                this.edges[i].rotation.z = initialRotateZ;
-                this.obj[i].scale.set(initialScale, initialScale, initialScale);
-                this.edges[i].scale.set(initialScale, initialScale, initialScale);
-                this.obj[i].updateMatrixWorld();
-                this.edges[i].updateMatrixWorld();
+                if (this.obj[i].name != 'bati3D_faces') {
+                    this.obj[i].rotation.x = initialRotateX;
+                    this.edges[i].rotation.x = initialRotateX;
+                    this.obj[i].rotation.y = initialRotateY;
+                    this.edges[i].rotation.y = initialRotateY;
+                    this.obj[i].rotation.z = initialRotateZ;
+                    this.edges[i].rotation.z = initialRotateZ;
+                    this.obj[i].scale.set(initialScale, initialScale, initialScale);
+                    this.edges[i].scale.set(initialScale, initialScale, initialScale);
+                    this.obj[i].updateMatrixWorld();
+                    this.edges[i].updateMatrixWorld();
+                }
             }
             this.view.notifyChange(true);
         },
@@ -1107,14 +1109,16 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
 };
 
 Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
-    if (this.obj.length > 0) {
+    if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
         var initialScale = this.obj[0].scale.x;
         folder.add({ scale: initialScale }, 'scale', 0.1, 1000, 0.01).name('scale').onChange((value) => {
             for (var i = 0; i < this.obj.length; i++) {
-                this.obj[i].scale.set(value, value, value);
-                this.edges[i].scale.set(value, value, value);
-                this.obj[i].updateMatrixWorld();
-                this.edges[i].updateMatrixWorld();
+                if (this.obj[i].name != 'bati3D_faces') {
+                    this.obj[i].scale.set(value, value, value);
+                    this.edges[i].scale.set(value, value, value);
+                    this.obj[i].updateMatrixWorld();
+                    this.edges[i].updateMatrixWorld();
+                }
             }
             this.view.notifyChange(true);
         });
@@ -1122,7 +1126,7 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
 };
 
 Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
-    if (this.obj.length > 0) {
+    if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
         var initialRotateX = this.obj[0].rotation.x;
         var initialRotateY = this.obj[0].rotation.y;
         var initialRotateZ = this.obj[0].rotation.z;
@@ -1131,31 +1135,37 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
         var prevValueZ = 0;
         folder.add({ rotationX: initialRotateX }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('rotationX').onChange((value) => {
             for (var i = 0; i < this.obj.length; i++) {
-                this.obj[i].rotateX(value - prevValueX);
-                this.edges[i].rotateX(value - prevValueX);
-                prevValueX = value;
-                this.obj[i].updateMatrixWorld();
-                this.edges[i].updateMatrixWorld();
+                if (this.obj[i].name != 'bati3D_faces') {
+                    this.obj[i].rotateX(value - prevValueX);
+                    this.edges[i].rotateX(value - prevValueX);
+                    prevValueX = value;
+                    this.obj[i].updateMatrixWorld();
+                    this.edges[i].updateMatrixWorld();
+                }
             }
             this.view.notifyChange(true);
         });
         folder.add({ rotationY: initialRotateY }, 'rotationY', -Math.PI, Math.PI, Math.PI / 100).name('rotationY').onChange((value) => {
             for (var i = 0; i < this.obj.length; i++) {
-                this.obj[i].rotateY(value - prevValueY);
-                this.edges[i].rotateY(value - prevValueY);
-                prevValueY = value;
-                this.obj[i].updateMatrixWorld();
-                this.edges[i].updateMatrixWorld();
+                if (this.obj[i].name != 'bati3D_faces') {
+                    this.obj[i].rotateY(value - prevValueY);
+                    this.edges[i].rotateY(value - prevValueY);
+                    prevValueY = value;
+                    this.obj[i].updateMatrixWorld();
+                    this.edges[i].updateMatrixWorld();
+                }
             }
             this.view.notifyChange(true);
         });
         folder.add({ rotationZ: initialRotateZ }, 'rotationZ', -Math.PI, Math.PI, Math.PI / 100).name('rotationZ').onChange((value) => {
             for (var i = 0; i < this.obj.length; i++) {
-                this.obj[i].rotateZ(value - prevValueZ);
-                this.edges[i].rotateZ(value - prevValueZ);
-                prevValueZ = value;
-                this.obj[i].updateMatrixWorld();
-                this.edges[i].updateMatrixWorld();
+                if (this.obj[i].name != 'bati3D_faces') {
+                    this.obj[i].rotateZ(value - prevValueZ);
+                    this.edges[i].rotateZ(value - prevValueZ);
+                    prevValueZ = value;
+                    this.obj[i].updateMatrixWorld();
+                    this.edges[i].updateMatrixWorld();
+                }
             }
             this.view.notifyChange(true);
         });
