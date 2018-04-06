@@ -38,7 +38,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
             if (Object.prototype.hasOwnProperty.call(folder.__folders.Faces.__folders, k)) {
                 folder.__folders.Faces.__folders[k].__controllers[0].setValue(style.faces[count].opacity);
                 folder.__folders.Faces.__folders[k].__controllers[1].setValue(style.faces[count].color);
-                folder.__folders.Faces.__folders[k].__controllers[2].setValue(style.faces[count].emmissive);
+                folder.__folders.Faces.__folders[k].__controllers[2].setValue(style.faces[count].emissive);
                 folder.__folders.Faces.__folders[k].__controllers[3].setValue(style.faces[count].specular);
                 folder.__folders.Faces.__folders[k].__controllers[4].setValue(style.faces[count].shininess);
             }
@@ -73,22 +73,24 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                 }
             }
         }
+        var test = 0;
         if (this.bdTopo) {
             h = 0;
             while (h < style.faces.length) {
+                console.log(test++);
                 // edges' bdTopo
                 this._changeOpacityEdge(style.edges.opacity, -10, 0);
                 this._changeColorEdge(style.edges.color, -10, 0);
                 this._changeWidthEdge(style.edges.width, -10, 0);
                 // faces' bdTopo
-                if (style.faces.name == 'wall_faces') {
+                if (style.faces[h].name == 'wall_faces') {
                     this._changeOpacity(style.faces[h].opacity, -10, 0);
                     this._changeColor(style.faces[h].color, -10, 0);
                     this._changeEmissive(style.faces[h].emissive, -10, 0);
                     this._changeSpecular(style.faces[h].specular, -10, 0);
                     this._changeShininess(style.faces[h].shininess, -10, 0);
                     if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, -10, 0, folder.__folders.Faces);
-                } else if (style.faces.name == 'roof_faces') {
+                } else if (style.faces[h].name == 'roof_faces') {
                     this._changeOpacity(style.faces[h].opacity, -10, 1);
                     this._changeColor(style.faces[h].color, -10, 1);
                     this._changeEmissive(style.faces[h].emissive, -10, 1);
@@ -96,6 +98,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                     this._changeShininess(style.faces[h].shininess, -10, 1);
                     if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, -10, 1, folder.__folders.Faces);
                 }
+                h++;
             }
         }
     }
@@ -106,7 +109,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
         folder.__folders.Edges.__controllers[2].setValue(style.edges.width);
         folder.__folders.Faces.__controllers[0].setValue(style.faces[0].opacity);
         folder.__folders.Faces.__controllers[1].setValue(style.faces[0].color);
-        folder.__folders.Faces.__controllers[2].setValue(style.faces[0].emmissive);
+        folder.__folders.Faces.__controllers[2].setValue(style.faces[0].emissive);
         folder.__folders.Faces.__controllers[3].setValue(style.faces[0].specular);
         folder.__folders.Faces.__controllers[4].setValue(style.faces[0].shininess);
         // Apply given style to all children
@@ -299,6 +302,7 @@ Symbolizer.prototype._changeEmissive = function changeEmissive(value, i, j) {
         this.bdTopoStyle[name].emissive = value;
         this.bdTopo(f);
     }
+    console.log('_changeEmissive');
 };
 
 Symbolizer.prototype._changeSpecular = function changeSpecular(value, i, j) {
@@ -504,7 +508,6 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, i, fo
             var f2 = (parent) => {
                 for (var j = 0; j < parent.children.length; j++) {
                     if (parent.children[j].name == 'wall_faces' || parent.children[j].name == 'roof_faces') {
-                        
                         parent.children[j].material.map = null;
                         parent.children[j].material.needsUpdate = true;
                     }
@@ -697,20 +700,115 @@ Symbolizer.prototype._changeTextureRepetition = function _changeTextureRepetitio
 
 Symbolizer.prototype._saveVibes = function saveVibes() {
     // Initiate stylesheet with edge style and an empty list for face style
-    var vibes = {
-        edges: {
-            opacity: this.edges[0].children[0].material.opacity,
-            color: this.edges[0].children[0].material.color,
-            width: this.edges[0].children[0].material.linewidth,
-        },
-        faces: [] };
-    // Iteration over the children of each object (they all have the same)
-    for (var i = 0; i < this.obj[0].children.length; i++) {
+    var vibes;
+    var name;
+    if (this.obj.length > 0) {
+        name = this.obj[0].name.split('_')[0];
+        vibes = {
+            edges: {
+                opacity: this.edges[0].children[0].material.opacity,
+                color: this.edges[0].children[0].material.color,
+                width: this.edges[0].children[0].material.linewidth,
+            },
+            faces: [],
+        };
+        // Iteration over the children of each object (they all have the same)
+        for (var i = 0; i < this.obj[0].children.length; i++) {
+            // Get the texture path
+            var textureUse = null;
+            // Checks if the mesh has a texture
+            if (this.obj[0].children[i].material.map != null) {
+                var textureUsetab = this.obj[0].children[i].material.map.image.src.split('/');
+                var j = 0;
+                while (j < textureUsetab.length && textureUsetab[j] != 'textures') j++;
+                textureUse = '.';
+                while (j < textureUsetab.length) {
+                    textureUse = textureUse.concat('/', textureUsetab[j]);
+                    j++;
+                }
+            }
+            // Push each face style in the list
+            vibes.faces.push({
+                name: this.obj[0].children[i].name,
+                opacity: this.obj[0].children[i].material.opacity,
+                color: '#'.concat(this.obj[0].children[i].material.color.getHexString()),
+                emissive: '#'.concat(this.obj[0].children[i].material.emissive.getHexString()),
+                specular: '#'.concat(this.obj[0].children[i].material.specular.getHexString()),
+                shininess: this.obj[0].children[i].material.shininess,
+                texture: textureUse,
+            });
+        }
+        if (this.bdTopo) {
+            vibes.faces.push({
+                name: 'wall_faces',
+                opacity: this.bdTopoStyle.wall_faces.opacity,
+                color: this.bdTopoStyle.wall_faces.color,
+                emissive: this.bdTopoStyle.wall_faces.emissive,
+                specular: this.bdTopoStyle.wall_faces.specular,
+                shininess: this.bdTopoStyle.wall_faces.shininess,
+                texture: this.bdTopoStyle.wall_faces.texture,
+            });
+            vibes.faces.push({
+                name: 'roof_faces',
+                opacity: this.bdTopoStyle.roof_faces.opacity,
+                color: this.bdTopoStyle.roof_faces.color,
+                emissive: this.bdTopoStyle.roof_faces.emissive,
+                specular: this.bdTopoStyle.roof_faces.specular,
+                shininess: this.bdTopoStyle.roof_faces.shininess,
+                texture: this.bdTopoStyle.roof_faces.texture,
+            });
+        }
+    } else if (this.bdTopo) {
+        name = 'bdTopo';
+        vibes = {
+            edges: {
+                opacity: this.bdTopoStyle.edges.opacity,
+                color: this.bdTopoStyle.edges.color,
+                width: this.bdTopoStyle.edges.width,
+            },
+            faces: [
+                {
+                    name: 'wall_faces',
+                    opacity: this.bdTopoStyle.wall_faces.opacity,
+                    color: this.bdTopoStyle.wall_faces.color,
+                    emissive: this.bdTopoStyle.wall_faces.emissive,
+                    specular: this.bdTopoStyle.wall_faces.specular,
+                    shininess: this.bdTopoStyle.wall_faces.shininess,
+                    texture: this.bdTopoStyle.wall_faces.texture,
+                }, {
+                    name: 'roof_faces',
+                    opacity: this.bdTopoStyle.roof_faces.opacity,
+                    color: this.bdTopoStyle.roof_faces.color,
+                    emissive: this.bdTopoStyle.roof_faces.emissive,
+                    specular: this.bdTopoStyle.roof_faces.specular,
+                    shininess: this.bdTopoStyle.roof_faces.shininess,
+                    texture: this.bdTopoStyle.roof_faces.texture,
+                },
+            ],
+        };
+    }
+    var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
+    // model[0].name.split('_')[0]
+    FILE.saveAs(blob, name.concat('_partie.vibes'));
+};
+
+Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
+    var vibes;
+    var name;
+    if (this.obj.length > 0) {
+        name = this.obj[0].name.split('_')[0];
+        vibes = {
+            edges: {
+                opacity: this.edges[0].children[0].material.opacity,
+                color: this.edges[0].children[0].material.color,
+                width: this.edges[0].children[0].material.linewidth,
+            },
+            faces: [] };
         // Get the texture path
         var textureUse = null;
         // Checks if the mesh has a texture
-        if (this.obj[0].children[i].material.map != null) {
-            var textureUsetab = this.obj[0].children[i].material.map.image.src.split('/');
+        if (this.obj[0].children[0].material.map != null) {
+            var textureUsetab = this.obj[0].children[0].material.map.image.src.split('/');
             var j = 0;
             while (j < textureUsetab.length && textureUsetab[j] != 'textures') j++;
             textureUse = '.';
@@ -719,54 +817,36 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
                 j++;
             }
         }
-        // Push each face style in the list
         vibes.faces.push({
-            name: this.obj[0].children[i].name,
-            opacity: this.obj[0].children[i].material.opacity,
-            color: '#'.concat(this.obj[0].children[i].material.color.getHexString()),
-            emissive: '#'.concat(this.obj[0].children[i].material.emissive.getHexString()),
-            specular: '#'.concat(this.obj[0].children[i].material.specular.getHexString()),
-            shininess: this.obj[0].children[i].material.shininess,
+            opacity: this.obj[0].children[0].material.opacity,
+            color: '#'.concat(this.obj[0].children[0].material.color.getHexString()),
+            emissive: '#'.concat(this.obj[0].children[0].material.emissive.getHexString()),
+            specular: '#'.concat(this.obj[0].children[0].material.specular.getHexString()),
+            shininess: this.obj[0].children[0].material.shininess,
             texture: textureUse,
         });
+    } else if (this.bdTopo) {
+        name = 'bdTopo';
+        vibes = {
+            edges: {
+                opacity: this.bdTopoStyle.edges.opacity,
+                color: this.bdTopoStyle.edges.color,
+                width: this.bdTopoStyle.edges.width,
+            },
+            faces: [
+                {
+                    opacity: this.bdTopoStyle.wall_faces.opacity,
+                    color: this.bdTopoStyle.wall_faces.color,
+                    emissive: this.bdTopoStyle.wall_faces.emissive,
+                    specular: this.bdTopoStyle.wall_faces.specular,
+                    shininess: this.bdTopoStyle.wall_faces.shininess,
+                    texture: this.bdTopoStyle.wall_faces.texture,
+                },
+            ],
+        };
     }
     var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
-    // model[0].name.split('_')[0]
-    FILE.saveAs(blob, this.obj[0].name.concat('.vibes'));
-};
-
-Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
-    var vibes = {
-        edges: {
-            opacity: this.edges[0].children[0].material.opacity,
-            color: this.edges[0].children[0].material.color,
-            width: this.edges[0].children[0].material.linewidth,
-        },
-        faces: [] };
-    // Get the texture path
-    var textureUse = null;
-    // Checks if the mesh has a texture
-    if (this.obj[0].children[0].material.map != null) {
-        var textureUsetab = this.obj[0].children[0].material.map.image.src.split('/');
-        var j = 0;
-        while (j < textureUsetab.length && textureUsetab[j] != 'textures') j++;
-        textureUse = '.';
-        while (j < textureUsetab.length) {
-            textureUse = textureUse.concat('/', textureUsetab[j]);
-            j++;
-        }
-    }
-    vibes.faces.push({
-        opacity: this.obj[0].children[0].material.opacity,
-        color: '#'.concat(this.obj[0].children[0].material.color.getHexString()),
-        emissive: '#'.concat(this.obj[0].children[0].material.emissive.getHexString()),
-        specular: '#'.concat(this.obj[0].children[0].material.specular.getHexString()),
-        shininess: this.obj[0].children[0].material.shininess,
-        texture: textureUse,
-
-    });
-    var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
-    FILE.saveAs(blob, this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4).concat('.vibes'));
+    FILE.saveAs(blob, name.concat('_globale.vibes'));
 };
 
 Symbolizer.prototype._readVibes = function readVibes(file, folder) {
@@ -937,7 +1017,7 @@ Symbolizer.prototype._addLoad = function addLoad(folder) {
         var button = document.createElement('input');
         button.setAttribute('type', 'file');
         button.addEventListener('change', () => this._readVibes(button.files[0], folder), false);
-        button.cick();
+        button.click();
     } }, 'load').name('Load style');
 };
 

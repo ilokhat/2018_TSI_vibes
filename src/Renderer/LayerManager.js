@@ -48,8 +48,7 @@ function createBati3dBtn() {
                 _this.handleLayer(model);
                 _this.menu.gui.remove(_this.bati3dBtn);
             }
-               
-        }   
+        }
     },
     }, 'bati3D').name('bati3D');
 }
@@ -146,7 +145,6 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
         _this.listControllers = [];
         // Actually remove the model from the scene
         _this.listLayers.forEach((layer) => {
-
             if (layer == 'BDTopo') {
                 this.loader.ForBuildings(hideBDTopo);
                 _this.loader.bdTopoVisibility = false;
@@ -161,12 +159,11 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                             _this.menu.gui.remove(_this.bdTopoBtn);
                             _this.handleBdTopo();
                         }
-                           
-                    }   
+                    }
                 },
                 }, 'bdTopo').name('bdTopo');
             } else if (layer[0].name === 'bati3D_faces' || layer[0].name === 'bati3D_lines') {
-               createBati3dBtn();               
+                createBati3dBtn();
             } else {
                 _this.view.scene.remove(layer[0]);
                 _this.view.scene.remove(layer[1]);

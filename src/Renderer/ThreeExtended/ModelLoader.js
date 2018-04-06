@@ -25,7 +25,7 @@ function ModelLoader(view) {
             color: '#ffffff',
             emissive: '#ffffff',
             specular: '#ffffff',
-            shininess: '#ffffff',
+            shininess: 30,
             textureRepetition: 1,
         },
         roof_faces: {
@@ -34,7 +34,7 @@ function ModelLoader(view) {
             color: '#ffffff',
             emissive: '#ffffff',
             specular: '#ffffff',
-            shininess: '#ffffff',
+            shininess: 30,
             textureRepetition: 1,
         },
         edges: {
@@ -232,9 +232,6 @@ function acceptFeature(properties) {
 }
 
 ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
-    console.log('coucou');
-    
-    var self = this;
     var a = this.view.addLayer({
         type: 'geometry',
         update: FeatureProcessingBDTopo.update, // fichier modifier à revoir !!! L50
@@ -259,6 +256,7 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
         },
     }, this.view.tileLayer);
     a.then(this.bDTopoLoaded = true);
+    // var self = this;
     // setTimeout(() => self.ForBuildings(calleback), 1000);
 };
 
@@ -282,7 +280,7 @@ ModelLoader.prototype.traverseElement = function traverseElement(element, calleb
         }
     }
 };
-
+/*
 function calleback(group) {
     var mesh;
     var i;
@@ -298,5 +296,6 @@ function calleback(group) {
         }
     }
 }
+*/
 
 export default ModelLoader;
