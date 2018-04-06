@@ -290,7 +290,6 @@ function coordinateToPolygonExtruded(coordinates, properties, options) {
     }
     // wall
     geometryWall.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    // geometryWall.addAttribute('color', new THREE.BufferAttribute(colors, 3, true));
     geometryWall.addAttribute('id', new THREE.BufferAttribute(ids, 1));
     geometryWall.addAttribute('zmin', new THREE.BufferAttribute(zmins, 1));
     geometryWall.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
@@ -300,7 +299,6 @@ function coordinateToPolygonExtruded(coordinates, properties, options) {
     resultWall.pos = pos;
     // roof
     geometryRoof.addAttribute('position', new THREE.BufferAttribute(new Float32Array(verticesRoof), 3));
-    // geometryRoof.addAttribute('color', new THREE.BufferAttribute(colors, 3, true));
     geometryRoof.addAttribute('id', new THREE.BufferAttribute(ids, 1));
     geometryRoof.addAttribute('zmin', new THREE.BufferAttribute(zmins, 1));
     geometryRoof.setIndex(new THREE.BufferAttribute(new Uint16Array(indicesRoof), 1));
@@ -351,16 +349,44 @@ function coordinatesToMesh(coordinates, properties, options) {
         case 'polygon': {
             if (options.extrude) {
                 meshes = coordinateToPolygonExtruded(coordinates, properties, options);
-                meshes[0].material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide, transparent: true, opacity: 1 });
+                // [resultWall, resultRoof, lineWall, lineRoof]
+                // wall
+                meshes[0].material = new THREE.MeshPhongMaterial({
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: options.style.wall_faces.opacity,
+                    color: options.style.wall_faces.color,
+                    emissive: options.style.wall_faces.emissive,
+                    specular: options.style.wall_faces.specular,
+                    shininess: options.style.wall_faces.shininess,
+                });
                 meshes[0].material.needsUpdate = true;
-                meshes[1].material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide, transparent: true, opacity: 1 });
+                // roof
+                meshes[1].material = new THREE.MeshPhongMaterial({
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: options.style.roof_faces.opacity,
+                    color: options.style.roof_faces.color,
+                    emissive: options.style.roof_faces.emissive,
+                    specular: options.style.roof_faces.specular,
+                    shininess: options.style.roof_faces.shininess,
+                });
                 meshes[1].material.needsUpdate = true;
-                /*
-                vertexColors = THREE.VertexColors;
-                meshes[0].material.color = new THREE.Color(0xffffff);
-                meshes[1].material.vertexColors = THREE.VertexColors;
-                meshes[1].material.color = new THREE.Color(0xffffff);
-                */
+                // edges
+                meshes[2].material = new THREE.LineBasicMaterial({
+                    color: options.style.edges.color,
+                    transparent: true,
+                    opacity: options.style.edges.opacity,
+                    linewidth: options.style.edges.width,
+                });
+                meshes[2].material.needsUpdate = true;
+                meshes[3].material = new THREE.LineBasicMaterial({
+                    color: options.style.edges.color,
+                    transparent: true,
+                    opacity: options.style.edges.opacity,
+                    linewidth: options.style.edges.width,
+                });
+                meshes[3].material.needsUpdate = true;
                 return meshes;
             }
             else {
@@ -375,21 +401,6 @@ function coordinatesToMesh(coordinates, properties, options) {
     mesh.material.vertexColors = THREE.VertexColors;
     mesh.material.color = new THREE.Color(0xffffff);
     return mesh;
-}
-
-function featureToThree(feature, options) {
-    const mesh = coordinatesToMesh(feature.geometry, feature.properties, options);
-    if (mesh instanceof THREE.Mesh) {
-        mesh.properties = feature.properties;
-        return mesh;
-    } else if (mesh.length > 0) {
-        const group = new THREE.Group();
-        for (var i = 0; i < mesh.length; i++) {
-            group.add(mesh[i]);
-        }
-        group.features = feature.properties;
-        return group;
-    }
 }
 
 function featureCollectionToThree(featureCollection, options) {
@@ -408,7 +419,6 @@ function featureCollectionToThree(featureCollection, options) {
         group.minAltitude = Math.min(mesh.minAltitude, group.minAltitude);
     }
     group.name = 'bdTopo';
-    group.visible = false;
     group.features = featureCollection.features;
     return group;
 }
@@ -420,8 +430,6 @@ export default {
             if (!feature) return;
             if (feature.geometries) {
                 return featureCollectionToThree(feature, options);
-            } else {
-                return featureToThree(feature, options);
             }
         };
     },

@@ -6,7 +6,7 @@ import * as OBJLoader from 'three-obj-loader';
 import * as THREE from 'three';
 import Cartography3D from '../B3Dreader/Cartography3D';
 import Feature2MeshStyle from './Feature2MeshStyle';
-import FeatureProcessing from '../../Process/FeatureProcessing';
+import FeatureProcessingBDTopo from '../../Process/FeatureProcessingBDTopo';
 
 var _this;
 OBJLoader(THREE);
@@ -18,6 +18,31 @@ function ModelLoader(view) {
     this.obj = new THREE.Group();
     this.checked = false;
     this.bdTopoVisibility = false;
+    this.bdTopoStyle = {
+        wall_faces: {
+            texture: './textures/',
+            opacity: 1,
+            color: '#ffffff',
+            emissive: '#ffffff',
+            specular: '#ffffff',
+            shininess: '#ffffff',
+            textureRepetition: 1,
+        },
+        roof_faces: {
+            texture: './textures/',
+            opacity: 1,
+            color: '#ffffff',
+            emissive: '#ffffff',
+            specular: '#ffffff',
+            shininess: '#ffffff',
+            textureRepetition: 1,
+        },
+        edges: {
+            color: '#ffffff',
+            opacity: 1,
+            width: 1,
+        },
+    };
     _this = this;
 }
 
@@ -212,11 +237,12 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
     var self = this;
     var a = this.view.addLayer({
         type: 'geometry',
-        update: FeatureProcessing.update, // fichier modifier à revoir !!! L50
+        update: FeatureProcessingBDTopo.update, // fichier modifier à revoir !!! L50
         convert: Feature2MeshStyle.convert({
             color: colorBuildings,
             altitude: altitudeBuildings,
-            extrude: extrudeBuildings }),
+            extrude: extrudeBuildings,
+            style: this.bdTopoStyle }),
         filter: acceptFeature,
         url: 'http://wxs.ign.fr/72hpsel8j8nhb5qgdh07gcyp/geoportail/wfs?',
         networkOptions: { crossOrigin: 'anonymous' },
@@ -227,12 +253,13 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
         level: 14,
         projection: 'EPSG:4326',
         ipr: 'IGN',
+        visible: false,
         options: {
             mimetype: 'json',
         },
     }, this.view.tileLayer);
     a.then(this.bDTopoLoaded = true);
-    setTimeout(() => self.ForBuildings(calleback), 1000);
+    // setTimeout(() => self.ForBuildings(calleback), 1000);
 };
 
 ModelLoader.prototype.ForBuildings = function ForBuildings(calleback) {

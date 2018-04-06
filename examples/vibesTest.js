@@ -55,8 +55,8 @@ var scale = 300;
 var loader = new itowns.ModelLoader(globeView);
 
 // Symbolizer
-var symbolizer = function(view, listObj, listEdge, menu, nbSymbolizer, light, plane) {
-    return new itowns.Symbolizer(view, listObj, listEdge, menu, nbSymbolizer, light, plane);
+var symbolizer = function(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane) {
+    return new itowns.Symbolizer(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane);
 }
 
 
@@ -71,7 +71,7 @@ globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function 
         document.getElementById('result').innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + ", Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
     }) 
     // globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
-   // loader.loadBDTopo();
+    loader.loadBDTopo();
 });
 //var loader2 = new itowns.ModelLoader(globeView);
  loader.loadBati3D();

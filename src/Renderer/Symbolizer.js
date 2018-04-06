@@ -7,43 +7,19 @@ import * as THREE from 'three';
 import * as FILE from 'file-saver';
 import Fetcher from '../Core/Scheduler/Providers/Fetcher';
 
-// Class Symbolizer
+// Classe Symbolizer
 
 function Symbolizer(view, obj, edges, bdTopo, menu, nb) {
     // Constructor
     this.obj = obj;
     this.edges = edges;
-    this.bdTopo = bdTopo;
+    if (bdTopo != null) this.bdTopo = bdTopo.ForBuildings;
     this.view = view;
     this.menu = menu;
     this.menu.view = this.view;
     this.nb = nb;
     this.folder = null;
-    this.bdTopoStyle = {
-        wall_faces: {
-            texture: './textures/',
-            opacity: 1,
-            color: 0xffffff,
-            emissive: 0xffffff,
-            specular: 0xffffff,
-            shininess: 0xffffff,
-            textureRepetition: 1,
-        },
-        roof_faces: {
-            texture: './textures/',
-            opacity: 1,
-            color: 0xffffff,
-            emissive: 0xffffff,
-            specular: 0xffffff,
-            shininess: 0xffffff,
-            textureRepetition: 1,
-        },
-        edges: {
-            color: 0xffffff,
-            opacity: 1,
-            width: 1,
-        },
-    };
+    if (bdTopo != null) this.bdTopoStyle = bdTopo.bdTopoStyle;
     this.applyStyle();
 }
 
@@ -178,7 +154,6 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
     else {
         var color = getRandomColor();
         // Apply default style
-        console.log(this.edges);
         if (this.edges.length > 0) {
             // edges
             for (i = 0; i < this.edges.length; i++) {
@@ -604,14 +579,22 @@ Symbolizer.prototype._changeStyleEdge = function _changeStyleEdge(value, i, j, f
         // If not, add dashSize and gapSize controllers to the GUI
         if (!isDashed) {
             folder.add({ dashSize: 0.05 }, 'dashSize', 0.01, 0.5).name('Dash Size').onChange((value) => {
-                for (let j = 0; j < this.obj[i].children.length; j++) {
-                    this._changeDashSize(value, i, j);
+                if (this.obj.length > 0) {
+                    for (let j = 0; j < this.obj[i].children.length; j++) {
+                        this._changeDashSize(value, i, j);
+                    }
                 }
+                this._changeDashSize(value, -10, 0);
+                this._changeDashSize(value, -10, 1);
             });
             folder.add({ gapSize: 0.05 }, 'gapSize', 0.01, 0.5).name('Gap Size').onChange((value) => {
-                for (let j = 0; j < this.obj[i].children.length; j++) {
-                    this._changeGapSize(value, i, j);
+                if (this.obj.length > 0) {
+                    for (let j = 0; j < this.obj[i].children.length; j++) {
+                        this._changeGapSize(value, i, j);
+                    }
                 }
+                this._changeGapSize(value, -10, 0);
+                this._changeGapSize(value, -10, 1);
             });
         }
     }
@@ -700,7 +683,7 @@ Symbolizer.prototype._changeTextureRepetition = function _changeTextureRepetitio
     } else if (this.bdTopo) {
         var f2 = (parent) => {
             for (var j = 0; j < parent.children.length; j++) {
-                if (parent.children[j].name == 'wall_edges' || parent.children[j].name == 'roof_edges') {
+                if (parent.children[j].name == 'wall_faces' || parent.children[j].name == 'roof_faces') {
                     parent.children[j].material.map.repeat.set(value, value);
                     parent.children[j].material.needsUpdate = true;
                 }
@@ -748,7 +731,6 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
         });
     }
     var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
-    console.log(this.obj[0]);
     // model[0].name.split('_')[0]
     FILE.saveAs(blob, this.obj[0].name.concat('.vibes'));
 };
@@ -812,13 +794,10 @@ Symbolizer.prototype._addOpacity = function addOpacity(folder, j) {
             for (var i = 0; i < parent.children.length; i++) {
                 if (parent.children[i].name == name) {
                     initialOpacity = parent.children[i].material.opacity;
-                    console.log(parent.children[i].material.opacity);
                 }
             }
-            console.log(initialOpacity);
         };
         this.bdTopo(f);
-        console.log('out', initialOpacity);
         folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Opacity').onChange((value) => {
             // Iteration over the list of objects
             this._changeOpacity(value, -10, j / -10 - 1);
@@ -842,13 +821,10 @@ Symbolizer.prototype._addColor = function addColor(folder, j) {
             for (var i = 0; i < parent.children.length; i++) {
                 if (parent.children[i].name == name) {
                     initialColor = '#'.concat(parent.children[i].material.color.getHexString());
-                    console.log(parent.children[i].material.opacity);
                 }
             }
-            console.log(initialColor);
         };
         this.bdTopo(f);
-        console.log('out', initialColor);
         folder.addColor({ color: initialColor }, 'color').name('Color').onChange((value) => {
             this._changeColor(value, -10, j / -10 - 1);
         });
@@ -873,10 +849,8 @@ Symbolizer.prototype._addEmissive = function addEmissive(folder, j) {
                     initialEmissive = '#'.concat(parent.children[i].material.emissive.getHexString());
                 }
             }
-            console.log(initialEmissive);
         };
         this.bdTopo(f);
-        console.log('out', initialEmissive);
         folder.addColor({ emissive: initialEmissive }, 'emissive').name('Emissive').onChange((value) => {
             this._changeEmissive(value, -10, j / -10 - 1);
         });
@@ -903,10 +877,8 @@ Symbolizer.prototype._addSpecular = function addSpecular(folder, j) {
                     initialSpecular = '#'.concat(parent.children[i].material.specular.getHexString());
                 }
             }
-            console.log(initialSpecular);
         };
         this.bdTopo(f);
-        console.log('out', initialSpecular);
         folder.addColor({ specular: initialSpecular }, 'specular').name('Specular').onChange((value) => {
             this._changeSpecular(value, -10, 0);
         });
@@ -932,10 +904,8 @@ Symbolizer.prototype._addShininess = function addShininess(folder, j) {
                     initialShininess = parent.children[i].material.shininess;
                 }
             }
-            console.log(initialShininess);
         };
         this.bdTopo(f);
-        console.log('out', initialShininess);
         folder.add({ shininess: initialShininess }, 'shininess', 0, 100).name('Shininess').onChange((value) => {
             this._changeShininess(value, -10, 0);
         });
@@ -956,7 +926,6 @@ Symbolizer.prototype._addTexture = function addTexture(folder, j) {
     });
 };
 
-
 // More parameters...
 
 Symbolizer.prototype._addSave = function addSave(folder) {
@@ -968,7 +937,7 @@ Symbolizer.prototype._addLoad = function addLoad(folder) {
         var button = document.createElement('input');
         button.setAttribute('type', 'file');
         button.addEventListener('change', () => this._readVibes(button.files[0], folder), false);
-        button.click();
+        button.cick();
     } }, 'load').name('Load style');
 };
 
@@ -1126,22 +1095,21 @@ Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
                 }
             }
             this._changeOpacity(value, -10, 0);
+            this._changeOpacity(value, -10, 1);
         });
     } else if (this.bdTopo) {
         var f = (parent) => {
             for (var i = 0; i < parent.children.length; i++) {
                 if (parent.children[i].name == 'wall_faces') {
                     initialOpacity = parent.children[i].material.opacity;
-                    console.log(parent.children[i].material.opacity);
                 }
             }
-            console.log(initialOpacity);
         };
         this.bdTopo(f);
-        console.log('out', initialOpacity);
         folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Opacity').onChange((value) => {
             // Iteration over the list of objects
             this._changeOpacity(value, -10, 0);
+            this._changeOpacity(value, -10, 1);
         });
     }
 };
@@ -1157,21 +1125,20 @@ Symbolizer.prototype._addOpacityEdgeAll = function addOpacityEdgeAll(folder) {
                 }
             }
             this._changeOpacityEdge(value, -10, 0);
+            this._changeOpacityEdge(value, -10, 1);
         });
     } else if (this.bdTopo) {
         var f = (parent) => {
             for (var i = 0; i < parent.children.length; i++) {
                 if (parent.children[i].name == 'wall_edges') {
                     initialOpacity = parent.children[i].material.opacity;
-                    console.log(parent.children[i].material.opacity);
                 }
             }
-            console.log(initialOpacity);
         };
         this.bdTopo(f);
-        console.log('out', initialOpacity);
         folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Edge opacity').onChange((value) => {
             this._changeOpacityEdge(value, -10, 0);
+            this._changeOpacityEdge(value, -10, 1);
         });
     }
 };
@@ -1187,21 +1154,20 @@ Symbolizer.prototype._addColorAll = function addColorAll(folder) {
                 }
             }
             this._changeColor(value, -10, 0);
+            this._changeColor(value, -10, 1);
         });
     } else if (this.bdTopo) {
         var f = (parent) => {
             for (var i = 0; i < parent.children.length; i++) {
                 if (parent.children[i].name == 'wall_faces') {
                     initialColor = '#'.concat(parent.children[i].material.color.getHexString());
-                    console.log(parent.children[i].material.color);
                 }
             }
-            console.log(initialColor);
         };
         this.bdTopo(f);
-        console.log('out', initialColor);
         folder.addColor({ color: initialColor }, 'color').name('Color').onChange((value) => {
             this._changeColor(value, -10, 0);
+            this._changeColor(value, -10, 1);
         });
     }
 };
@@ -1258,10 +1224,8 @@ Symbolizer.prototype._addEmissiveAll = function addEmissiveAll(folder) {
         };
         this.bdTopo(f);
         folder.addColor({ emissive: initialEmissive }, 'emissive').name('Emissive').onChange((value) => {
-            for (var i = 0; i < this.obj.length; i++) {
-                this._changeEmissive(value, -10, 0);
-                this._changeEmissive(value, -10, 1);
-            }
+            this._changeEmissive(value, -10, 0);
+            this._changeEmissive(value, -10, 1);
         });
     }
 };
@@ -1336,6 +1300,7 @@ Symbolizer.prototype._addWidthEdgeAll = function addWidthEdgeAll(folder) {
                 }
             }
             this._changeWidthEdge(value, -10, 0);
+            this._changeWidthEdge(value, -10, 1);
         });
     } else if (this.bdTopo) {
         var f = (parent) => {
@@ -1348,6 +1313,7 @@ Symbolizer.prototype._addWidthEdgeAll = function addWidthEdgeAll(folder) {
         this.bdTopo(f);
         folder.add({ width: initialWidth }, 'width', 0, 5).name('Edge width').onChange((value) => {
             this._changeWidthEdge(value, -10, 0);
+            this._changeWidthEdge(value, -10, 1);
         });
     }
 };
@@ -1360,6 +1326,7 @@ Symbolizer.prototype._addStyleEdgeAll = function addStyleEdgeAll(folder) {
             }
         }
         this._changeStyleEdge(value, -10, 0, folder);
+        this._changeStyleEdge(value, -10, 1, folder);
     });
 };
 
@@ -1421,7 +1388,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
 
 Symbolizer.prototype._checkStructure = function checkStructure() {
     var i;
-    if (this.obj[0].length > 0 && this.obj[0].children.length != 2 && this.bdTopo) return false;
+    if (this.bdTopo && this.obj.length > 0 && this.obj[0].children.length != 2) return false;
     // We check if the objects have the same number of children
     for (i = 0; i < this.obj.length; i++) {
         if (this.obj[i].children.length != this.obj[0].children.length) {

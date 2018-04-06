@@ -47,8 +47,6 @@ export default {
         for (const feat of features) {
             feat.traverse((o) => {
                 if (o.material) {
-                    o.material.transparent = layer.opacity < 1.0;
-                    o.material.opacity = layer.opacity;
                     o.material.wireframe = layer.wireframe;
                     if (layer.size) {
                         o.material.size = layer.size;
