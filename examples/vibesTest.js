@@ -7,6 +7,7 @@
 
 // Position near Gerbier mountain.
 var positionOnGlobe = { longitude: 2.396387, latitude: 48.848701, altitude: 2000 };
+// var positionOnGlobe = { longitude: 4.818, latitude: 45.7354, altitude: 3000 };
 
 // `viewerDiv` will contain iTowns' rendering area (`<canvas>`)
 var viewerDiv = document.getElementById('viewerDiv');
@@ -54,8 +55,8 @@ var scale = 300;
 var loader = new itowns.ModelLoader(globeView);
 
 // Symbolizer
-var symbolizer = function(view, listObj, listEdge, menu, nbSymbolizer, light, plane) {
-    return new itowns.Symbolizer(view, listObj, listEdge, menu, nbSymbolizer, light, plane);
+var symbolizer = function(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane) {
+    return new itowns.Symbolizer(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane);
 }
 
 
@@ -70,12 +71,8 @@ globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function 
     document.getElementById('viewerDiv').addEventListener('mousemove', function() { 
         document.getElementById('result').innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + ", Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
     }) 
+    // globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
+    loader.loadBDTopo();
 });
-
-function loadFileException(message) {
-    this.message = message;
-    this.name = "loadFileException";
- }
-
-var loader2 = new itowns.ModelLoader(globeView);
-loader2.loadBati3D();
+//var loader2 = new itowns.ModelLoader(globeView);
+ loader.loadBati3D();
