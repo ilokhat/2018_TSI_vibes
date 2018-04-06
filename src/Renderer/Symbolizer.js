@@ -102,6 +102,9 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
         // Apply default style
         for (i = 0; i < this.edges.length; i++) {
             for (j = 0; j < this.edges[i].children.length; j++) {
+                // this._changeOpacityEdge(1, i, j);
+-               // this._changeColorEdge('#000000', i, j);
+-               // this._changeWidthEdge(1, i, j);
                 this._changeOpacityEdge(this.edges[i].children[j].material.opacity, i, j);
                 this._changeColorEdge(this.edges[i].children[j].material.color, i, j);
                 this._changeWidthEdge(this.edges[i].children[j].material.linewidth, i, j);
