@@ -5,48 +5,60 @@ console.log(manager);
 
 var f = new File([""], "filename.text", {type: "text/plain"})
 
-describe('readFile()', function () {
-  it('fichier de type .obj attendu', function () {
+describe('LayerManager._readFile()', function () {
+  it('Expected .obj or .gibes file', function () {
     chai.expect( function(){ manager._readFile(f); } ).to.throw("Unvalid format");
-
   });
 });
 
-var parts = [
+ parts = [
   new Blob(['v 0.123 0.234 0.345 1.0'], {type: 'text/plain'}),
 
   new Uint16Array([33])
 ];
-var f1 = new File(parts, 'sample.obj') ;
+var f1 = new File(parts, 'file.obj') ;
 
-describe('readFile()', function () {
-  it("chargement d'un fichier obj", function () {
+describe('LayerManager._readFile()', function () {
+  it(".obj file loaded successfully", function () {
     chai.expect(  manager._readFile(f1) ).to.equal(0);
 
   });
 });
 
 
+parts = [
+  new Blob(['{"name":"croutitower","coordX":4202010,"coordY":178050,"coordZ":4779009,"rotateX":-3.093,"rotateY":0.851,"rotateZ":-1.634,"scale":300}'], {type: 'text/plain'}),
 
-var mesh ;
+  new Uint16Array([33])
+];
+var f2 = new File(parts, 'sample.obj') ;
+
+describe('LayerManager._readFile()', function () {
+  it(".gibes file loaded successfully", function () {
+    chai.expect(  manager._readFile(f2) ).to.equal(0);
+
+  });
+});
+
+var folder ;
 
 describe('symbolizer.readVibes()', function () {
-  it("fichier de style de type .vibes attendu", function () {
-    chai.expect( function(){ symbolizer._readVibes(f,mesh); } ).to.throw("Unvalid format");
+  it("Expected .vibes file ", function () {
+    chai.expect( function(){ symbolizer._readVibes(f,folder); } ).to.throw("Unvalid format");
 
   });
 });
 
 
-var parts = [
+ parts = [
   new Blob(['{"edges":{"opacity":0.4124241147981423,"color":0,"width":5},"faces":[{"name":"Tower1_Tower_Fence_posts_Tube_4","opacity":0.5836138769686149,"color":4947287,"emissive":4428373,"specular":4428373,"shininess":30,"texture":null}]}'], {type: 'text/plain'}),
 
   new Uint16Array([33])
 ];
-var f2 = new File(parts, 'sample.vibes') ;
+var f3 = new File(parts, 'sample.vibes') ;
 describe('symbolizer.readVibes()', function () {
-  it("chargement d'un fichier de style vibes", function () {
-    chai.expect(   symbolizer._readVibes(f2,mesh) ).to.equal(0);
+  it(".vibes file loaded successfully", function () {
+    chai.expect(   symbolizer._readVibes(f3,folder) ).to.equal(0);
 
   });
 });

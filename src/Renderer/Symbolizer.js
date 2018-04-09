@@ -826,8 +826,13 @@ Symbolizer.prototype._saveGibesAll = function saveGibesAll() {
 
 Symbolizer.prototype._readVibes = function readVibes(file, folder) {
     var reader = new FileReader();
-    reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
-    reader.readAsText(file);
+    if (file.name.endsWith('.vibes')) {
+        reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
+        reader.readAsText(file);
+        return 0;
+    } else {
+        throw new loadFileException('Unvalid format');
+    }
 };
 
 // Menu management
@@ -1544,6 +1549,11 @@ function getRandomColor() {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+}
+
+function loadFileException(message) {
+    this.message = message;
+    this.name = 'loadFileException';
 }
 
 /*
