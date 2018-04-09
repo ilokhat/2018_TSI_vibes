@@ -123,7 +123,7 @@ view.addLayer({
         mesh.scale.z = 0.01;
         meshes.push(mesh);
     },
-    url: 'https://wxs.ign.fr/72hpsel8j8nhb5qgdh07gcyp/geoportail/wfs?',
+    url: 'http://wxs.ign.fr/72hpsel8j8nhb5qgdh07gcyp/geoportail/wfs?',
     networkOptions: { crossOrigin: 'anonymous' },
     protocol: 'wfs',
     version: '2.0.0',
@@ -168,7 +168,7 @@ view.addLayer({
         altitude: 0,
         color: colorPoint }),
     onMeshCreated: configPointMaterial,
-    url: 'https://wxs.ign.fr/72hpsel8j8nhb5qgdh07gcyp/geoportail/wfs?',
+    url: 'http://wxs.ign.fr/72hpsel8j8nhb5qgdh07gcyp/geoportail/wfs?',
     networkOptions: { crossOrigin: 'anonymous' },
     protocol: 'wfs',
     version: '2.0.0',

@@ -1121,8 +1121,13 @@ Symbolizer.prototype._saveGibesAll = function saveGibesAll() {
 
 Symbolizer.prototype._readVibes = function readVibes(file, folder) {
     var reader = new FileReader();
-    reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
-    reader.readAsText(file);
+    if (file.name.endsWith('.vibes')) {
+        reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
+        reader.readAsText(file);
+        return 0;
+    } else {
+        throw new loadFileException('Unvalid format');
+    }
 };
 
 // Menu management
@@ -1600,24 +1605,18 @@ Symbolizer.prototype._addPositionAll = function addPositionAll(folder) {
         var vectCoord = new THREE.Vector3();
         folder.add({ longitude: initialX }, 'longitude').name('Position X').onChange((value) => {
             X = value;
-            if (Y != initialY || Z != initialZ) {
-                vectCoord.set(X, Y, Z);
-                this._changeCoordinates(vectCoord);
-            }
+            vectCoord.set(X, Y, Z);
+            this._changeCoordinates(vectCoord);
         });
         folder.add({ latitude: initialY }, 'latitude').name('Position Y').onChange((value) => {
             Y = value;
-            if (X != initialX || Z != initialZ) {
-                vectCoord.set(X, Y, Z);
-                this._changeCoordinates(vectCoord);
-            }
+            vectCoord.set(X, Y, Z);
+            this._changeCoordinates(vectCoord);
         });
         folder.add({ altitude: initialZ }, 'altitude').name('Position Z').onChange((value) => {
             Z = value;
-            if (Y != initialY || X != initialX) {
-                vectCoord.set(X, Y, Z);
-                this._changeCoordinates(vectCoord);
-            }
+            vectCoord.set(X, Y, Z);
+            this._changeCoordinates(vectCoord);
         });
     }
 };
@@ -1885,6 +1884,11 @@ function getRandomColor() {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+}
+
+function loadFileException(message) {
+    this.message = message;
+    this.name = 'loadFileException';
 }
 
 /*
