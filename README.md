@@ -381,10 +381,8 @@ The answer to this issue is twofold :
 ##### Adjustments
 
 The second problem can be solved thanks to the GUI, with a few more sliders to move the objects, just like it is done in PLU++.  
-
-(image of the GUI - position)  
-
-TODO : click on a building and move it with keyboard keys.
+In order to move the objects, we applied the translation methodes on x,y and z, and that allow the user to use the sliders on the GUI to do that.
+another feature let the user to move the object after clicking on it or select it from the GUI , and that can be done with the keyboard keys ((a,z) or (4,6)) on the X axis, ((w,x) or ( 8.2)) on the Y axis and ((q,s) or (7.3)).
 
 ##### Absolute positionning
 
