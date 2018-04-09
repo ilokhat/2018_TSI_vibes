@@ -48,8 +48,6 @@ var rotateY = 0;
 var rotateZ = 0;
 var scale = 300;
 
-
-
 // Loader initialization
 var loader = new itowns.ModelLoader(globeView);
 
@@ -57,7 +55,6 @@ var loader = new itowns.ModelLoader(globeView);
 var symbolizer = function(view, listObj, listEdge, menu, nbSymbolizer, light, plane) {
     return new itowns.Symbolizer(view, listObj, listEdge, menu, nbSymbolizer, light, plane);
 }
-
 
 // Layer management
 var manager = new itowns.LayerManager(globeView, document, menuGlobe, coord, rotateX, rotateY, rotateZ, scale, loader, symbolizer)

@@ -13,6 +13,7 @@ function Symbolizer(view, obj, edges, menu, nb, light, plane) {
     // Constructor
     this.obj = obj;
     this.edges = edges;
+    this.quads = null;
     this.view = view;
     this.menu = menu;
     this.menu.view = this.view;
@@ -98,8 +99,8 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
     }
     /*
     else {
-        // Apply default style , we deleted this section in order to 
-        // Update GUI with current style when re-opening the Symbolizer 
+        // Apply default style , we deleted this section in order to
+        // Update GUI with current style when re-opening the Symbolizer
         // (instead of loading default style)
         for (i = 0; i < this.edges.length; i++) {
             for (j = 0; j < this.edges[i].children.length; j++) {
@@ -122,7 +123,6 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                 // No texture
             }
         }
-        
     }
     */
 };
@@ -283,13 +283,138 @@ Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, i, j) {
     this.view.notifyChange(true);
 };
 
-Symbolizer.prototype._changeStyleEdge = function _changeStyleEdge(value, i, j, folder) {
-    // Save edges property
-    var oldOpacity = this.edges[i].children[j].material.opacity;
-    var oldColor = this.edges[i].children[j].material.color;
-    var oldWidth = this.edges[i].children[j].material.linewidth;
+Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, folder) {
+    var i;
+    var j;
+    var k;
+    // Create or remove specific controllers according to the style chosen (sketchy, dashed, continuous)
+    if (value === 'Sketchy') {
+        // Initial GUI parameters
+        var color = this.edges[0].children[0].material.color;
+        var width = 30.0;
+        var threshold = 100.0;
+        var stroke = 'dashed';
+        // Checks if sketchy parameters controllers already exists
+        var isSketchy = false;
+        for (k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'sketchyThreshold') {
+                isSketchy = true;
+            }
+        }
+        // If not, these controllers are added to the GUI
+        if (!isSketchy) {
+            // Controller to change the threshold
+            folder.add({ sketchyThreshold: 100.0 }, 'sketchyThreshold', 10.0, 200.0).name('Threshold').onChange((value) => {
+                threshold = value;
+                this._createSketchyMaterial(stroke, color, width, threshold);
+            });
+            // Controller to change the stroke
+            folder.add({ sketchyStroke: 'dashed' }, 'sketchyStroke', ['dashed', 'brush', 'irregular', 'thick', 'two', 'wavy']).name('Stroke').onChange((value) => {
+                stroke = value;
+                this._createSketchyMaterial(stroke, color, width, threshold);
+            });
+            // Adapt color controller to sketchy edge
+            folder.__controllers[0].onChange((value) => {
+                color = new THREE.Color(value);
+                this._createSketchyMaterial(stroke, color, width, threshold);
+            });
+            // Adapt width controller to sketchy edge
+            folder.__controllers[2].__min = 10.0;
+            folder.__controllers[2].__max = 100.0;
+            folder.__controllers[2].onChange((value) => {
+                width = value;
+                this._createSketchyMaterial(stroke, color, width, threshold);
+            });
+        }
+        // Remove dashed specific controllers grom the GUI
+        for (k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'dashSize') {
+                folder.remove(folder.__controllers[k]);
+            }
+            if (folder.__controllers[k].property == 'gapSize') {
+                folder.remove(folder.__controllers[k]);
+            }
+        }
+    }
+    else {
+        // Remove sketchy specific controllers from the GUI
+        for (k = 0; k < folder.__controllers.length; k++) {
+            if (folder.__controllers[k].property == 'sketchyThreshold') {
+                folder.remove(folder.__controllers[k]);
+            }
+            if (folder.__controllers[k].property == 'sketchyStroke') {
+                folder.remove(folder.__controllers[k]);
+            }
+        }
+        // Readapt color and width controller to classic edge (continuous or dashed)
+        folder.__controllers[0].onChange((value) => {
+            for (i = 0; i < this.edges.length; i++) {
+                for (j = 0; j < this.edges[i].children.length; j++) {
+                    this._changeColorEdge(value, i, j);
+                }
+            }
+        });
+        folder.__controllers[2].__min = 0.0;
+        folder.__controllers[2].__max = 5.0;
+        folder.__controllers[2].onChange((value) => {
+            for (i = 0; i < this.edges.length; i++) {
+                for (j = 0; j < this.edges[i].children.length; j++) {
+                    this._changeWidthEdge(value, i, j);
+                }
+            }
+        });
+        if (value === 'Dashed') {
+            // Checks if dash size and gap size controllers already exist
+            var isDashed = false;
+            for (k = 0; k < folder.__controllers.length; k++) {
+                if (folder.__controllers[k].property == 'dashSize') {
+                    isDashed = true;
+                }
+            }
+            // If not, add dashSize and gapSize controllers to the GUI
+            if (!isDashed) {
+                folder.add({ dashSize: 0.05 }, 'dashSize', 0.01, 0.5).name('Dash Size').onChange((value) => {
+                    // Iteration over all the edges, to apply the changes everywhere
+                    for (i = 0; i < this.edges.length; i++) {
+                        for (j = 0; j < this.edges[i].children.length; j++) {
+                            this._changeDashSize(value, i, j);
+                        }
+                    }
+                });
+                folder.add({ gapSize: 0.05 }, 'gapSize', 0.01, 0.5).name('Gap Size').onChange((value) => {
+                    for (i = 0; i < this.edges.length; i++) {
+                        for (j = 0; j < this.edges[i].children.length; j++) {
+                            this._changeGapSize(value, i, j);
+                        }
+                    }
+                });
+            }
+        }
+        else {
+            // Remove dashed specific controllers from the GUI
+            for (k = 0; k < folder.__controllers.length; k++) {
+                if (folder.__controllers[k].property == 'dashSize') {
+                    folder.remove(folder.__controllers[k]);
+                }
+                if (folder.__controllers[k].property == 'gapSize') {
+                    folder.remove(folder.__controllers[k]);
+                }
+            }
+        }
+    }
+};
+
+Symbolizer.prototype._changeStyleEdge = function changeStyleEdge(value, folder) {
+    // Save edges property (all edges have the same)
+    var oldOpacity = this.edges[0].children[0].material.opacity;
+    var oldColor = this.edges[0].children[0].material.color;
+    var oldWidth = this.edges[0].children[0].material.linewidth;
+    var i;
+    var j;
     // Create new material
     var newMaterial;
+    // Adapt the GUI
+    this._addStyleEdgeParams(value, folder);
     if (value === 'Dashed') {
         // Create dashed material
         newMaterial = new THREE.LineDashedMaterial({
@@ -299,26 +424,37 @@ Symbolizer.prototype._changeStyleEdge = function _changeStyleEdge(value, i, j, f
             dashSize: 0.05,
             gapSize: 0.05,
         });
-        // Checks if dash size and gap size controllers already exist
-        var isDashed = false;
-        for (let k = 0; k < folder.__controllers.length; k++) {
-            if (folder.__controllers[k].property == 'dashSize') {
-                isDashed = true;
+        // If quads (for sketchy edges) were created before, we hide them
+        if (this.quads != null) {
+            this.quads.traverse((child) => {
+                child.visible = false;
+            });
+        }
+        // Dashed material is applied to the edges
+        for (i = 0; i < this.edges.length; i++) {
+            for (j = 0; j < this.edges[i].children.length; j++) {
+                // Compute line distances (necessary to apply dashed material)
+                this.edges[i].children[j].computeLineDistances();
+                // Apply new material
+                this.edges[i].children[j].material = newMaterial;
+                this.edges[i].children[j].material.needsUpdate = true;
+                this.view.notifyChange(true);
             }
         }
-        // If not, add dashSize and gapSize controllers to the GUI
-        if (!isDashed) {
-            folder.add({ dashSize: 0.05 }, 'dashSize', 0.01, 0.5).name('Dash Size').onChange((value) => {
-                for (let j = 0; j < this.obj[i].children.length; j++) {
-                    this._changeDashSize(value, i, j);
-                }
-            });
-            folder.add({ gapSize: 0.05 }, 'gapSize', 0.01, 0.5).name('Gap Size').onChange((value) => {
-                for (let j = 0; j < this.obj[i].children.length; j++) {
-                    this._changeGapSize(value, i, j);
-                }
-            });
+    }
+    else if (value === 'Sketchy') {
+        // Initialize parameters to create the material
+        var width = 30.0;
+        var threshold = 100.0;
+        var stroke = 'dashed';
+        for (i = 0; i < this.edges.length; i++) {
+            for (j = 0; j < this.edges[i].children.length; j++) {
+                // Hide classic edges
+                this.edges[i].children[j].material.visible = false;
+            }
         }
+        // Apply sketchy style
+        this._createSketchyMaterial(stroke, oldColor, width, threshold);
     }
     else {
         // Create basic material
@@ -327,22 +463,165 @@ Symbolizer.prototype._changeStyleEdge = function _changeStyleEdge(value, i, j, f
             linewidth: oldWidth,
             opacity: oldOpacity,
         });
-        // Remove dashSize and gapSize controllers from the GUI
-        for (let k = 0; k < folder.__controllers.length; k++) {
-            if (folder.__controllers[k].property == 'dashSize') {
-                folder.remove(folder.__controllers[k]);
-            }
-            if (folder.__controllers[k].property == 'gapSize') {
-                folder.remove(folder.__controllers[k]);
+        // If quads (for sketchy edges) were created before, we hide them
+        if (this.quads != null) {
+            this.quads.traverse((child) => {
+                child.visible = false;
+            });
+        }
+        for (i = 0; i < this.edges.length; i++) {
+            for (j = 0; j < this.edges[i].children.length; j++) {
+                // Apply new material
+                this.edges[i].children[j].material = newMaterial;
+                this.edges[i].children[j].material.needsUpdate = true;
+                this.view.notifyChange(true);
             }
         }
     }
-    // Compute line distances (necessary to apply dashed material)
-    this.edges[i].children[j].computeLineDistances();
-    // Apply new material
-    this.edges[i].children[j].material = newMaterial;
-    this.edges[i].children[j].material.needsUpdate = true;
-    this.view.notifyChange(true);
+};
+
+Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(stroke, color, width, threshold) {
+    // Create shaders to render sketchy edges
+    var vertex =
+    `
+    attribute vec3  position2;
+    uniform   vec2  resolution;
+    uniform   float thickness;
+    uniform   float texthreshold;
+    varying   vec3 v_uv;
+    varying   float choixTex;
+
+    void main() {
+
+        // Calcul positions ECRAN des sommets de l'arête
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+        vec4 Position2 = projectionMatrix * modelViewMatrix * vec4(position2,1.0);
+
+        vec2 dir = (gl_Position.xy/gl_Position.w - Position2.xy/Position2.w) * resolution;
+
+        // Choix texture selon taille écran de l'arête
+        if (length(dir) < texthreshold){
+            choixTex = 1.0;
+        } else {
+            choixTex = 1.0;
+        }
+
+        // Calcul des normales
+        vec2 normal = normalize(dir);
+        normal = uv.x * uv.y * vec2(-normal.y, normal.x);
+
+        // Déplacement points pour faire un quad (largeur selon taille écran : rapport longueur largeur constant)
+        gl_Position.xy += ((length(dir)/thickness) * normal * 0.5) * (gl_Position.w / resolution);
+
+        gl_Position.z =  -gl_Position.w;
+
+        v_uv = vec3(uv,1.) * gl_Position.w;
+
+    }
+    `;
+    var fragment =
+    `
+    varying vec3  v_uv;
+    varying float choixTex;
+    uniform sampler2D texture1;
+    uniform sampler2D texture2;
+    uniform vec3 color;
+    
+    void main() {
+
+        vec2 uv = v_uv.xy/v_uv.z;
+        vec4 baseColor;
+
+        // Détermination textures (choisie dans le vertex shader)
+        if (choixTex == 1.0){
+            baseColor = texture2D(texture1, (uv+1.)*0.5);   
+        } else {
+            baseColor = texture2D(texture2, (uv+1.)*0.5);   
+        }
+
+        //if ( baseColor.a < 0.3 ) discard;
+        // Application de la texture
+        gl_FragColor = vec4(baseColor.a*baseColor.xyz,baseColor.a)+vec4(color,0.0);
+
+    }
+    `;
+    // Initializations
+    var texture1;
+    var texture2;
+    var loader = new THREE.TextureLoader();
+    var path1 = './strokes/'.concat(stroke).concat('_small.png');
+    var path2 = './strokes/'.concat(stroke).concat('.png');
+    // Load textures
+    loader.load(
+        path1,
+        (t1) => {
+            // Save texture 1
+            texture1 = t1;
+            loader.load(
+                path2,
+                (t2) => {
+                    // Save texture 2
+                    texture2 = t2;
+                    // Create shader material
+                    var material = new THREE.ShaderMaterial({
+                        uniforms: {
+                            texthreshold: { value: threshold },
+                            thickness: { value: width },
+                            resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+                            texture1: { type: 't', value: texture1 },
+                            texture2: { type: 't', value: texture2 },
+                            color: { type: 'v3', value: [color.r, color.g, color.b] },
+                        },
+                        vertexShader: vertex,
+                        fragmentShader: fragment,
+                    });
+                    material.transparent = true;
+                    material.polygonOffset = true;
+                    material.polygonOffsetUnits = -150.0;
+                    // Quad group initialization
+                    var quadGroup = new THREE.Group();
+                    // If the quads are not created we create them
+                    if (this.quads == null) {
+                        // Iteration over the edges
+                        for (var i = 0; i < this.edges.length; i++) {
+                            for (var j = 0; j < this.edges[i].children.length; j++) {
+                                // Position of the edges
+                                var edgePos = this.edges[i].children[j].geometry.getAttribute('position').array;
+                                // Iteration over the array of positions to isolate each edge
+                                for (var k = 0; k < edgePos.length - 5; k += 6) {
+                                    // Create quads from the edge
+                                    var pt1 = new THREE.Vector3(edgePos[k], edgePos[k + 1], edgePos[k + 2]);
+                                    var pt2 = new THREE.Vector3(edgePos[k + 3], edgePos[k + 4], edgePos[k + 5]);
+                                    var quadGeom = createQuad(pt1, pt2);
+                                    // Apply sketchy material to the quad
+                                    var quadMesh = new THREE.Mesh(quadGeom, material);
+                                    quadMesh.visible = true;
+                                    quadMesh.material.needsUpdate = true;
+                                    // Add quad to the group
+                                    quadGroup.add(quadMesh);
+                                }
+                                this.quads = quadGroup;
+                            }
+                            // Set group position
+                            quadGroup.position.copy(this.obj[i].position);
+                            quadGroup.rotation.copy(this.obj[i].rotation);
+                            quadGroup.scale.copy(this.obj[i].scale);
+                            quadGroup.updateMatrixWorld();
+                        }
+                    }
+                    // Else, we apply the material on the existing quads
+                    else {
+                        this.quads.traverse((child) => {
+                            child.visible = true;
+                            child.material = material;
+                            child.material.needsUpdate = true;
+                        });
+                    }
+                    // Add the group of quads to the scene
+                    this.view.scene.add(quadGroup);
+                    this.view.notifyChange(true);
+                });
+        });
 };
 
 Symbolizer.prototype._changeDashSize = function changeDashSize(value, i, j) {
@@ -608,6 +887,13 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
             this.edges[i].scale.set(initialScale, initialScale, initialScale);
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
+            // Reset quads position if they exist
+            if (this.quads != null) {
+                this.quads.position.copy(this.obj[i].position);
+                this.quads.rotation.copy(this.obj[i].rotation);
+                this.quads.scale.copy(this.obj[i].scale);
+                this.quads.updateMatrixWorld();
+            }
         }
         this.view.notifyChange(true);
     },
@@ -615,13 +901,21 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
 };
 
 Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
+    // Initial GUI value
     var initialScale = this.obj[0].scale.x;
+    // Add controller for scaling objects
     folder.add({ scale: initialScale }, 'scale', 0.1, 1000, 0.01).name('Scale').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
+            // Scale objects and edges
             this.obj[i].scale.set(value, value, value);
             this.edges[i].scale.set(value, value, value);
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
+            // Scale quads if they exist
+            if (this.quads != null) {
+                this.quads.scale.copy(this.obj[i].scale);
+                this.quads.updateMatrixWorld();
+            }
         }
         this.view.notifyChange(true);
     });
@@ -631,33 +925,57 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
     var prevValueX = 0;
     var prevValueY = 0;
     var prevValueZ = 0;
+    // Add controller for X translation
     folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 0.1).name('Translation X').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
+            // Translate object and edges
             this.obj[i].translateX(value - prevValueX);
             this.edges[i].translateX(value - prevValueX);
+            // Save previous value
             prevValueX = value;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
+            // Translate quads if they exist
+            if (this.quads != null) {
+                this.quads.position.copy(this.obj[i].position);
+                this.quads.updateMatrixWorld();
+            }
         }
         this.view.notifyChange(true);
     });
+    // Add controller for Y translation
     folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('Translation Y').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
+            // Translate object and edges
             this.obj[i].translateZ(value - prevValueY);
             this.edges[i].translateZ(value - prevValueY);
+            // Save previous value
             prevValueY = value;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
+            // Translate quads if they exist
+            if (this.quads != null) {
+                this.quads.position.copy(this.obj[i].position);
+                this.quads.updateMatrixWorld();
+            }
         }
         this.view.notifyChange(true);
     });
+    // Add controller for Z translation
     folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('Translation Z').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
+            // Translate object and edges
             this.obj[i].translateY(value - prevValueZ);
             this.edges[i].translateY(value - prevValueZ);
+            // Save previous value
             prevValueZ = value;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
+            // Translate quads if they exist
+            if (this.quads != null) {
+                this.quads.position.copy(this.obj[i].position);
+                this.quads.updateMatrixWorld();
+            }
         }
         this.view.notifyChange(true);
     });
@@ -668,18 +986,21 @@ Symbolizer.prototype._addMoveLight = function addMoveLight(folder) {
     var prevValueX = 0;
     var prevValueY = 0;
     var prevValueZ = 0;
+    // Add controller for X translation of light
     folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 0.1).name('Translation X').onChange((value) => {
         this.light.position.x += value - prevValueX;
         prevValueX = value;
         this.light.updateMatrixWorld();
         this.view.notifyChange(true);
     });
+    // Add controller for Y translation of light
     folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('Translation Y').onChange((value) => {
         this.light.position.y += value - prevValueY;
         prevValueY = value;
         this.light.updateMatrixWorld();
         this.view.notifyChange(true);
     });
+    // Add controller for Z translation of light
     folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('Translation Z').onChange((value) => {
         this.light.position.z += value - prevValueZ;
         prevValueZ = value;
@@ -689,39 +1010,64 @@ Symbolizer.prototype._addMoveLight = function addMoveLight(folder) {
 };
 
 Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
+    // Initial GUI value
     var initialRotateX = this.obj[0].rotation.x;
     var initialRotateY = this.obj[0].rotation.y;
     var initialRotateZ = this.obj[0].rotation.z;
     var prevValueX = 0;
     var prevValueY = 0;
     var prevValueZ = 0;
+    // Add controller for X rotation
     folder.add({ rotationX: initialRotateX }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('Rotation X').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
+            // Rotate object and edges
             this.obj[i].rotateX(value - prevValueX);
             this.edges[i].rotateX(value - prevValueX);
+            // Save previous value
             prevValueX = value;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
+            // Rotate quads if they exist
+            if (this.quads != null) {
+                this.quads.rotation.copy(this.obj[i].rotation);
+                this.quads.updateMatrixWorld();
+            }
         }
         this.view.notifyChange(true);
     });
+    // Add controller for Y rotation
     folder.add({ rotationY: initialRotateY }, 'rotationY', -Math.PI, Math.PI, Math.PI / 100).name('Rotation Y').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
+            // Rotate object and edges
             this.obj[i].rotateY(value - prevValueY);
             this.edges[i].rotateY(value - prevValueY);
+            // Save previous value
             prevValueY = value;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
+            // Rotate quads if they exist
+            if (this.quads != null) {
+                this.quads.rotation.copy(this.obj[i].rotation);
+                this.quads.updateMatrixWorld();
+            }
         }
         this.view.notifyChange(true);
     });
+    // Add controlelr for Z rotation
     folder.add({ rotationZ: initialRotateZ }, 'rotationZ', -Math.PI, Math.PI, Math.PI / 100).name('Rotation Z').onChange((value) => {
         for (var i = 0; i < this.obj.length; i++) {
+            // Rotate object and edges
             this.obj[i].rotateZ(value - prevValueZ);
             this.edges[i].rotateZ(value - prevValueZ);
+            // Save previous value
             prevValueZ = value;
             this.obj[i].updateMatrixWorld();
             this.edges[i].updateMatrixWorld();
+            // Rotate quads if they exist
+            if (this.quads != null) {
+                this.quads.rotation.copy(this.obj[i].rotation);
+                this.quads.updateMatrixWorld();
+            }
         }
         this.view.notifyChange(true);
     });
@@ -861,12 +1207,8 @@ Symbolizer.prototype._addWidthEdgeAll = function addWidthEdgeAll(folder) {
 };
 
 Symbolizer.prototype._addStyleEdgeAll = function addStyleEdgeAll(folder) {
-    folder.add({ style: 'Continuous' }, 'style', ['Continous', 'Dashed']).name('Edge style').onChange((value) => {
-        for (var i = 0; i < this.edges.length; i++) {
-            for (var j = 0; j < this.edges[i].children.length; j++) {
-                this._changeStyleEdge(value, i, j, folder);
-            }
-        }
+    folder.add({ style: 'Continuous' }, 'style', ['Continous', 'Dashed', 'Sketchy']).name('Edge style').onChange((value) => {
+        this._changeStyleEdge(value, folder);
     });
 };
 
@@ -879,18 +1221,6 @@ Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
                     this._changeTextureAll('./textures/'.concat(value), i, folder);
                 }
             }).name('Texture');
-        }
-    });
-};
-
-
-Symbolizer.prototype._addEdgeTextureAll = function addEdgeTextureAll(folder, index) {
-    Fetcher.json('./textures/listeEdgeTexture.json').then((listTextures) => {
-        if (listTextures) {
-            listTextures[''] = '';
-            folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
-                this._changeEdgeTexture('./textures/'.concat(value), index);
-            }).name('Edge texture');
         }
     });
 };
@@ -918,7 +1248,6 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addOpacityEdgeAll(edgesFolder);
     this._addWidthEdgeAll(edgesFolder);
     this._addStyleEdgeAll(edgesFolder);
-    // this.addEdgeTextureAll(folder);
     var facesFolder = folder.addFolder('Faces');
     this._addTextureAll(facesFolder);
     this._addOpacityAll(facesFolder);
@@ -972,7 +1301,6 @@ export function getRandomColor() {
     return color;
 }
 
-
 function getSourceSynch(url) {
     var req = new XMLHttpRequest();
     req.open('GET', url, false);
@@ -980,10 +1308,37 @@ function getSourceSynch(url) {
     return req.responseText;
 }
 
-function getMethod(shader) {
-    var text = getSourceSynch('./methods/'.concat(shader).concat('.json'));
-    var method = JSON.parse(text);
-    return method;
+function createQuad(pt1, pt2) {
+    // Définition propre a chaque géométrie
+    var geometry = new THREE.BufferGeometry();
+    // les 6 points
+    var vertices = new Float32Array([
+        pt1.x, pt1.y, pt1.z, // -1
+        pt2.x, pt2.y, pt2.z, // -1
+        pt2.x, pt2.y, pt2.z, //  1
+        pt2.x, pt2.y, pt2.z, //  1
+        pt1.x, pt1.y, pt1.z, //  1
+        pt1.x, pt1.y, pt1.z]);
+    // pour chacun des six points, le point opposé correspondant
+    var vertices2 = new Float32Array([
+        pt2.x, pt2.y, pt2.z,
+        pt1.x, pt1.y, pt1.z,
+        pt1.x, pt1.y, pt1.z,
+        pt1.x, pt1.y, pt1.z,
+        pt2.x, pt2.y, pt2.z,
+        pt2.x, pt2.y, pt2.z]);
+    geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    geometry.addAttribute('position2', new THREE.BufferAttribute(vertices2, 3));
+    var uv = new Float32Array([
+        -1, -1,
+        1, -1,
+        1, 1,
+
+        1, 1,
+        -1, 1,
+        -1, -1]);
+    geometry.addAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    return geometry;
 }
 
 export default Symbolizer;
