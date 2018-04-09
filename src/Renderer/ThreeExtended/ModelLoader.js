@@ -241,7 +241,7 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
             extrude: extrudeBuildings,
             style: this.bdTopoStyle }),
         filter: acceptFeature,
-        url: 'http://wxs.ign.fr/72hpsel8j8nhb5qgdh07gcyp/geoportail/wfs?',
+        url: 'https://wxs.ign.fr/72hpsel8j8nhb5qgdh07gcyp/geoportail/wfs?',
         networkOptions: { crossOrigin: 'anonymous' },
         protocol: 'wfs',
         version: '2.0.0',

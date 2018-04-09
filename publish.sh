@@ -16,6 +16,6 @@ npm run build
 git add -f dist/*.js
 git commit -m "dist"
 echo -e "${BLUE}Copie${NC} du ${LPURPLE}dossier ${GREEN}dist ${NC}sur ${RED}itownsResearch/2018_TSI_vibes${NC}"
-git push
+git push -f
 
 
