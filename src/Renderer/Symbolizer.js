@@ -1240,24 +1240,18 @@ Symbolizer.prototype._addPositionAll = function addPositionAll(folder) {
         var vectCoord = new THREE.Vector3();
         folder.add({ longitude: initialX }, 'longitude').name('Position X').onChange((value) => {
             X = value;
-            if (Y != initialY || Z != initialZ) {
-                vectCoord.set(X, Y, Z);
-                this._changeCoordinates(vectCoord);
-            }
+            vectCoord.set(X, Y, Z);
+            this._changeCoordinates(vectCoord);
         });
         folder.add({ latitude: initialY }, 'latitude').name('Position Y').onChange((value) => {
             Y = value;
-            if (X != initialX || Z != initialZ) {
-                vectCoord.set(X, Y, Z);
-                this._changeCoordinates(vectCoord);
-            }
+            vectCoord.set(X, Y, Z);
+            this._changeCoordinates(vectCoord);
         });
         folder.add({ altitude: initialZ }, 'altitude').name('Position Z').onChange((value) => {
             Z = value;
-            if (Y != initialY || X != initialX) {
-                vectCoord.set(X, Y, Z);
-                this._changeCoordinates(vectCoord);
-            }
+            vectCoord.set(X, Y, Z);
+            this._changeCoordinates(vectCoord);
         });
     }
 };
