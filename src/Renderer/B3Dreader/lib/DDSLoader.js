@@ -30,9 +30,11 @@ DDSLoader.parse = function parse(buffer, loadMipmaps) {
         return value.charCodeAt(0) + (value.charCodeAt(1) << 8) + (value.charCodeAt(2) << 16) + (value.charCodeAt(3) << 24);
     }
 
+    /*
     function int32ToFourCC(value) {
         return String.fromCharCode(value & 0xff, (value >> 8) & 0xff, (value >> 16) & 0xff, (value >> 24) & 0xff);
     }
+    */
 
     function loadARGBMip(buffer, dataOffset, width, height) {
         var dataLength = width * height * 4;
@@ -77,11 +79,11 @@ DDSLoader.parse = function parse(buffer, loadMipmaps) {
     // Parse header
     var header = new Int32Array(buffer, 0, headerLengthInt);
     if (header[off_magic] !== DDS_MAGIC) {
-        console.error('DDSLoader.parse: Invalid magic number in DDS header.');
+        // console.error('DDSLoader.parse: Invalid magic number in DDS header.');
         return dds;
     }
     if (!header[off_pfFlags] & DDPF_FOURCC) {
-        console.error('DDSLoader.parse: Unsupported format, must contain a FourCC code.');
+        // console.error('DDSLoader.parse: Unsupported format, must contain a FourCC code.');
         return dds;
     }
     var blockBytes;
@@ -114,7 +116,7 @@ DDSLoader.parse = function parse(buffer, loadMipmaps) {
                 blockBytes = 64;
                 dds.format = THREE.RGBAFormat;
             } else {
-                console.error('DDSLoader.parse: Unsupported FourCC code ', int32ToFourCC(fourCC));
+                // console.error('DDSLoader.parse: Unsupported FourCC code ', int32ToFourCC(fourCC));
                 return dds;
             }
     }
@@ -132,7 +134,7 @@ DDSLoader.parse = function parse(buffer, loadMipmaps) {
         !(caps2 & DDSCAPS2_CUBEMAP_POSITIVEZ) ||
         !(caps2 & DDSCAPS2_CUBEMAP_NEGATIVEZ)
        )) {
-        console.error('DDSLoader.parse: Incomplete cubemap faces');
+        // console.error('DDSLoader.parse: Incomplete cubemap faces');
         return dds;
     }
     dds.width = header[off_width];

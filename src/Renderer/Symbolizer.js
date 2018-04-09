@@ -4,7 +4,7 @@
  */
 
 import * as THREE from 'three';
-import * as FILE from 'file-saver';
+import * as FILE_SAVER from '../utils/FileSaver';
 import Fetcher from '../Core/Scheduler/Providers/Fetcher';
 
 // Classe Symbolizer
@@ -748,7 +748,7 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
     }
     var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
     // model[0].name.split('_')[0]
-    FILE.saveAs(blob, name.concat('_partie.vibes'));
+    FILE_SAVER.saveAs(blob, name.concat('_partie.vibes'));
 };
 
 Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
@@ -805,7 +805,7 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
         };
     }
     var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
-    FILE.saveAs(blob, name.concat('_globale.vibes'));
+    FILE_SAVER.saveAs(blob, name.concat('_globale.vibes'));
 };
 
 Symbolizer.prototype._saveGibesAll = function saveGibesAll() {
@@ -820,7 +820,7 @@ Symbolizer.prototype._saveGibesAll = function saveGibesAll() {
         scale: this.obj[0].scale.x,
     };
     var blob = new Blob([JSON.stringify(gibes)], { type: 'text/plain; charset=utf-8' });
-    FILE.saveAs(blob, this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4).concat('.gibes'));
+    FILE_SAVER.saveAs(blob, this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4).concat('.gibes'));
 };
 
 
@@ -1536,7 +1536,7 @@ Symbolizer.prototype._checkStructure = function checkStructure() {
     return true;
 };
 
-
+/*
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
@@ -1545,7 +1545,7 @@ function getRandomColor() {
     }
     return color;
 }
-
+*/
 /*
 function getSourceSynch(url) {
     var req = new XMLHttpRequest();
@@ -1560,6 +1560,5 @@ function getMethod(shader) {
     return method;
 }
 */
-
 
 export default Symbolizer;

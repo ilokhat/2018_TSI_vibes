@@ -192,7 +192,7 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
         self.view.scene.add(self.model[1]);
         self.model[1].visible = false;
         self.view.notifyChange(true);
-        console.log('bati3D Loaded');
+        // console.log('bati3D Loaded');
     }
 };
 
@@ -215,10 +215,6 @@ ModelLoader.prototype._setVisibility = function _setVisibility(self, v) {
     }
 };
 
-function colorBuildings(properties) {
-    return new THREE.Color(0x00eeee);
-}
-
 function altitudeBuildings(properties) {
     return properties.z_min - properties.hauteur;
 }
@@ -236,7 +232,6 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
         type: 'geometry',
         update: FeatureProcessingBDTopo.update, // fichier modifier à revoir !!! L50
         convert: Feature2MeshStyle.convert({
-            color: colorBuildings,
             altitude: altitudeBuildings,
             extrude: extrudeBuildings,
             style: this.bdTopoStyle }),

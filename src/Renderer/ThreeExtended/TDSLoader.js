@@ -17,24 +17,27 @@ function TDSLoader() {
     this.meshes = [];
 }
 
-var NULL_CHUNK = 0x0000;
+// var NULL_CHUNK = 0x0000;
 var M3DMAGIC = 0x4D4D;
-var SMAGIC = 0x2D2D;
-var LMAGIC = 0x2D3D;
+// var SMAGIC = 0x2D2D;
+// var LMAGIC = 0x2D3D;
 var MLIBMAGIC = 0x3DAA;
-var MATMAGIC = 0x3DFF;
+// var MATMAGIC = 0x3DFF;
 var CMAGIC = 0xC23D;
 var M3D_VERSION = 0x0002;
-var M3D_KFVERSION = 0x0005;
+// var M3D_KFVERSION = 0x0005;
 var COLOR_F = 0x0010;
 var COLOR_24 = 0x0011;
 var LIN_COLOR_24 = 0x0012;
 var LIN_COLOR_F = 0x0013;
+/*
 var INT_PERCENTAGE = 0x0030;
 var FLOAT_PERCENTAGE = 0x0031;
+*/
 var MDATA = 0x3D3D;
 var MESH_VERSION = 0x3D3E;
 var MASTER_SCALE = 0x0100;
+/*
 var LO_SHADOW_BIAS = 0x1400;
 var HI_SHADOW_BIAS = 0x1410;
 var SHADOW_MAP_SIZE = 0x1420;
@@ -58,12 +61,14 @@ var DCUE_BGND = 0x2310;
 var USE_FOG = 0x2201;
 var USE_LAYER_FOG = 0x2303;
 var USE_DISTANCE_CUE = 0x2301;
+*/
 var MAT_ENTRY = 0xAFFF;
 var MAT_NAME = 0xA000;
 var MAT_AMBIENT = 0xA010;
 var MAT_DIFFUSE = 0xA020;
 var MAT_SPECULAR = 0xA030;
 var MAT_SHININESS = 0xA040;
+/*
 var MAT_SHIN2PCT = 0xA041;
 var MAT_TRANSPARENCY = 0xA050;
 var MAT_XPFALL = 0xA052;
@@ -72,16 +77,20 @@ var MAT_REFBLUR = 0xA053;
 var MAT_SHADING = 0xA100;
 var MAT_USE_REFBLUR = 0xA250;
 var MAT_SELF_ILLUM = 0xA084;
+*/
 var MAT_TWO_SIDE = 0xA081;
-var MAT_DECAL = 0xA082;
+// var MAT_DECAL = 0xA082;
 var MAT_ADDITIVE = 0xA083;
 var MAT_WIRE = 0xA085;
+/*
 var MAT_FACEMAP = 0xA088;
 var MAT_TRANSFALLOFF_IN = 0xA08A;
 var MAT_PHONGSOFT = 0xA08C;
 var MAT_WIREABS = 0xA08E;
+*/
 var MAT_WIRE_SIZE = 0xA087;
 var MAT_TEXMAP = 0xA200;
+/*
 var MAT_SXP_TEXT_DATA = 0xA320;
 var MAT_TEXMASK = 0xA33E;
 var MAT_SXP_TEXTMASK_DATA = 0xA32A;
@@ -89,15 +98,21 @@ var MAT_TEX2MAP = 0xA33A;
 var MAT_SXP_TEXT2_DATA = 0xA321;
 var MAT_TEX2MASK = 0xA340;
 var MAT_SXP_TEXT2MASK_DATA = 0xA32C;
+*/
 var MAT_OPACMAP = 0xA210;
+/*
 var MAT_SXP_OPAC_DATA = 0xA322;
 var MAT_OPACMASK = 0xA342;
 var MAT_SXP_OPACMASK_DATA = 0xA32E;
+*/
 var MAT_BUMPMAP = 0xA230;
+/*
 var MAT_SXP_BUMP_DATA = 0xA324;
 var MAT_BUMPMASK = 0xA344;
 var MAT_SXP_BUMPMASK_DATA = 0xA330;
+*/
 var MAT_SPECMAP = 0xA204;
+/*
 var MAT_SXP_SPEC_DATA = 0xA325;
 var MAT_SPECMASK = 0xA348;
 var MAT_SXP_SPECMASK_DATA = 0xA332;
@@ -113,20 +128,26 @@ var MAT_REFLMAP = 0xA220;
 var MAT_REFLMASK = 0xA34C;
 var MAT_SXP_REFLMASK_DATA = 0xA338;
 var MAT_ACUBIC = 0xA310;
+*/
 var MAT_MAPNAME = 0xA300;
+/*
 var MAT_MAP_TILING = 0xA351;
 var MAT_MAP_TEXBLUR = 0xA353;
+*/
 var MAT_MAP_USCALE = 0xA354;
 var MAT_MAP_VSCALE = 0xA356;
 var MAT_MAP_UOFFSET = 0xA358;
 var MAT_MAP_VOFFSET = 0xA35A;
+/*
 var MAT_MAP_ANG = 0xA35C;
 var MAT_MAP_COL1 = 0xA360;
 var MAT_MAP_COL2 = 0xA362;
 var MAT_MAP_RCOL = 0xA364;
 var MAT_MAP_GCOL = 0xA366;
 var MAT_MAP_BCOL = 0xA368;
+*/
 var NAMED_OBJECT = 0x4000;
+/*
 var N_DIRECT_LIGHT = 0x4600;
 var DL_OFF = 0x4620;
 var DL_OUTER_RANGE = 0x465A;
@@ -156,15 +177,19 @@ var OBJ_MATTE = 0x4013;
 var OBJ_FAST = 0x4014;
 var OBJ_PROCEDURAL = 0x4015;
 var OBJ_FROZEN = 0x4016;
+*/
 var N_TRI_OBJECT = 0x4100;
 var POINT_ARRAY = 0x4110;
-var POINT_FLAG_ARRAY = 0x4111;
+// var POINT_FLAG_ARRAY = 0x4111;
 var FACE_ARRAY = 0x4120;
 var MSH_MAT_GROUP = 0x4130;
+/*
 var SMOOTH_GROUP = 0x4150;
 var MSH_BOXMAP = 0x4190;
+*/
 var TEX_VERTS = 0x4140;
 var MESH_MATRIX = 0x4160;
+/*
 var MESH_COLOR = 0x4165;
 var MESH_TEXTURE_INFO = 0x4170;
 var KFDATA = 0xB000;
@@ -234,6 +259,7 @@ var VIEWPORT_DATA = 0x7011;
 var VIEWPORT_DATA_3 = 0x7012;
 var VIEWPORT_SIZE = 0x7020;
 var NETWORK_VIEW = 0x7030;
+*/
 
 /**
  * Load 3ds file from url.
@@ -250,7 +276,7 @@ TDSLoader.prototype.load = function load(url, onLoad, onProgress, onError) {
     var loader = new THREE.FileLoader(THREE.DefaultLoadingManager);
     loader.setResponseType('arraybuffer');
     loader.load(url, (data) => {
-        console.log('on load');
+        // console.log('on load');
         onLoad(temp.parse(data, path));
     }, onProgress, onError);
 };
@@ -552,7 +578,7 @@ TDSLoader.prototype.readFaceArray = function readFaceArray(data, mesh) {
     this.debugMessage('   Faces: '.concat(faces));
     for (var i = 0; i < faces; ++i) {
         mesh.geometry.faces.push(new THREE.Face3(this.readWord(data), this.readWord(data), this.readWord(data)));
-        var visibility = this.readWord(data);
+        // var visibility = this.readWord(data);
     }
     // The rest of the FACE_ARRAY chunk is subchunks
     while (this.position < chunkD.end) {
@@ -624,7 +650,7 @@ TDSLoader.prototype.readMap = function readMap(data, path) {
  * @return {Object} Object with name and index of the object.
  */
 TDSLoader.prototype.readMaterialGroup = function readMaterialGroup(data) {
-    var chunk = this.readChunk(data);
+    // var chunk = this.readChunk(data);
     var nameD = this.readString(data, 64);
     var numFaces = this.readWord(data);
     this.debugMessage('         Name: '.concat(nameD));
@@ -852,8 +878,9 @@ TDSLoader.prototype.setPath = function setPath(path) {
  */
 TDSLoader.prototype.debugMessage = function debugMessage(message) {
     if (this.debug) {
-        console.log(message);
+        // console.log(message);
     }
+    message.concat('.');
 };
 
 export default TDSLoader;
