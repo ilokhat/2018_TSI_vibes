@@ -384,9 +384,9 @@ There are two ways to move objects:
 
 The first one can be done by using the keyboard keys after clicking on the object or selecting it from the GUI, the user can use the follown keys:
 
-* Keys a and z or 4 and 6 to move the object on the X axis.
-* Keys w and x or 7 and 3 to move the object on the Y axis.
-* Keys q and s or 8 and 2 to move the object on the Z axis.
+* Keys a and z or 4 and 6 to move the object from West to East.
+* Keys q and s or 8 and 2 to move the object from North to South.
+* Keys w and x or 7 and 3 to move the object from Top-Down.
 
 The second way the user can use the sliders on the GUI which are shown in the picture below : Translate X, Translate Y and Translate Z
 
