@@ -508,7 +508,7 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
     if (value === 'Sketchy') {
         // Initial GUI parameters
         var color = this.edges[0].children[0].material.color;
-        var width = 30.0;
+        var width = this.edges[0].children[0].material.linewidth;
         var threshold = 100.0;
         var stroke = 'dashed';
         // Checks if sketchy parameters controllers already exists
@@ -1596,23 +1596,28 @@ Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
 
 Symbolizer.prototype._addPositionAll = function addPositionAll(folder) {
     if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
+        // Initial GUI value
         var initialX = this.obj[0].position.x;
         var initialY = this.obj[0].position.y;
         var initialZ = this.obj[0].position.z;
         let X = initialX;
         let Y = initialY;
         let Z = initialZ;
+        // vector to store the new coordinates
         var vectCoord = new THREE.Vector3();
+        // Controller for position on X
         folder.add({ longitude: initialX }, 'longitude').name('Position X').onChange((value) => {
             X = value;
             vectCoord.set(X, Y, Z);
             this._changeCoordinates(vectCoord);
         });
+        // Controller for position on Y
         folder.add({ latitude: initialY }, 'latitude').name('Position Y').onChange((value) => {
             Y = value;
             vectCoord.set(X, Y, Z);
             this._changeCoordinates(vectCoord);
         });
+        // Controller for position on Z
         folder.add({ altitude: initialZ }, 'altitude').name('Position Z').onChange((value) => {
             Z = value;
             vectCoord.set(X, Y, Z);
@@ -1625,10 +1630,16 @@ Symbolizer.prototype._changeCoordinates = function changeCoordinates(vectCoord) 
     if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
         for (var i = 0; i < this.obj.length; i++) {
             if (this.obj[0].name != 'bati3D_faces') {
+                // Modification of object and edges position
                 this.obj[i].position.copy(vectCoord);
                 this.edges[i].position.copy(vectCoord);
                 this.obj[i].updateMatrixWorld();
                 this.edges[i].updateMatrixWorld();
+                // Modification of quads position if they exist
+                if (this.quads != null) {
+                    this.quads.position.copy(this.obj[i].position);
+                    this.quads.updateMatrixWorld();
+                }
             }
         }
         this.view.controls.setCameraTargetPosition(this.obj[0].position, false);
