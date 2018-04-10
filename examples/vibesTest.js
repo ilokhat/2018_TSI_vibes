@@ -68,9 +68,12 @@ window.onload = () => manager.initListener();
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
     globeView.controls.setOrbitalPosition({ heading: 30, tilt: 30 });
     globeView.controls.setZoom(13, true);
+    var result = document.getElementById('result')
     document.getElementById('viewerDiv').addEventListener('mousemove', function() { 
-        document.getElementById('result').innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + ", Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
-    }) 
+        result.innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + ", Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
+        result.innerHTML += "<br> use keys a and z or 4 and 6 to move object on x axis <br> use keys w and x or 7 and 3 to move object on y axis <br> use keys q and s or 8 and 2 to move object on z axis ";
+    })
+    result.innerHTML += "<br> use keys a and z or 4 and 6 to move object on x axis <br> use keys w and x or 7 and 3 to move object on y axis <br> use keys q and s or 8 and 2 to move object on z axis";
     // globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
     loader.loadBDTopo();
 });
