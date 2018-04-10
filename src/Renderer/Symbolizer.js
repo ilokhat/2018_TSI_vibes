@@ -4,12 +4,14 @@
  */
 
 import * as THREE from 'three';
-import * as FILE from 'file-saver';
+// import savery from 'savery';
 import Fetcher from '../Core/Scheduler/Providers/Fetcher';
+
+var saveData;
 
 // Classe Symbolizer
 
-function Symbolizer(view, obj, edges, bdTopo, menu, nb, light, plane) {
+function Symbolizer(view, obj, edges, bdTopo, menu, nb, light, plane, saveDataInit) {
     // Constructor
     this.obj = obj;
     this.edges = edges;
@@ -24,6 +26,7 @@ function Symbolizer(view, obj, edges, bdTopo, menu, nb, light, plane) {
     this.plane = plane;
     if (bdTopo != null) this.bdTopoStyle = bdTopo.bdTopoStyle;
     this.applyStyle();
+    saveData = saveDataInit();
 }
 
 Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = null) {
@@ -1041,9 +1044,9 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
             ],
         };
     }
-    var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
-    // model[0].name.split('_')[0]
-    FILE.saveAs(blob, name.concat('_partie.vibes'));
+    // var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
+    // console.log(blob);
+    saveData(vibes, name.concat('_partie.vibes'));
 };
 
 Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
@@ -1099,23 +1102,28 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
             ],
         };
     }
-    var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
-    FILE.saveAs(blob, name.concat('_globale.vibes'));
+    // var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
+    // FILE_SAVER.saveAs(blob, name.concat('_globale.vibes'));
+    saveData(vibes, name.concat('_globale.vibes'));
 };
 
 Symbolizer.prototype._saveGibesAll = function saveGibesAll() {
-    var gibes = {
-        name: this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4),
-        coordX: this.obj[0].position.x,
-        coordY: this.obj[0].position.y,
-        coordZ: this.obj[0].position.z,
-        rotateX: this.obj[0].rotation.x,
-        rotateY: this.obj[0].rotation.y,
-        rotateZ: this.obj[0].rotation.z,
-        scale: this.obj[0].scale.x,
-    };
-    var blob = new Blob([JSON.stringify(gibes)], { type: 'text/plain; charset=utf-8' });
-    FILE.saveAs(blob, this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4).concat('.gibes'));
+    if (this.obj.length > 0) {
+        var nameFile = this.obj[0].name.split('_')[0];
+        var gibes = {
+            name: nameFile,
+            coordX: this.obj[0].position.x,
+            coordY: this.obj[0].position.y,
+            coordZ: this.obj[0].position.z,
+            rotateX: this.obj[0].rotation.x,
+            rotateY: this.obj[0].rotation.y,
+            rotateZ: this.obj[0].rotation.z,
+            scale: this.obj[0].scale.x,
+        };
+        // var blob = new Blob([JSON.stringify(gibes)], { type: 'text/plain; charset=utf-8' });
+        // FILE_SAVER.saveAs(blob, this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4).concat('.gibes'));
+        saveData(gibes, nameFile.concat('_globale.gibes'));
+    }
 };
 
 
@@ -1876,7 +1884,7 @@ Symbolizer.prototype._checkStructure = function checkStructure() {
     return true;
 };
 
-
+/*
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
@@ -1885,6 +1893,7 @@ function getRandomColor() {
     }
     return color;
 }
+*/
 
 function loadFileException(message) {
     this.message = message;

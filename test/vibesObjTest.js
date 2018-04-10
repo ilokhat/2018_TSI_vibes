@@ -1,9 +1,10 @@
-var manager = itowns.LayerManager.prototype ;
-var symbolizer = itowns.Symbolizer.prototype ;
+/* global itowns, describe, it */
+var chai = require('chai');
 
-console.log(manager);
+var manager = itowns.LayerManager.prototype;
+var symbolizer = itowns.Symbolizer.prototype;
 
-var f = new File([""], "filename.text", {type: "text/plain"})
+var f = new File([''], 'filename.text', { type: 'text/plain' });
 
 describe('LayerManager._readFile()', function () {
   it('Expected .obj or .gibes file', function () {
@@ -62,4 +63,3 @@ describe('symbolizer.readVibes()', function () {
 
   });
 });
-
