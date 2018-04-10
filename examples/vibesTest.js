@@ -50,13 +50,28 @@ var rotateZ = 0;
 var scale = 300;
 
 
+function saveDataInit() {
+    var a = document.createElement('a');
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    return function saveData(data, fileName) {
+        var json = JSON.stringify(data);
+        var blob = new Blob([json], { type: 'text/plain;charset=utf-8' });
+        var url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+};
 
 // Loader initialization
 var loader = new itowns.ModelLoader(globeView);
 
 // Symbolizer
 var symbolizer = function(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane) {
-    return new itowns.Symbolizer(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane);
+    // console.log(saveDataInit);
+    return new itowns.Symbolizer(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane, saveDataInit);
 }
 
 

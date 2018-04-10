@@ -110,7 +110,7 @@ if (!process.env.PWD) {
     process.env.PWD = process.cwd();
 }
 // eslint-disable-next-line import/no-dynamic-require
-const itowns = require('../dist/itowns.js');// `${process.env.PWD}/lib/Main.js`);
+const itowns = require(`${process.env.PWD}/lib/Main.js`);
 
 global.renderer = {
     context: {
