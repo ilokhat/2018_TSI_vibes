@@ -391,6 +391,7 @@ The first one can be done by using the keyboard keys after clicking on the objec
 The second way the user can use the sliders on the GUI which are shown in the picture below : Translate X, Translate Y and Translate Z
 
 <img src="VIBES/move-object.png" style="width: 400px;"/>
+
 ##### Absolute positionning
 
 But this method cannot be used to georeference an object completely - we cannot use a slider to move a mesh from one end of the world to the other. Until this step, the coordinates were hard-coded in the example, which is not satisfying.  
