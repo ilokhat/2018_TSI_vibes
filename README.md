@@ -1,5 +1,5 @@
 
-<img src="Vibes.png" style="width: 400px;"/>
+<p align="center"><img src="Vibes.png" style="width: 400px;"/></p>
 
 # Visualization in iTowns of Buildings Elegantly Stylized
 
@@ -319,9 +319,17 @@ A callback function should be passed in the parameters of the public method, to 
 
 TODO : describe how we load OBJ data.
 
+
 #### BATI3D Loader
 
-TODO : describe how we load BATI3D data.
+The BATI3D is a IGN production who give the 3D building of France by 500mx500m tile (in the localization where the data exists). 
+One tile match one folder whose name depend on the top lef corner coordinates (ex:'EXPORT_1302-13722'). The 3D model is save as '.3DS' and link to the corrresponding orthophoto images. The 3D model has each point geolocated with the Lambert93 coordinates (EPSG:2154).
+
+For load the IGN's BATI3D, we were guided by the iGN project : [*itowns-legacy*](https://github.com/iTowns/itowns-legacy) who has an sample of BATI3D and load it on a itowns plan view.
+
+We reuse the classes : Cartography3D,  clipMap,  dalleClasse,  Shader, B3DLoader,  BinaryStream,  DDSLoader,  PlatformInfo and the function BufferGeometryUtils extracted from  Utils.
+
+The dificulty is to make the load work on the itowns glob view instead of the itowns plan view.
 
 #### BDTOPO Loader
 
