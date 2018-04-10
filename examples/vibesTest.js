@@ -64,16 +64,13 @@ window.onload = () => manager.initListener();
 // Listen for globe full initialisation event
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
     globeView.controls.setOrbitalPosition({ heading: 30, tilt: 30 });
-<<<<<<< HEAD
     globeView.controls.setZoom(13, true);
     var result = document.getElementById('result')
-=======
->>>>>>> 3c74d6d1373ca60ce4266c3590348aa88d2165bf
     document.getElementById('viewerDiv').addEventListener('mousemove', function() { 
-        result.innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + ", Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
-        result.innerHTML += "<br> use keys a and z or 4 and 6 to move object on x axis <br> use keys w and x or 7 and 3 to move object on y axis <br> use keys q and s or 8 and 2 to move object on z axis ";
+        result.innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + "<br> Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
+        result.innerHTML += "<br> To move object click on it or select it from GUI <br> use keys a and z or 4 and 6 to move it on x axis <br> use keys w and x or 7 and 3 to move it on y axis <br> use keys q and s or 8 and 2 to move it on z axis ";
     })
-    result.innerHTML += "<br> use keys a and z or 4 and 6 to move object on x axis <br> use keys w and x or 7 and 3 to move object on y axis <br> use keys q and s or 8 and 2 to move object on z axis";
+    result.innerHTML += "<br> To move object click on it or select it from GUI <br> use keys a and z or 4 and 6 to move it on x axis <br> use keys w and x or 7 and 3 to move it on y axis <br> use keys q and s or 8 and 2 to move it on z axis ";
     // globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
     loader.loadBDTopo();
 });
