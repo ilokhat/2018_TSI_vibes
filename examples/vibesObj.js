@@ -97,9 +97,9 @@ exports.loadOBJ = function loadOBJ(url) {
             mesh.lookAt(mesh.position.clone().add(coord.geodesicNormal));
             // user rotate building to align with ortho image
             //mesh.rotateZ(-Math.PI * 0.2);
-            mesh.rotateX(Math.PI/2);
-            mesh.rotateY(Math.PI/4);
-            mesh.scale.set(300, 300, 300);
+            //mesh.rotateX(Math.PI/2);
+            // mesh.rotateY(Math.PI/4);
+            //mesh.scale.set(300, 300, 300);
 
             // set camera's layer to do not disturb the picking
             mesh.traverse(function _(obj) { obj.layers.set(objID); });
@@ -122,9 +122,9 @@ exports.loadOBJ = function loadOBJ(url) {
                 line.position.copy(coord.as(globeView.referenceCrs).xyz());
                 // align up vector with geodesic normal
                 line.lookAt(mesh.position.clone().add(coord.geodesicNormal));
-                line.rotateX(Math.PI/2);
-                line.rotateY(Math.PI/4);
-                line.scale.set(300, 300, 300);
+                //line.rotateX(Math.PI/2);
+                ///line.rotateY(Math.PI/4);
+                //line.scale.set(300, 300, 300);
                 line.updateMatrixWorld();
 
                 globeView.scene.add(line);

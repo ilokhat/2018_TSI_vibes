@@ -1415,7 +1415,7 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
         var prevValueY = 0;
         var prevValueZ = 0;
         // Add controller for X translation
-        folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 0.1).name('Translation X').onChange((value) => {
+        folder.add({ MovecoordX: 0 }, 'MovecoordX', -500, 500, 0.1).name('Translation X').onChange((value) => {
             for (var i = 0; i < this.obj.length; i++) {
                 if (this.obj[i].name != 'bati3D_faces') {
                     // Translate object and edges
@@ -1435,7 +1435,7 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
             this.view.notifyChange(true);
         });
         // Add controller for Y translation
-        folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('Translation Y').onChange((value) => {
+        folder.add({ MovecoordY: 0 }, 'MovecoordY', -500, 500, 0.1).name('Translation Y').onChange((value) => {
             for (var i = 0; i < this.obj.length; i++) {
                 if (this.obj[i].name != 'bati3D_faces') {
                     // Translate object and edges
@@ -1455,7 +1455,7 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
             this.view.notifyChange(true);
         });
         // Add controller for Z translation
-        folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('Translation Z').onChange((value) => {
+        folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -500, 500, 0.1).name('Translation Z').onChange((value) => {
             for (var i = 0; i < this.obj.length; i++) {
                 if (this.obj[i].name != 'bati3D_faces') {
                     // Translate object and edges
