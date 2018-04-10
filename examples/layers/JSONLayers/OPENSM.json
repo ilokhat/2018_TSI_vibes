@@ -3,7 +3,7 @@
     "protocol": "xyz",
     "networkOptions": { "crossOrigin" : "anonymous" },
     "id": "OPENSM",
-    "url": "http://osm.oslandia.io/styles/klokantech-basic/${z}/${x}/${y}.png",
+    "url": "https://osm.oslandia.io/styles/klokantech-basic/${z}/${x}/${y}.png",
     "options": {
         "attribution": {
             "name":"OpenStreetMap",

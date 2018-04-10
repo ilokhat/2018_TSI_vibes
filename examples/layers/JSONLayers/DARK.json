@@ -3,7 +3,7 @@
     "protocol": "xyz",
 	"networkOptions": { "crossOrigin" : "anonymous" },
     "id": "DARK",
-    "url": "http://a.basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png",
+    "url": "https://a.basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png",
     "options": {
     	"attribution": {
     		"name":"CARTO",

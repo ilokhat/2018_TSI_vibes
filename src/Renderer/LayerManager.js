@@ -27,31 +27,54 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.stylizePartsBtn = null;
     this.deleteBtn = null;
     this.bati3dBtn = null;
+    this.coordCRS = coord.as('EPSG:4326');
     _this = this;
 }
 
 var showBDTopo = (parent) => { parent.visible = true; };
 var hideBDTopo = (parent) => { parent.visible = false; };
 
+
 function createBati3dBtn() {
+    _this.loader.loadBati3D();
     _this.bati3dBtn = _this.menu.gui.add({ bati3D: () => {
         var bati3D_faces = _this.view.scene.getObjectByName('bati3D_faces');
         var bati3D_lines = _this.view.scene.getObjectByName('bati3D_lines');
         if (bati3D_faces != undefined && bati3D_lines != undefined) {
-            if (_this.loader.checked) {
-                _this.loader._setVisibility(_this.view, false);
-                _this.loader.checked = false;
-            } else {
-                _this.loader._setVisibility(_this.view, true);
-                _this.loader.checked = true;
-                var model = [bati3D_faces, bati3D_lines];
-                _this.handleLayer(model);
-                _this.menu.gui.remove(_this.bati3dBtn);
-            }
+            _this.loader._setVisibility(_this.view, true);
+            // _this.loader.checked = true;
+            var model = [bati3D_faces, bati3D_lines];
+            _this.handleLayer(model);
+            _this.menu.gui.remove(_this.bati3dBtn);
         }
     },
-    }, 'bati3D').name('bati3D');
+    }, 'bati3D').name('Load Bati3D');
 }
+
+function manageCamera() {
+    var camFolder = _this.menu.gui.addFolder('Camera');
+    var initialCamX = _this.coordCRS.longitude();
+    var initialCamY = _this.coordCRS.latitude();
+    let camX = initialCamX;
+    let camY = initialCamY;
+    camFolder.add({ resetCam: () => {
+        _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: initialCamX, latitude: initialCamY, zoom: 15, tilt: 30, heading: 30 }, false);
+    },
+    }, 'resetCam').name('Reset camera');
+    
+    camFolder.add({ moveCamX: initialCamX }, 'moveCamX').name('Longitude').onChange((value) => {
+        camX = value;
+        _this.view.controls.setCameraTargetGeoPosition({ longitude: camX, latitude: camY }, false);
+    });
+    camFolder.add({ moveCamY: initialCamY }, 'moveCamY').name('Latitude').onChange((value) => {
+        camY = value;
+        _this.view.controls.setCameraTargetGeoPosition({ longitude: camX, latitude: camY }, false);
+    });
+    camFolder.add({ zoom: 15 }, 'zoom').name('Zoom').onChange((value) => {
+        _this.view.controls.setZoom(value, false);
+    });
+}
+
 LayerManager.prototype.initListener = function initListener() {
     createBati3dBtn();
     // bati3D visibility
@@ -69,7 +92,8 @@ LayerManager.prototype.initListener = function initListener() {
             }
         }
     },
-    }, 'bdTopo').name('bdTopo');
+    }, 'bdTopo').name('Load BDTopo');
+    manageCamera();
     this.document.addEventListener('keypress', _this.checkKeyPress, false);
     this.document.addEventListener('click', _this.picking, false);
     this.document.addEventListener('drop', _this.documentDrop, false);
@@ -92,8 +116,8 @@ LayerManager.prototype._readFile = function readFile(file) {
     if (file.name.endsWith('.obj')) {
         reader.addEventListener('load', () => {
             // Load object
-            _this.loader.loadOBJ(reader.result, _this.coord, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale, _this.handleLayer, _this.menu);
-            _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: _this.coord.longitude(), latitude: _this.coord.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
+            _this.loader.loadOBJ(reader.result, _this.coordCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale, _this.handleLayer, _this.menu);
+            _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: _this.coordCRS.longitude(), latitude: _this.coordCRS.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
         }, false);
         reader.readAsDataURL(file);
         return 0;
@@ -112,12 +136,11 @@ LayerManager.prototype._readFile = function readFile(file) {
                 _this.rotateZ = json.rotateZ + this.rotateZ;
                 _this.scale = json.scale;
                 // Moving object
-                var crs = _this.coord.crs;
                 var vectCoord = new THREE.Vector3().set(coordX, coordY, coordZ);
                 _this.coord.set('EPSG:4978', vectCoord);
-                var coordCRS = _this.coord.as(crs);
-                _this.loader._loadModel(layer[0], layer[1], coordCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
-                _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: coordCRS.longitude(), latitude: coordCRS.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
+                var newCRS = _this.coord.as('EPSG:4326');
+                _this.loader._loadModel(layer[0], layer[1], newCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
+                _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: newCRS.longitude(), latitude: newCRS.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
             });
         });
         reader.readAsText(file);
@@ -128,6 +151,7 @@ LayerManager.prototype._readFile = function readFile(file) {
         throw new loadFileException('Unvalid format');
     }
 };
+
 LayerManager.prototype.guiInitialize = function guiInitialize() {
     _this.stylizeObjectBtn = _this.layerFolder.add({ symbolizer: () => {
         _this.initSymbolizer(false);
@@ -164,14 +188,24 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                     }
                 },
                 }, 'bdTopo').name('bdTopo');
-            } else if (layer[0].name === 'bati3D_faces' || layer[0].name === 'bati3D_lines') {
+                _this.view.scene.remove(_this.view.scene.getObjectByName('quads_bdTopo'));
+            } 
+            else if (layer[0].name === 'bati3D_faces' || layer[0].name === 'bati3D_lines') {
                 createBati3dBtn();
-            } else {
+                _this.loader._setVisibility(_this.view, false);
+                _this.loader.checked = false;
+                // Remove quads if they exist
+                _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
+            } 
+            else {
+                // Simple object
                 _this.view.scene.remove(layer[0]);
                 _this.view.scene.remove(layer[1]);
+                    // Remove quads if they exist
+                _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
             }
+            _this.view.notifyChange(true);
         });
-        _this.view.notifyChange(true);
         // Remove the layers from the list of layers to stylize
         _this.listLayers = [];
         // If there is no more layers, remove 'Open symbolizer' and 'Delete Layer' buttons
@@ -205,11 +239,6 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
             }
         }
     });
-    _this.layerFolder.add({ resetCam: () => {
-        var coordCRS = _this.coord.as('EPSG:4326');
-        _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: coordCRS.longitude(), latitude: coordCRS.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
-    },
-    }, 'resetCam').name('Reset camera');
 };
 
 LayerManager.prototype.handleBdTopo = function handleBdTopo() {

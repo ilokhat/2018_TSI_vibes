@@ -41,6 +41,7 @@ function ModelLoader(view) {
             color: '#ffffff',
             opacity: 1,
             width: 1,
+            style: 'Continuous',
         },
     };
     _this = this;
@@ -192,7 +193,6 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
         self.view.scene.add(self.model[1]);
         self.model[1].visible = false;
         self.view.notifyChange(true);
-        console.log('bati3D Loaded');
     }
 };
 
@@ -260,22 +260,22 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
     // setTimeout(() => self.ForBuildings(calleback), 1000);
 };
 
-ModelLoader.prototype.ForBuildings = function ForBuildings(calleback) {
+ModelLoader.prototype.ForBuildings = function ForBuildings(callback) {
     // For all globe tile meshes we look for tile at level 14 on which building meshes are attached.
-    var a = element => _this.traverseElement(element, calleback);
+    var a = element => _this.traverseElement(element, callback);
     for (var i = 0; i < _this.view.wgs84TileLayer.level0Nodes.length; ++i) {
         _this.view.wgs84TileLayer.level0Nodes[i].traverse(a);
     }
     _this.view.notifyChange(true);
 };
 
-ModelLoader.prototype.traverseElement = function traverseElement(element, calleback) {
+ModelLoader.prototype.traverseElement = function traverseElement(element, callback) {
     if (element.level != undefined && element.level <= 14) {
         // console.log(element);
         for (var c = 0; c < element.children.length; ++c) {
             if (element.children[c].type == 'Group') {
                 var parent = element.children[c];
-                calleback(parent);
+                callback(parent);
             }
         }
     }

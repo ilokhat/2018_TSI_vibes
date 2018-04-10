@@ -6,7 +6,7 @@
 // setting is "coordonnée geographiques en degres decimaux"
 
 // Position near Gerbier mountain.
-var positionOnGlobe = { longitude: 2.396387, latitude: 48.848701, altitude: 2000 };
+var positionOnGlobe = { longitude: 6.364034, latitude: 44.577192, altitude: 5000 };
 // var positionOnGlobe = { longitude: 4.818, latitude: 45.7354, altitude: 3000 };
 
 // `viewerDiv` will contain iTowns' rendering area (`<canvas>`)
@@ -43,11 +43,13 @@ promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/WORLD_DTM.json').
 promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/IGN_MNT_HIGHRES.json').then(result => addLayerCb(result)));
 
 // Geolocation default parameters
-var coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 50);
+var coord = new itowns.Coordinates('EPSG:4326', 6.364034, 44.577192, 50);
 var rotateX = Math.PI/2;
 var rotateY = 0;
 var rotateZ = 0;
 var scale = 300;
+
+
 
 // Loader initialization
 var loader = new itowns.ModelLoader(globeView);
@@ -57,25 +59,19 @@ var symbolizer = function(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, l
     return new itowns.Symbolizer(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane);
 }
 
+
 // Layer management
 var manager = new itowns.LayerManager(globeView, document, menuGlobe, coord, rotateX, rotateY, rotateZ, scale, loader, symbolizer)
 window.onload = () => manager.initListener();
 
 // Listen for globe full initialisation event
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
-    globeView.controls.setOrbitalPosition({ heading: 30, tilt: 30 });
-<<<<<<< HEAD
-    globeView.controls.setZoom(13, true);
-    var result = document.getElementById('result')
-=======
->>>>>>> 3c74d6d1373ca60ce4266c3590348aa88d2165bf
+    globeView.controls.setOrbitalPosition({ heading: 20, tilt: 20 });
     document.getElementById('viewerDiv').addEventListener('mousemove', function() { 
-        result.innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + ", Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
-        result.innerHTML += "<br> use keys a and z or 4 and 6 to move object on x axis <br> use keys w and x or 7 and 3 to move object on y axis <br> use keys q and s or 8 and 2 to move object on z axis ";
-    })
-    result.innerHTML += "<br> use keys a and z or 4 and 6 to move object on x axis <br> use keys w and x or 7 and 3 to move object on y axis <br> use keys q and s or 8 and 2 to move object on z axis";
-    // globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
+        document.getElementById('result').innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + ", Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
+    }) 
+    //globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
     loader.loadBDTopo();
 });
 //var loader2 = new itowns.ModelLoader(globeView);
- // loader.loadBati3D();
+ loader.loadBati3D();
