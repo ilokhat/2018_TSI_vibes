@@ -95,6 +95,7 @@ function manageCamera() {
 }
 
 LayerManager.prototype.initListener = function initListener() {
+    this.document.addEventListener('keypress', _this.checkKeyPress, false);
     createBati3dBtn();
     // bati3D visibility
     _this.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
@@ -208,14 +209,14 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                 },
                 }, 'bdTopo').name('bdTopo');
                 _this.view.scene.remove(_this.view.scene.getObjectByName('quads_bdTopo'));
-            } 
+            }
             else if (layer[0].name === 'bati3D_faces' || layer[0].name === 'bati3D_lines') {
                 createBati3dBtn();
                 _this.loader._setVisibility(_this.view, false);
                 _this.loader.checked = false;
                 // Remove quads if they exist
                 _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
-            } 
+            }
             else {
                 // Simple object
                 _this.view.scene.remove(layer[0]);

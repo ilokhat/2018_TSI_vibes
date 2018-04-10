@@ -2,14 +2,14 @@
  * A loader for 3D model of diverse formats
  */
 
-import * as OBJLoader from 'three-obj-loader';
+// import * as OBJLoader from 'three-obj-loader';
 import * as THREE from 'three';
 import Cartography3D from '../B3Dreader/Cartography3D';
 import Feature2MeshStyle from './Feature2MeshStyle';
 import FeatureProcessingBDTopo from '../../Process/FeatureProcessingBDTopo';
 
 var _this;
-OBJLoader(THREE);
+// var _a = OBJLoader(THREE);
 
 function ModelLoader(view) {
     // Constructor
@@ -215,10 +215,6 @@ ModelLoader.prototype._setVisibility = function _setVisibility(self, v) {
     }
 };
 
-function colorBuildings(properties) {
-    return new THREE.Color(0x00eeee);
-}
-
 function altitudeBuildings(properties) {
     return properties.z_min - properties.hauteur;
 }
@@ -236,7 +232,6 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
         type: 'geometry',
         update: FeatureProcessingBDTopo.update, // fichier modifier à revoir !!! L50
         convert: Feature2MeshStyle.convert({
-            color: colorBuildings,
             altitude: altitudeBuildings,
             extrude: extrudeBuildings,
             style: this.bdTopoStyle }),

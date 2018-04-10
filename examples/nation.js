@@ -107,7 +107,7 @@ exports.loadOBJ = function loadOBJ(url) {
 
 
             for (var i = 0; i < mesh.children.length; i++) {
-                let material = new THREE.MeshPhongMaterial(
+                var material = new THREE.MeshPhongMaterial(
                     {
                         transparent : true,
                         color       : new THREE.Color(getRandomColor()),
@@ -170,7 +170,7 @@ function getRandomColor() {
 
 
 function addToGUI(mesh, line) {
-    let parentFolder = menuGlobe.gui.addFolder(mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length - 4));
+    var parentFolder = menuGlobe.gui.addFolder(mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length - 4));
 
     parentFolder.add({save : function(){saveVibes(mesh)}}, "save");
     addVibes(mesh,parentFolder);
@@ -180,8 +180,8 @@ function addToGUI(mesh, line) {
     addAllColorEdge(line, parentFolder);
 
 
-    for (let i = 0; i < mesh.children.length; i++) {
-       let folder = parentFolder.addFolder(mesh.children[i].name);
+    for (var i = 0; i < mesh.children.length; i++) {
+       var folder = parentFolder.addFolder(mesh.children[i].name);
        addOpacity(mesh,folder,i);
        addColor(mesh,folder,i);
        addEmissive(mesh,folder,i);
@@ -210,7 +210,7 @@ function addVibes(mesh,folder) {
 
 function readVibes(file,mesh) {
     console.log(file);
-    let reader = new FileReader();
+    var reader = new FileReader();
     reader.addEventListener('load', () => {
         loadVibes(reader.result,mesh);
     }, false);
@@ -219,7 +219,7 @@ function readVibes(file,mesh) {
 
 
 function loadVibes(file,mesh) {
-    let json ; 
+    var json ; 
     try {
          json = JSON.parse(file);    }
           catch (e) {
@@ -303,7 +303,7 @@ function addTexture(mesh,folder,index) {
 
 function readTexture(file,mesh,index) {
     console.log(file);
-    let reader = new FileReader();
+    var reader = new FileReader();
     reader.addEventListener('load', () => {
         loadTexture(reader.result,mesh,index);
     }, false);
@@ -372,7 +372,7 @@ function addShininess(mesh,folder,index) {
 
 function saveVibes(mesh){
     console.log("sauvegarde");
-    let vibes = { "styles" : [] };
+    var vibes = { "styles" : [] };
     for (var i = 0; i < mesh.children.length; i++) {
         vibes.styles.push({
             "name"     : mesh.children[i].name,
@@ -385,7 +385,7 @@ function saveVibes(mesh){
     }
     console.log(vibes);
 
-    let blob = new Blob([JSON.stringify(vibes)], {type: "text/plain;charset=utf-8"});
+    var blob = new Blob([JSON.stringify(vibes)], {type: "text/plain;charset=utf-8"});
         itowns.FILE.saveAs(blob, mesh.materialLibraries[0].substring(0,mesh.materialLibraries[0].length -4) + ".vibes");
     }
 
@@ -396,7 +396,7 @@ console.log(itowns.FILE);
 
 function initListener() {
     document.addEventListener('drop', documentDrop, false);
-    let prevDefault = e => e.preventDefault();
+    var prevDefault = e => e.preventDefault();
     document.addEventListener('dragenter', prevDefault, false);
     document.addEventListener('dragover', prevDefault, false);
     document.addEventListener('dragleave', prevDefault, false);
@@ -415,7 +415,7 @@ function readFile(file) {
     console.log("reaaaddddd fiilleeee");
     
     if(file.name.endsWith(".obj")){
-        let reader = new FileReader();
+        var reader = new FileReader();
         reader.addEventListener('load', () => {
             //console.log(reader.result);
             exports.loadOBJ(reader.result);

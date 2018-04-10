@@ -3,7 +3,7 @@
 
 # Visualization in iTowns of Buildings Elegantly Stylized
 
-[![Build Status](https://travis-ci.org/arnaudgregoire/itowns-style.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)
+[![Build Status](https://travis-ci.org/arnaudgregoire/vibes.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)
 
 
 ## Summary
@@ -380,10 +380,18 @@ The answer to this issue is twofold :
 
 ##### Adjustments
 
-The second problem can be solved thanks to the GUI, with a few more sliders to move the objects, just like it is done in PLU++.  
-In order to move the objects, we applied the translation methodes on x,y and z, and that allow the user to use the sliders on the GUI to do that.
-another feature let the user to move the object after clicking on it or select it from the GUI , and that can be done with the keyboard keys ((a,z) or (4,6)) on the X axis, ((w,x) or ( 8.2)) on the Y axis and ((q,s) or (7.3)).
+There are two ways to move objects:
+
+The first one can be done by using the keyboard keys after clicking on the object or selecting it from the GUI, the user can use the follown keys:
+
+* Keys a and z or 4 and 6 to move the object from West to East.
+* Keys q and s or 8 and 2 to move the object from North to South.
+* Keys w and x or 7 and 3 to move the object from Top-Down.
+
+The second way the user can use the sliders on the GUI which are shown in the picture below : Translate X, Translate Y and Translate Z
+
 <img src="VIBES/move-object.png" style="width: 400px;"/>
+
 ##### Absolute positionning
 
 But this method cannot be used to georeference an object completely - we cannot use a slider to move a mesh from one end of the world to the other. Until this step, the coordinates were hard-coded in the example, which is not satisfying.  
@@ -539,9 +547,12 @@ the pictures below show the results of the test units:
   
 
 
-### CI/CD
+### CI/CD [![Build Status](https://travis-ci.org/arnaudgregoire/vibes.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)
 
-Travis.
+For run all the test we use [TravisCI](https://travis-ci.org/arnaudgregoire/vibes). The initial iTowns project use already TravisCI for the unit test and deploy it on its website. So we change the [*'.travis.yml'*](/.travis.yml) for do only the tests with ont the deployment. 
+
+At the begining all work well, but after add the salving of style *.vibes* and position *.gibes* it fail.
+We have some problems with the npm package for save the files, [*'file-saver'*](https://www.npmjs.com/package/file-saver), during the compilation of itowns on [*'itowns-testing.js'*](/test/itowns-testing.js#L113). We start to une an other package, [*'savery'*](https://www.npmjs.com/package/savery) but it have the same problem. So we use an other save function write on the example and give it to the *Symbolyzer*.
 
 **[Back to the top](#summary)** 
 
