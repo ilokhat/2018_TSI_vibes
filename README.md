@@ -16,27 +16,27 @@
 6. [Architecture set-up](#architecture-set-up)
 7. [Advanced functionalities](#advanced-functionalities)
 8. [Tests](#tests)
-9. [Perspectives](#perspectives) 
-  
+9. [Perspectives](#perspectives)
+
   ​
 ## Presentation of the project
 
 The VIBES (Visualization in iTowns of Buildings Elegantly Stylized) project consists in implementing geovisualisation techniques to stylize buildings on the platform iTowns. This project aims to provide a visual support for city planning, among other purposes.  
 
-The user should be able to : 
+The user should be able to :
 * Load one or several 3D file (of various formats).
 * Transform its/their visual aspect(s) using a GUI.
 * Save the current style in a JSON-like format (to be defined).
 * Load an existing style to re-apply it, including predefined styles (transparent, typical, sketchy).  
-  
+
 This project was proposed by Sidonie Christophe, from the COGIT laboratory (IGN), with Alexandre Devaux and Mathieu Bredif as technical support on iTowns.
 
-**[Back to the top](#summary)** 
+**[Back to the top](#summary)**
 
 
 ## Project management
 
-This project will be carried out in March and April 2018 by a group of seven students in ENSG TSI, using SCRUM methodology. It will be divided into seven sprints, each one during a week. 
+This project will be carried out in March and April 2018 by a group of seven students in ENSG TSI, using SCRUM methodology. It will be divided into seven sprints, each one during a week.
 
 ### Team
 
@@ -48,10 +48,10 @@ The seven members of the team are :
 * Laurie Nino
 * Adel Ouhabi
 * Ludivine Schlegel
-  
+
 Given the number of people in the team, it is crucial to apply an efficient orgnization so everyone can be involved. To that end, we chose to work mostly in variable pairs, and to divide the tasks each week among these pairs (one person would be working alone since we are an uneven number).  
 ​    
-### Backlog 
+### Backlog
 
 The previsional planning is the following :
 * **Sprint 1** : analysis, conception, first version of the tool, CI/CD.
@@ -61,21 +61,21 @@ The previsional planning is the following :
 * **Sprint 5** : implementation of a BDTOPO loader (WFS), integration of the BATI3D loader in the project, edge texturation (sketchy style), possibility to click on objects.
 * **Sprint 6** : advanced parameters including light, shadows, cameras and advanced texturation.
 * **Sprint 7** : finalization, reports, presentation.  
-  
-A first previsional backlog was created at the beginning of the project. 
+
+A first previsional backlog was created at the beginning of the project.
 Each friday afternoon, at the end of the sprint, we take some time for :
 * a review of the work completed during the week.
 * a backlog grooming to plan the next sprint and divide the tasks (usually one or two tasks per pair).
 * updating the report.
-  
+
 ### Management tools
 
 * **GitHub** - for code hosting.
 * **Travis** - for continuous integration.
 * **Easybacklog** - for backlog and planning.
 * **Trello** - for task assignment and file sharing.
-  
-**[Back to the top](#summary)** 
+
+**[Back to the top](#summary)**
 
 
 ## Analysis of the existing situation
@@ -89,7 +89,7 @@ The main challenge of this project is that it has to be included into the archit
 Two sorts of development can be carried out in iTowns :
 * develop a new example, based on the existing classes of the core of iTowns.
 * add new functionalities directly to the core.
-  
+
 This choice depends on the purpose of the tool. Our stylization tool is intended to be applied in multiple examples, therefore the main functionalities should be integrated in the source of iTowns. This implies that they should be as generic as possible, and respect the iTowns standards. An example will also be created, only to demonstrate how our tool should be used, but the goal is to make this example as simple as possible and to avoid including too much logic in it.
 ​    
 ### PLU++
@@ -103,7 +103,7 @@ The goal of this analysis is to find out how the following things can be done :
 * Loading an OBJ file.
 * Applying a style to a mesh.
 * Changing this style dynamically using a user interface (dat.GUI).
-  
+
 #### Description of the project
 
 The project consists in a webpage which display a 3D scene that contains a plane geometry with building on it, and a user menu made with dat.GUI to change the visual aspect of the buildings (color, opacity, style...) and do some other actions, such as recenter the camera, save the current style, etc.  
@@ -123,7 +123,7 @@ The main code is divided into 5 files, as follow :
 * **fonctions_load.js** : contains the utils functions to load 3D files.
 * **fonctions_sliders.js** : contains the utils functions to handle the sliders.
 * **fonctions.js** : contains other utils functions
-  
+
 #### How does it work ?
 
 1. The user chooses a JSON file as an input, to define the initial style.
@@ -132,7 +132,7 @@ The main code is divided into 5 files, as follow :
 3. Three.js materials are initialized with the initial parameters.
 4. Event listeners are created on the GUI : each change will be repercuted directly on the materials previously created (for the context) or on each vertice created (for the focus).
 5. OBJ models are loaded with the current material.
-  
+
 #### Possible ameliorations
 
 Although the PLU++ project successes in creating an easy-to-use interface to dynamically change the stylization of 3D objects through various parameters, its implementation has some limitations. Particularly, its structure does not clearly separate the 3D geometry and the stylization itself.
@@ -145,7 +145,7 @@ Therefore, the idea of our project is to re-make the concept of PLU++ inside the
 
 TODO : what is a style (definition in litterature), specificities in 3D, definition of 'generic' styles (discrete, typical, sketchy)...
 
-**[Back to the top](#summary)** 
+**[Back to the top](#summary)**
 
 
 ## Conception
@@ -195,7 +195,7 @@ Therefore, there will also be two types of style formats :
             "texture": "./textures/texture.png"
         }
     ],
-    
+
 }
 ```
 
@@ -208,7 +208,7 @@ Therefore, there will also be two types of style formats :
             "color": "#ffffff",
             "width": 1
     },
-    "faces" : [ 
+    "faces" : [
         {
             "name": "nom_element1",
             "opacity": 1,
@@ -238,7 +238,7 @@ Therefore, there will also be two types of style formats :
 }
 ```
 
-**[Back to the top](#summary)** 
+**[Back to the top](#summary)**
 
 
 ## First version of the tool : basic functionalities
@@ -252,7 +252,7 @@ The first step to stylize a 3D object is to load this object and make it visible
 To load a 3D object in iTowns, we have to follow the following steps :
 * Instanciate the globe.
 * Instanciate the OBJLoader and call the load function.  
-  
+
 The following steps are implemented in the callback of the load function.
 * Place the object on its right location, rotate and scale it if necessary.
 * Put the object layer in the camera layers so it is rendered.
@@ -277,7 +277,7 @@ To change the stylization of an object, we must know how this object is structur
 
 The objects we just loaded are actually a group of meshes (type *THREE.Group*). For example, the croutitower is composed of 14 meshes. We can access these meshes by iterating over the children of the object. Then we just have to access the attribute *material* of each mesh and change the attributes we want to change.  
 
-The basic implemented parameters are : **color**, **opacity**, **emissive color**, **specular color**, and **shininess**. 
+The basic implemented parameters are : **color**, **opacity**, **emissive color**, **specular color**, and **shininess**.
 
 ### Creating a user interface to dynamically modify the stylization
 
@@ -292,7 +292,7 @@ Our tool must also allow to save the current style in a *.vibes* file (see [abov
 We used the Javascript object FileReader to load a file and get the data in it. This data can then be parsed in JSON and read directly to be applied to the meshes.  
 When a stylesheet is loaded, the values of the GUI are updated to match the current stylisation of the object.
 
-**[Back to the top](#summary)** 
+**[Back to the top](#summary)**
 
 
 ## Architecture set-up
@@ -302,7 +302,7 @@ Although the first version is functional, it did not respond to the main issue o
 * **Symbolizer.js** : the class that carries all the stylization functionalities.
 * **LayerManager.js** : the class that manages the user interface.
 * **VibesTest.js** : the example file (linked to the HTML document) where we call the previous classes.
-  
+
 (class diagram)
 
 ### Class ModelLoader
@@ -310,7 +310,7 @@ Although the first version is functional, it did not respond to the main issue o
 This class has 2 attributes :
 * **view** : the iTowns view, passed as parameter of the constructor.
 * **model** : initialized as null, this attribute will carry the object loaded and the edges extracted from it (see [after](#edges-extraction)).  
-  
+
 It contains one public method for each format. These functions convert the 3D object into a group of meshes adapted to the symbolizer, and call an internal method to load the object in iTowns. The final object (and its edges) are stored in the attribute *model*.  
 
 A callback function should be passed in the parameters of the public method, to specify what should be done when the loading is complete.  
@@ -335,10 +335,10 @@ This class has 5 attributes, all passed as parameters of the constructor :
 * **edges** : the edges to stylize (a group of *THREE.LineSegments*).
 * **menu** : the GUI where the user interface will be created.
 * **nb** : the ID of the symbolizer.  
-  
+
 When the Symbolizer is instanciated, a default style is applied to the object with random colors.  
 
-The public methods are the two different GUI initialization : 
+The public methods are the two different GUI initialization :
 * **initGuiAll** : opens one Symbolizer for all the meshes of the object.
 * **initGui** : opens one Symbolizer for each mesh.
 
@@ -355,7 +355,7 @@ The 'change' functions perform the concrete stylization on the object/edges.
 
 In the first version, our tool was only able to stylize one object. But what if the user wants to apply a style to several objects ?   
 
-To answer this issue, we needed to add a layer management functionality : instead of opening a symbolizer directly after the loading, the layer is added to a list of checkboxes, similar to those we can find in GIS, where the user can manipulate it. 
+To answer this issue, we needed to add a layer management functionality : instead of opening a symbolizer directly after the loading, the layer is added to a list of checkboxes, similar to those we can find in GIS, where the user can manipulate it.
 
 (image menu layer)  
 ​        
@@ -364,8 +364,8 @@ To answer this issue, we needed to add a layer management functionality : instea
 When one layer (or more) is checked, three buttons appear :
 * **Stylize object** : open a symbolizer to stylize all the meshes of the objects at once.
 * **Stylize parts** : open a symbolizer to stylize the meshes of the objects independently (the objects must have the same number of meshes).
-* **Delete layers** : delete the objects. 
-  
+* **Delete layers** : delete the objects.
+
 These buttons disappear when there is no more layers checked (if they are all unchecked or deleted).
 ​    
 (diagramme d'activité)
@@ -378,7 +378,7 @@ The answer to this issue is twofold :
 * The user should be able to enter (somehow) the parameters to locate the object he wants to stylize.
 * He also should be able to adjust the position he chose (slight translations, rotations, scaling) later.  
 
-##### Adjustments
+##### Adjustments and relative positionning
 
 There are two ways to move objects:
 
@@ -415,7 +415,7 @@ Therefore, we went for an intermediary solution, where a default position (on pl
 
 It can be drag and dropped at any time, and will be applied to all the checked layers in the GUI.
 
-**[Back to the top](#summary)** 
+**[Back to the top](#summary)**
 
 
 ## Advanced functionalities
@@ -457,11 +457,11 @@ Customizing the stylization of the environment in iTowns is a little more challe
 
 #### Lights
 
-Possible addition : changing light direction, color, intensity... 
+Possible addition : changing light direction, color, intensity...
 
 #### Shadows
 
-In a native iTowns application, there is no easy way to implement buildings shadow. In fact, iTowns modify the classic shadowmapping method, making it not usable for us. In order to create shadows of buildings on the ground, we create 2 objects : 
+In a native iTowns application, there is no easy way to implement buildings shadow. In fact, iTowns modify the classic shadowmapping method, making it not usable for us. In order to create shadows of buildings on the ground, we create 2 objects :
 
 - a  1x1km plan centered on building. This plan is made of ShadowMaterial. This particular Threejs material can receive shadows, but otherwise is completely transparent. We make it semi-transparent in order to have a nice shadow (less dark). Unfortunately, we had to disable the depthTest to make our shadow appear. According to our product owner Alexandre Devaux, its due to a bug internally to itowns. This lack of depthTest makes sometimes a visual bug where shadows will be put in front of the building.
 
@@ -491,7 +491,7 @@ Finally, we add  an option "Display shades" in our dat.gui to let to the user th
 
 Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), camera reinitialization.  
 
-**[Back to the top](#summary)** 
+**[Back to the top](#summary)**
 
 
 ## Results
@@ -508,7 +508,7 @@ Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), 
 
 ...
 
-**[Back to the top](#summary)** 
+**[Back to the top](#summary)**
 
 
 ## Review
@@ -525,33 +525,33 @@ Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), 
 
 ...
 
-**[Back to the top](#summary)** 
+**[Back to the top](#summary)**
 
 
 ## Tests
 
 ### Unit tests
 
-In order to write our unit tests we rely on the mocha framework which was used in the previous unit tests of Itowns project. This framework is a feature-rich JavaScript test that can be used for both Node.js and browser-based testing,it's 
+In order to write our unit tests we rely on the mocha framework which was used in the previous unit tests of Itowns project. This framework is a feature-rich JavaScript test that can be used for both Node.js and browser-based testing,it's
 interfaces system such as BDD, TDD, Exports, QUnit and Require-style allows developers to choose their style of DSL.
 
 In our project we choose to continue working with the BDD (Behavior Driven Development ) interface which provide a syntax including describe() , context(), it(), specify(), before(), after(), beforeEach(), and afterEach(), it focus on what the application should do, and on how it will do it.
 
-As we mentioned above we continued working and adding some tests to the previous test folder of the Itowns project, a part of these unit tests run using the CLI (commande line interface) and the others need the browser to be executed since our application uses the Dom element,and the nodeJs server does not have access to the Dom,we had to run these kind of tests on the browser. to do that we made a simple HTML page which our test runner page (/mochaTest.html). 
+As we mentioned above we continued working and adding some tests to the previous test folder of the Itowns project, a part of these unit tests run using the CLI (commande line interface) and the others need the browser to be executed since our application uses the Dom element,and the nodeJs server does not have access to the Dom,we had to run these kind of tests on the browser. to do that we made a simple HTML page which our test runner page (/mochaTest.html).
 The page loads Mocha, the testing libraries and our test file(/tests/vibesObjTest.js) and finally to run the tests, we simply needed to open the runner in a browser.
 the pictures below show the results of the test units:
 
 <img src="VIBES/mochaTest.png" style="width: 400px;"/>
 <img src="VIBES/unit_tests_console.png" style="width: 400px;"/>
 
-  
+
 
 
 ### CI/CD
 
 Travis.
 
-**[Back to the top](#summary)** 
+**[Back to the top](#summary)**
 
 
 ## Perspectives
@@ -568,8 +568,8 @@ Travis.
 * Improve layer management.  
 * Geolocation : through a georef file ? or move it directly (cf three editor)  
 * More formats : 3DS, WFS extruded...  
-  
-**[Back to the top](#summary)** 
+
+**[Back to the top](#summary)**
 
 
 ## Authors
@@ -581,7 +581,6 @@ Travis.
 * **Laurie Nino**
 * **Adel Ouhabi**
 * **Ludivine Schlegel**
-  
-  ​
-**[Back to the top](#summary)** 
 
+  ​
+**[Back to the top](#summary)**
