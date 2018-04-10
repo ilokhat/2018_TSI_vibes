@@ -380,9 +380,16 @@ The answer to this issue is twofold :
 
 ##### Adjustments
 
-The second problem can be solved thanks to the GUI, with a few more sliders to move the objects, just like it is done in PLU++.  
-In order to move the objects, we applied the translation methodes on x,y and z, and that allow the user to use the sliders on the GUI to do that.
-another feature let the user to move the object after clicking on it or select it from the GUI , and that can be done with the keyboard keys ((a,z) or (4,6)) on the X axis, ((w,x) or ( 8.2)) on the Y axis and ((q,s) or (7.3)).
+There are two ways to move objects:
+
+* The first one can be done by using the keyboard keys after clicking on the object or selecting it from the GUI, the user can use the follown keys:
+
+Keys a and z or 4 and 6 to move the object on the X axis.
+Keys w and x or 7 and 3 to move the object on the Y axis.
+Keys q and s or 8 and 2 to move the object on the Z axis.
+
+* The second way the user can use the sliders on the GUI which are shown in the picture below : Translate X, Translate Y and Translate Z
+
 <img src="VIBES/move-object.png" style="width: 400px;"/>
 ##### Absolute positionning
 
