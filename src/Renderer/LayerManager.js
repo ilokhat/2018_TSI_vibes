@@ -21,6 +21,7 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.nbSymbolizer = 0;
     this.guiInitialized = false;
     this.layerFolder = this.menu.gui.addFolder('Layers');
+    this.layerFolder.open();
     this.loader = loader;
     this.symbolizer = symbolizer;
     this.stylizeObjectBtn = null;
