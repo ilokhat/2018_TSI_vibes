@@ -243,6 +243,8 @@ function coordinateToPolygonExtruded(coordinates, properties, options) {
     const indicesRoof = [];
     const verticesRoof = new Float32Array(2 * 3 * coordinates.coordinates.length);
     const vertices = new Float32Array(2 * 3 * coordinates.coordinates.length);
+    const normalsRoof = new Float32Array(2 * 3 * coordinates.coordinates.length);
+    const normals = new Float32Array(2 * 3 * coordinates.coordinates.length);
     const colors = new Uint8Array(3 * 2 * coordinates.coordinates.length);
     const ids = new Uint16Array(2 * coordinates.coordinates.length);
     const zmins = new Uint16Array(2 * coordinates.coordinates.length);
@@ -273,6 +275,9 @@ function coordinateToPolygonExtruded(coordinates, properties, options) {
             verticesRoof[(offset + indice) * 3] = vertices[(offset + indice) * 3];
             verticesRoof[(offset + indice) * 3 + 1] = vertices[(offset + indice) * 3 + 1];
             verticesRoof[(offset + indice) * 3 + 2] = vertices[(offset + indice) * 3 + 2];
+            normalsRoof[(offset + indice) * 3] = 0;
+            normalsRoof[(offset + indice) * 3 + 1] = 0;
+            normalsRoof[(offset + indice) * 3 + 2] = 1;
             indicesRoof.push(offset + indice);
         }
         const ofid = Math.floor(offset2 / 3);
@@ -288,8 +293,14 @@ function coordinateToPolygonExtruded(coordinates, properties, options) {
         fillColorArray(colors, offset, contour.length * 2, color.r * 255, color.g * 255, color.b * 255);
         offset += contour.length * 2;
     }
+    for (var i = 0; i < normals.length / 3; i++) {
+        normals[i * 3 + 0] = 0;
+        normals[i * 3 + 1] = 0;
+        normals[i * 3 + 2] = 1;
+    }
     // wall
     geometryWall.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    geometryWall.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
     geometryWall.addAttribute('id', new THREE.BufferAttribute(ids, 1));
     geometryWall.addAttribute('zmin', new THREE.BufferAttribute(zmins, 1));
     geometryWall.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
@@ -299,9 +310,12 @@ function coordinateToPolygonExtruded(coordinates, properties, options) {
     resultWall.pos = pos;
     // roof
     geometryRoof.addAttribute('position', new THREE.BufferAttribute(new Float32Array(verticesRoof), 3));
+    geometryRoof.addAttribute('normal', new THREE.BufferAttribute(normalsRoof, 3));
     geometryRoof.addAttribute('id', new THREE.BufferAttribute(ids, 1));
     geometryRoof.addAttribute('zmin', new THREE.BufferAttribute(zmins, 1));
     geometryRoof.setIndex(new THREE.BufferAttribute(new Uint16Array(indicesRoof), 1));
+    // geometryRoof.computeVertexNormals();
+    // geometryRoof.computeMorphNormals();
     const resultRoof = new THREE.Mesh(geometryRoof);
     resultRoof.name = 'roof_faces';
     resultRoof.minAltitude = minAltitude;
@@ -365,11 +379,11 @@ function coordinatesToMesh(coordinates, properties, options) {
                 meshes[1].material = new THREE.MeshPhongMaterial({
                     side: THREE.DoubleSide,
                     transparent: true,
-                    opacity: options.style.roof_faces.opacity,
-                    color: options.style.roof_faces.color,
-                    emissive: options.style.roof_faces.emissive,
-                    specular: options.style.roof_faces.specular,
-                    shininess: options.style.roof_faces.shininess,
+                    opacity: options.style.wall_faces.opacity,
+                    color: options.style.wall_faces.color,
+                    emissive: options.style.wall_faces.emissive,
+                    specular: options.style.wall_faces.specular,
+                    shininess: options.style.wall_faces.shininess,
                 });
                 meshes[1].material.needsUpdate = true;
                 // edges
