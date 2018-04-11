@@ -169,16 +169,16 @@ LayerManager.prototype._readFile = function readFile(file) {
         return 0;
     } else if (file.name.endsWith('.vibes')) {
         reader.addEventListener('load', () => {
-            _this.listLayers.forEach((layer) => {
+            _this.listLayers.forEach((/* layer */) => {
                 var name;
-            if (file.name.split('.')[0].split('_')[1] == 'globale') {
-                name = _this.initSymbolizer(false);
-                _this.symbolizerInit._readVibes(file, _this.menu.gui.__folders[name]);
-            } else if (file.name.split('.')[0].split('_')[1] == 'partie') {
-                name = _this.initSymbolizer(true);
-                _this.symbolizerInit._readVibes(file, _this.menu.gui.__folders[name]);
-            }
-            });   
+                if (file.name.split('.')[0].split('_')[1] == 'globale') {
+                    name = _this.initSymbolizer(false);
+                    _this.symbolizerInit._readVibes(file, _this.menu.gui.__folders[name]);
+                } else if (file.name.split('.')[0].split('_')[1] == 'partie') {
+                    name = _this.initSymbolizer(true);
+                    _this.symbolizerInit._readVibes(file, _this.menu.gui.__folders[name]);
+                }
+            });
         });
         reader.readAsText(file);
     }
