@@ -435,7 +435,7 @@ Symbolizer.prototype._addSave = function addSave(folder) {
 Symbolizer.prototype._addLoad = function addLoad(folder) {
     folder.add({ load: () => {
         var button = document.createElement('input');
-        button.setAttribute('type', 'file');
+        button.setAttribute('type', 'file');       
         button.addEventListener('change', () => this._readVibes(button.files[0], folder), false);
         button.click();
     } }, 'load').name('Load style');
