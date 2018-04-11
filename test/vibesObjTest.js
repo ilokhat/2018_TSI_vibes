@@ -1,6 +1,6 @@
 /* global itowns, describe, it */
-var chai;
-
+var assert = chai.assert;
+var expect = chai.expect;
 var parts;
 
 var manager = itowns.LayerManager.prototype;
@@ -24,8 +24,11 @@ describe('LayerManager._readFile()', function () {
     it('.obj file loaded successfully', function () {
         chai.expect(manager._readFile(f1)).to.equal(0);
     });
+    it('file loaded should be a file.obj',function() {
+        expect(f1).to.have.property('name','file.obj');
+    })
+      
 });
-
 
 parts = [
     new Blob(['{"name":"croutitower","coordX":4202010,"coordY":178050,"coordZ":4779009,"rotateX":-3.093,"rotateY":0.851,"rotateZ":-1.634,"scale":300}'], { type: 'text/plain' }),
@@ -37,6 +40,11 @@ describe('LayerManager._readFile()', function () {
     it('.gibes file loaded successfully', function () {
         chai.expect(manager._readFile(f2)).to.equal(0);
     });
+
+    it('file loaded should not be empty',function() {
+        expect({f2}).to.not.be.empty;
+    })
+    
 });
 
 var folder;
@@ -56,4 +64,11 @@ describe('symbolizer.readVibes()', function () {
     it('.vibes file loaded successfully', function () {
         chai.expect(symbolizer._readVibes(f3, folder)).to.equal(0);
     });
+
+    it('file type loaded should be vibes',function() {
+
+    assert.typeOf(f3,'.json');
+    });
+
+
 });
