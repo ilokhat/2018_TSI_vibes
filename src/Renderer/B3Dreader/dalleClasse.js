@@ -189,7 +189,7 @@ dalleClasse.prototype.computeUrlLoBLevel = function computeUrlLoBLevel() {
                 this.LOBLevel.urlDDS16 = '-16'.concat(this.textureType);
                 break;
             default:
-                console.log('Cartography3D: does not support this level');
+                // console.log('Cartography3D: does not support this level');
                 break;
         }
     } else {
@@ -219,7 +219,7 @@ dalleClasse.prototype.computeUrlLoBLevel = function computeUrlLoBLevel() {
                 this.LOBLevel.urlDDS16 = this.textureType;
                 break;
             default:
-                console.log('Cartography3D: does not support this level');
+                // console.log('Cartography3D: does not support this level');
                 break;
         }
     }
@@ -238,6 +238,7 @@ dalleClasse.prototype.getUrlDDS16 = function getUrlDDS16() {
 dalleClasse.prototype.load = function load() {
     this.computeUrlLoBLevel();
     var loader = new B3DLoader(this);
+    loader.decimalPrecision = 3;
 };
 dalleClasse.prototype.setVisible = function setVisible(v) {
     this.globalObject.traverse((object) => { object.visible = v; });
