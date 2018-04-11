@@ -21,6 +21,7 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.nbSymbolizer = 0;
     this.guiInitialized = false;
     this.layerFolder = this.menu.gui.addFolder('Layers');
+    this.layerFolder.open();
     this.loader = loader;
     this.symbolizer = symbolizer;
     this.stylizeObjectBtn = null;
@@ -28,6 +29,7 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.deleteBtn = null;
     this.bati3dBtn = null;
     this.coordCRS = coord.as('EPSG:4326');
+    this.symbolizerInit = null;
     _this = this;
 }
 
@@ -52,23 +54,43 @@ function createBati3dBtn() {
 }
 
 function manageCamera() {
+    // Create a folder on the menu to manage the camera
     var camFolder = _this.menu.gui.addFolder('Camera');
+    // Get initial coordinates
     var initialCamX = _this.coordCRS.longitude();
     var initialCamY = _this.coordCRS.latitude();
     let camX = initialCamX;
     let camY = initialCamY;
+    // Replace the camera at its initial place
     camFolder.add({ resetCam: () => {
         _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: initialCamX, latitude: initialCamY, zoom: 15, tilt: 30, heading: 30 }, false);
     },
     }, 'resetCam').name('Reset camera');
+    // Different point of view choises
+    camFolder.add({ plan: ' ' }, 'plan', ['Horizon', 'Plongeante', 'Globe']).name('Vue').onChange((value) => {
+        if (value === 'Horizon') {
+            _this.view.controls.setTilt(100, false);
+            _this.view.controls.setZoom(12, false);
+        }
+        else if (value === 'Plongeante') {
+            _this.view.controls.setTilt(10, false);
+            _this.view.controls.setZoom(17, false);
+        }
+        else {
+            _this.view.controls.setZoom(1, false);
+        }
+    });
+    // Change parameter 'longitude' of the camera
     camFolder.add({ moveCamX: initialCamX }, 'moveCamX').name('Longitude').onChange((value) => {
         camX = value;
         _this.view.controls.setCameraTargetGeoPosition({ longitude: camX, latitude: camY }, false);
     });
+    // Change parameter 'latitude' of the camera
     camFolder.add({ moveCamY: initialCamY }, 'moveCamY').name('Latitude').onChange((value) => {
         camY = value;
         _this.view.controls.setCameraTargetGeoPosition({ longitude: camX, latitude: camY }, false);
     });
+    // Change zoom scale of the camera
     camFolder.add({ zoom: 15 }, 'zoom').name('Zoom').onChange((value) => {
         _this.view.controls.setZoom(value, false);
     });
@@ -145,6 +167,20 @@ LayerManager.prototype._readFile = function readFile(file) {
         });
         reader.readAsText(file);
         return 0;
+    } else if (file.name.endsWith('.vibes')) {
+        reader.addEventListener('load', () => {
+            _this.listLayers.forEach((layer) => {
+                var name;
+            if (file.name.split('.')[0].split('_')[1] == 'globale') {
+                name = _this.initSymbolizer(false);
+                _this.symbolizerInit._readVibes(file, _this.menu.gui.__folders[name]);
+            } else if (file.name.split('.')[0].split('_')[1] == 'partie') {
+                name = _this.initSymbolizer(true);
+                _this.symbolizerInit._readVibes(file, _this.menu.gui.__folders[name]);
+            }
+            });   
+        });
+        reader.readAsText(file);
     }
     // Other format
     else {
@@ -269,7 +305,7 @@ LayerManager.prototype.handleBdTopo = function handleBdTopo() {
 LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
     var i;
     var deleteSymbolizerBtn;
-    _this._cleanGUI();
+    // _this._cleanGUI();
     // Checks if a layer is selected (if not, nothing happens)
     if (_this.listLayers.length != 0) {
         // Merge elements of the list as one group
@@ -342,6 +378,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         _this.listLayers = [];
         _this.listControllers = [];
     }
+    return 'Symbolizer '.concat(_this.nbSymbolizer);
 };
 
 LayerManager.prototype._cleanGUI = function cleanGUI() {
