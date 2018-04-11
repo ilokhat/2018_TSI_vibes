@@ -154,9 +154,9 @@ ModelLoader.prototype._placeModel = function placeModel(obj, coord, rotateX, rot
     // Aligns up vector with geodesic normal
     obj.lookAt(obj.position.clone().add(coord.geodesicNormal));
     // User rotates building to align with ortho image
-    obj.rotateX(rotateX);
-    obj.rotateY(rotateY);
-    obj.rotateZ(rotateZ);
+    obj.rotation.x = rotateX;
+    obj.rotation.y = rotateY;
+    obj.rotation.z = rotateZ;
     obj.scale.set(scale, scale, scale);
     return obj;
 };
