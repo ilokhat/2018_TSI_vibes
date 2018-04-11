@@ -456,7 +456,8 @@ Symbolizer.prototype._changeOpacityEdge = function changeOpacityEdge(value, i, j
         this.edges[i].children[j].material.opacity = value;
         this.edges[i].children[j].material.needsUpdate = true;
         this.view.notifyChange(true);
-    } else if (this.bdTopo) {
+    }
+    if (this.bdTopo) {
         var f = (parent) => {
             for (var i = 0; i < parent.children.length; i++) {
                 if (parent.children[i].name == 'wall_edges' || parent.children[i].name == 'roof_edges') {
@@ -481,10 +482,9 @@ Symbolizer.prototype._addOpacityEdgeAll = function addOpacityEdgeAll(folder) {
                     this._changeOpacityEdge(value, i, j);
                 }
             }
-            this._changeOpacityEdge(value, -10, 0);
-            this._changeOpacityEdge(value, -10, 1);
         });
-    } else if (this.bdTopo) {
+    }
+    if (this.bdTopo) {
         initialOpacity = this.bdTopoStyle.edges.opacity;
         folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Edge opacity').onChange((value) => {
             this._changeOpacityEdge(value, -10, 0);
@@ -501,7 +501,8 @@ Symbolizer.prototype._changeColorEdge = function changeColorEdge(value, i, j) {
         this.edges[i].children[j].material.color = new THREE.Color(value);
         this.edges[i].children[j].material.needsUpdate = true;
         this.view.notifyChange(true);
-    } else if (this.bdTopo) {
+    }
+    if (this.bdTopo) {
         var f = (parent) => {
             for (var i = 0; i < parent.children.length; i++) {
                 if (parent.children[i].name == 'wall_edges' || parent.children[i].name == 'roof_edges') {
@@ -525,10 +526,9 @@ Symbolizer.prototype._addColorEdgeAll = function addColorEdgeAll(folder) {
                     this._changeColorEdge(value, i, j);
                 }
             }
-            this._changeColorEdge(value, -10, 0);
-            this._changeColorEdge(value, -10, 1);
         });
-    } else if (this.bdTopo) {
+    }
+    if (this.bdTopo) {
         initialColor = this.bdTopoStyle.edges.color;
         folder.addColor({ color: initialColor }, 'color').name('Edge color').onChange((value) => {
             this._changeColorEdge(value, -10, 0);
@@ -545,7 +545,8 @@ Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, i, j) {
         this.edges[i].children[j].material.linewidth = value;
         this.edges[i].children[j].material.needsUpdate = true;
         this.view.notifyChange(true);
-    } else if (this.bdTopo) {
+    }
+    if (this.bdTopo) {
         var f2 = (parent) => {
             for (var j = 0; j < parent.children.length; j++) {
                 if (parent.children[j].name == 'wall_edges' || parent.children[j].name == 'roof_edges') {
@@ -569,10 +570,9 @@ Symbolizer.prototype._addWidthEdgeAll = function addWidthEdgeAll(folder) {
                     this._changeWidthEdge(value, i, j);
                 }
             }
-            this._changeWidthEdge(value, -10, 0);
-            this._changeWidthEdge(value, -10, 1);
         });
-    } else if (this.bdTopo) {
+    }
+    if (this.bdTopo) {
         initialWidth = this.bdTopoStyle.edges.width;
         folder.add({ width: initialWidth }, 'width', 0, 5).name('Edge width').onChange((value) => {
             this._changeWidthEdge(value, -10, 0);
@@ -705,6 +705,10 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
                     this._changeColorEdge(value, i, j);
                 }
             }
+            if (this.bdTopo) {
+                this._changeColorEdge(value, -10, 0);
+                this._changeColorEdge(value, -10, 1);
+            }
         });
         folder.__controllers[2].__min = 0.0;
         folder.__controllers[2].__max = 5.0;
@@ -713,6 +717,10 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
                 for (j = 0; j < this.edges[i].children.length; j++) {
                     this._changeWidthEdge(value, i, j);
                 }
+            }
+            if (this.bdTopo) {
+                this._changeWidthEdge(value, -10, 0);
+                this._changeWidthEdge(value, -10, 1);
             }
         });
         if (value === 'Dashed') {
@@ -725,20 +733,11 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
             }
             // If not, add dashSize and gapSize controllers to the GUI
             if (!isDashed) {
-                folder.add({ dashSize: 0.05 }, 'dashSize', 0.01, 0.5).name('Dash Size').onChange((value) => {
-                    // Iteration over all the edges, to apply the changes everywhere
-                    for (i = 0; i < this.edges.length; i++) {
-                        for (j = 0; j < this.edges[i].children.length; j++) {
-                            this._changeDashSize(value, i, j);
-                        }
-                    }
+                folder.add({ dashSize: 0.05 }, 'dashSize', 0.01, 1).name('Dash Size').onChange((value) => {
+                    this._changeDashSize(value, i, j);
                 });
-                folder.add({ gapSize: 0.05 }, 'gapSize', 0.01, 0.5).name('Gap Size').onChange((value) => {
-                    for (i = 0; i < this.edges.length; i++) {
-                        for (j = 0; j < this.edges[i].children.length; j++) {
-                            this._changeGapSize(value, i, j);
-                        }
-                    }
+                folder.add({ gapSize: 0.05 }, 'gapSize', 0.01, 1).name('Gap Size').onChange((value) => {
+                    this._changeGapSize(value, i, j);
                 });
             }
         }
