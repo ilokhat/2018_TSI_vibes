@@ -44,10 +44,10 @@ promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/IGN_MNT_HIGHRES.j
 
 // Geolocation default parameters
 var coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 50);
-var rotateX = Math.PI/2;
+var rotateX = 0;
 var rotateY = 0;
 var rotateZ = 0;
-var scale = 300;
+var scale = 1;
 
 
 function saveDataInit() {
