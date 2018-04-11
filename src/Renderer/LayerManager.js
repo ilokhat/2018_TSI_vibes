@@ -305,7 +305,7 @@ LayerManager.prototype.handleBdTopo = function handleBdTopo() {
 LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
     var i;
     var deleteSymbolizerBtn;
-    _this._cleanGUI();
+    // _this._cleanGUI();
     // Checks if a layer is selected (if not, nothing happens)
     if (_this.listLayers.length != 0) {
         // Merge elements of the list as one group
