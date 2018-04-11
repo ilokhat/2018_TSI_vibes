@@ -503,7 +503,6 @@ Symbolizer.prototype._changeColorEdge = function changeColorEdge(value, i, j) {
         this.view.notifyChange(true);
     }
     if (this.bdTopo) {
-        console.log('change color');
         var f = (parent) => {
             for (var i = 0; i < parent.children.length; i++) {
                 if (parent.children[i].name == 'wall_edges' || parent.children[i].name == 'roof_edges') {
