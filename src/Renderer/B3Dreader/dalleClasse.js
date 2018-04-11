@@ -73,33 +73,22 @@ dalleClasse.prototype.showDalleInScene = function showDalleInScene() {
     // Create mesh for each n material with BufferGeomtry and specific shader material
     var faces = this.geometry.faces;
     var faceVertexUvs = this.geometry.faceVertexUvs;
-    var nbMaterials = this.cachedMaterials.urls.length;
-    var nbTexturesInShader = 16;
     var geom2 = new THREE.Geometry();
-    var n;
-    for (n = 0; n <= nbMaterials; n += nbTexturesInShader) {
-        geom2.vertices = this.geometry.vertices;
-        geom2.faces = [];
-        geom2.faceVertexUvs[0] = [];
-        for (var i = 0; i < faces.length; i++) {
-            var face = faces[i];
-            var faceUV = faceVertexUvs[0][i];
-            if (face.materialIndex >= n && face.materialIndex < n + nbTexturesInShader) {
-                geom2.faces.push(face);
-                geom2.faceVertexUvs[0].push(faceUV);
-            }
-        }
-        var bufferGeometry = BufferGeometryUtils.fromGeometry(geom2, { indice: n });
-        var mat = this.createShaderForBati();
-        for (var a = 0; a < nbTexturesInShader; ++a) {
-            if (n + a < nbMaterials) this.affectTexture(mat, n + a, a);
-        }
-        mat = new THREE.MeshPhongMaterial({ color: 0x2194ce, emissive: 0xbb2727, specular: 0x111111, side: THREE.DoubleSide });
-        mat.needsUpdate = true;
-        var mesh = new THREE.Mesh(bufferGeometry, mat);
-        mesh.name = this.name.concat('-', n);
-        this.globalObject.add(mesh);
+    geom2.vertices = this.geometry.vertices;
+    geom2.faces = [];
+    geom2.faceVertexUvs[0] = [];
+    for (var i = 0; i < faces.length; i++) {
+        var face = faces[i];
+        var faceUV = faceVertexUvs[0][i];
+        geom2.faces.push(face);
+        geom2.faceVertexUvs[0].push(faceUV);
     }
+    var bufferGeometry = BufferGeometryUtils.fromGeometry(geom2);
+    var mat = new THREE.MeshPhongMaterial({ color: 0x2194ce, emissive: 0xbb2727, specular: 0x111111, side: THREE.DoubleSide });
+    mat.needsUpdate = true;
+    var mesh = new THREE.Mesh(bufferGeometry, mat);
+    mesh.name = this.name;
+    this.globalObject.add(mesh);
     this.globalObject.updateMatrixWorld();
     this.doAfter(this.globalObject, this.isLast, this.modelLoader);
 };
