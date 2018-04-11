@@ -1,5 +1,5 @@
 /* global itowns, describe, it */
-var chai = require('chai');
+var chai;
 
 var parts;
 
