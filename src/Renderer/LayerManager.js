@@ -29,6 +29,7 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.deleteBtn = null;
     this.bati3dBtn = null;
     this.coordCRS = coord.as('EPSG:4326');
+    this.symbolizerInit = null;
     _this = this;
 }
 
@@ -166,6 +167,20 @@ LayerManager.prototype._readFile = function readFile(file) {
         });
         reader.readAsText(file);
         return 0;
+    } else if (file.name.endsWith('.vibes')) {
+        reader.addEventListener('load', () => {
+            _this.listLayers.forEach((/* layer */) => {
+                var name;
+                if (file.name.split('.')[0].split('_')[1] == 'globale') {
+                    name = _this.initSymbolizer(false);
+                    _this.symbolizerInit._readVibes(file, _this.menu.gui.__folders[name]);
+                } else if (file.name.split('.')[0].split('_')[1] == 'partie') {
+                    name = _this.initSymbolizer(true);
+                    _this.symbolizerInit._readVibes(file, _this.menu.gui.__folders[name]);
+                }
+            });
+        });
+        reader.readAsText(file);
     }
     // Other format
     else {
@@ -292,7 +307,7 @@ LayerManager.prototype.handleBdTopo = function handleBdTopo() {
 LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
     var i;
     var deleteSymbolizerBtn;
-    _this._cleanGUI();
+    // _this._cleanGUI();
     // Checks if a layer is selected (if not, nothing happens)
     if (_this.listLayers.length != 0) {
         // Merge elements of the list as one group
@@ -365,6 +380,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         _this.listLayers = [];
         _this.listControllers = [];
     }
+    return 'Symbolizer '.concat(_this.nbSymbolizer);
 };
 
 LayerManager.prototype._cleanGUI = function cleanGUI() {
