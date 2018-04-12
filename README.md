@@ -567,11 +567,7 @@ We have some problems with the npm package for save the files, [*'file-saver'*](
   
 ## Conclusion
   
-### Limits and perspectives
-  
-...
-
-### Problems met during the project
+### General review
   
 ...
   
@@ -604,6 +600,10 @@ We have some problems with the npm package for save the files, [*'file-saver'*](
 * **Ludivine Schlegel**
   
  ...
+ 
+ ### Limits and perspectives
+  
+...
     
   
 **[Back to the top](#summary)**
