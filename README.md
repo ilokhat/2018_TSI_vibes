@@ -21,7 +21,9 @@
 
 ### Context  
 
-(TODO : Context)
+In order to make easier the urban plans consultation process and to implement techniques of buildings stylization in the iTowns geovisualization platform, we need to adapt the architecture of iTowns to be able to integrate a process of data stylization and visualization, in the most modular and configurable way possible,therefore we need to separate the data model and the specification of the style from the rendering process itself. 
+
+It is also necessary to implement adapted interfaces  to the parameterization of the style.
 
 ### Goals of the project
 
