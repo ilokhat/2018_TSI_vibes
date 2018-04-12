@@ -13,13 +13,12 @@ describe('LayerManager._readFile()', function () {
     it('Expected .obj or .gibes file', function () {
         chai.expect(function () { manager._readFile(f); }).to.throw('Unvalid format');
     });
-    it('the file loaded is not .obj',function(){
-        assert.notTypeOf(f,'.obj');
+    it('the file loaded is not .obj', function () {
+        assert.notTypeOf(f, '.obj');
     });
-    it('the file loaded is not .gibes',function(){
-        assert.notTypeOf(f,'.gibes');
+    it('the file loaded is not .gibes', function () {
+        assert.notTypeOf(f, '.gibes');
     });
-
 });
 
 parts = [
@@ -29,14 +28,12 @@ parts = [
 var f1 = new File(parts, 'file.obj');
 
 describe('LayerManager._readFile()', function () {
-    it('file loaded should be a file.obj',function() {
-        expect(f1).to.have.property('name','file.obj');
-    });    
+    it('file loaded should be a file.obj', function () {
+        expect(f1).to.have.property('name', 'file.obj');
+    });
     it('.obj file loaded successfully', function () {
         chai.expect(manager._readFile(f1)).to.equal(0);
     });
-    
-      
 });
 
 parts = [
@@ -46,13 +43,12 @@ parts = [
 var f2 = new File(parts, 'sample.obj');
 
 describe('LayerManager._readFile()', function () {
-    it('file loaded should not be empty',function() {
-        expect({f2}).to.not.be.empty;
-    });   
+    it('file loaded should not be empty', function () {
+        expect(f2).not.to.be.a('');
+    });
     it('.gibes file loaded successfully', function () {
         chai.expect(manager._readFile(f2)).to.equal(0);
     });
-        
 });
 
 var folder;
