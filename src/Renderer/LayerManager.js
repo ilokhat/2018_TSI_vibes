@@ -216,14 +216,16 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                 _this.loader._setVisibility(_this.view, false);
                 _this.loader.checked = false;
                 // Remove quads if they exist
-                _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
+                _this.view.scene.getObjectByName('quads').children.getObjectByName('quads_'.concat(layer[0].name.split('_')[0]));
+                // _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
             }
             else {
                 // Simple object
                 _this.view.scene.remove(layer[0]);
                 _this.view.scene.remove(layer[1]);
-                    // Remove quads if they exist
-                _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
+                // Remove quads if they exist
+                _this.view.scene.getObjectByName('quads').children.getObjectByName('quads_'.concat(layer[0].name.split('_')[0]));
+                // _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
             }
             _this.view.notifyChange(true);
         });
