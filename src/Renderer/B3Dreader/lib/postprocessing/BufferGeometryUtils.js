@@ -13,6 +13,7 @@ const BufferGeometryUtils = {
         var vertexColors = settings.vertexColors;
         var hasFaceVertexUv = faceVertexUvs[0].length > 0;
         var bufferGeometry = new THREE.BufferGeometry();
+        var normal = new Float32Array(faces.length * 3 * 3);
         var positions = new Float32Array(faces.length * 3 * 3);
         var materialindice = new Float32Array(faces.length * 3);
         var colors;
@@ -43,6 +44,16 @@ const BufferGeometryUtils = {
             positions[i3 + 6] = coordC.x();
             positions[i3 + 7] = coordC.y();
             positions[i3 + 8] = coordC.z();
+            // normals
+            normal[i3 + 0] = 0;
+            normal[i3 + 1] = 0;
+            normal[i3 + 2] = 1;
+            normal[i3 + 3] = 0;
+            normal[i3 + 4] = 0;
+            normal[i3 + 5] = 1;
+            normal[i3 + 6] = 0;
+            normal[i3 + 7] = 0;
+            normal[i3 + 8] = 1;
             if (vertexColors === THREE.FaceColors) {
                 var fc = face.color;
                 colors[i3] = fc.r;
@@ -83,6 +94,7 @@ const BufferGeometryUtils = {
             i2 += 6;
         }
         bufferGeometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+        bufferGeometry.addAttribute('normal', new THREE.BufferAttribute(normal, 3));
         bufferGeometry.addAttribute('materialindice', new THREE.BufferAttribute(materialindice, 1));
         if (vertexColors !== THREE.NoColors) bufferGeometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
         if (hasFaceVertexUv === true) bufferGeometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));

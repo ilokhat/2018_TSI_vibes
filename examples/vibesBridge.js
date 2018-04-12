@@ -6,7 +6,7 @@
 // setting is "coordonnée geographiques en degres decimaux"
 
 // Position near Gerbier mountain.
-var positionOnGlobe = { longitude: 2.396387, latitude: 48.848701, altitude: 2000 };
+var positionOnGlobe = { longitude: 6.3497177, latitude: 44.517698, altitude: 5000 };
 // var positionOnGlobe = { longitude: 4.818, latitude: 45.7354, altitude: 3000 };
 
 // `viewerDiv` will contain iTowns' rendering area (`<canvas>`)
@@ -43,7 +43,7 @@ promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/WORLD_DTM.json').
 promiseElevation.push(itowns.Fetcher.json('./layers/JSONLayers/IGN_MNT_HIGHRES.json').then(result => addLayerCb(result)));
 
 // Geolocation default parameters
-var coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 50);
+var coord = new itowns.Coordinates('EPSG:4326', 6.3497177, 44.517698, 800);
 var rotateX = 0;
 var rotateY = 0;
 var rotateZ = 0;
