@@ -90,7 +90,7 @@ The main challenge of this project is that it has to be included into the archit
 
 ![archi_itowns](VIBES/itowns_archi.png)
 
-<p align="center">*legend : iTowns architecture (version du 5/03/2018).*</p>
+*<p align="center">legend : iTowns architecture (version du 5/03/2018).</p>*
 
 Two sorts of development can be carried out in iTowns :
 
@@ -248,7 +248,7 @@ The architecture of our project must be included in iTowns. The following schema
 
 ![archi_itowns](VIBES/itowns_archi2.png)
 
-<p align="center">*legend : iTowns architecture (version du 5/03/2018).*</p>
+*<p align="center">legend : iTowns architecture (version du 5/03/2018).</p>*
 
 The goal is to make this tool as general as possible, which means it must not depend on just one example. On the contrary, it should be usable on any example containing a 3D object on an instance of the globe, as a full-fledged functionality of iTowns. Therefore, we will create a new class Symbolizer, which will manage the 3D render. We will also extend the loading functionalities of iTowns in order to handle .obj files and other formats, using a new class called ModelLoader.
 (TODO: à compléter avec les autres classes)
@@ -349,7 +349,7 @@ The Javascript library [dat.GUI](https://github.com/dataarts/dat.gui) allows to 
 
 ##### Saving and loading a style
 
-Our tool must also allow to save the current style in a *.vibes* file (see [above](#style-format)) and re-load it later. We used at first we use a npm package function but after [problems with the test](##CI/CD) we use a home made fonction to save the file as a Blob object.   
+Our tool must also allow to save the current style in a *.vibes* file (see [above](#style-format)) and re-load it later. We used at first we use a npm package function but after [problems with the test](#continuous-integration) we use a home made fonction to save the file as a Blob object.   
 
 We used the Javascript object *FileReader* to load a file and get the data in it. This data can then be parsed in JSON and read directly to be applied to the meshes.  
 When a stylesheet is loaded, the values of the GUI are updated to match the current stylisation of the object.
@@ -522,25 +522,48 @@ Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), 
 
 ##### Loaders
 
+We have three different loader for loads three types of object (.obj, the BATI3d and the BDTopo). 
+
 ###### OBJ Loader
 
-TODO : describe how we load OBJ data.
+The *'.obj'* is a standard for recording 3D objects. *three.js* have already a loader to convert *'.obj'* to THREE.Group.
+
+We use the npm package *'three-obj-loader'* to load the *'.obj'* and we created a function for personalize them. So, we put it at the giving location, apply the giving rotation and scaling, create and apply the initial THREE.MeshPhongMaterial on the faces and extract the edges and initialize its style. Then, we manage the light and the shadow for the group. Finally, we add the light, the shadow, the faces and the edges to the scene and after use the giving callback function with the faces and the edges.
 
 ###### BATI3D Loader
 
-The BATI3D is a IGN production who give the 3D building of France by 500mx500m tile (in the localization where the data exists). 
-One tile match one folder whose name depend on the top lef corner coordinates (ex:'EXPORT_1302-13722'). The 3D model is save as '.3DS' and link to the corrresponding orthophoto images. The 3D model has each point geolocated with the Lambert93 coordinates (EPSG:2154).
+The BATI3D is an IGN production that gives the 3D building of France by 500mx500m tile (in the localization where the data exists).
 
-For load the IGN's BATI3D, we were guided by the iGN project : [*itowns-legacy*](https://github.com/iTowns/itowns-legacy) who has an sample of BATI3D and load it on a itowns plan view.
+One tile match one folder whose name depend on the top left corner coordinates (ex:'EXPORT_1302-13722'). The 3D model is save as '.3DS' and link to the corresponding orthophoto images. The 3D model has each point geolocated with the *Lambert93* coordinates (EPSG:2154).
 
-We reuse the classes : Cartography3D,  clipMap,  dalleClasse,  Shader, B3DLoader,  BinaryStream,  DDSLoader,  PlatformInfo and the function BufferGeometryUtils extracted from  Utils.
+For load the IGN's BATI3D, we were guided by the iGN project : [*itowns-legacy*](https://github.com/iTowns/itowns-legacy) who has a sample of BATI3D and load it on an itowns plan view. 
 
-The dificulty is to make the load work on the itowns glob view instead of the itowns plan view.
+The difficulty is to make the load work on the itowns glob view instead of the itowns plan view. Another difficulty is the points coordinates who is expressed in *Lambert93* and iTowns use only the Geocentric coordinate system *WGS84* (EPSG:4978) and the Geodetic coordinate system *WSG84* (EPSG:4326).
 
-###### BDTOPO Loader
+We reuse the classes: Cartography3D,  clipMap,  dalleClasse,  Shader, B3DLoader,  BinaryStream,  DDSLoader,  PlatformInfo and the function BufferGeometryUtils extracted from  Utils.
 
-TODO : describe how we load BDTOPO data (WFS extruded).
-​      
+* *Cartography3D* initialize the creation of the BATI3D object. We change the refocusing of the tile, the way of loading the tile who initially depend on the camera position and now it depends only on the area and the tile available.
+* *clipMap* create the grid of all *dalleClasse* use. 
+* *dalleClasse* (tileClass) load the BATI3D data with the B3DLoader, create the THREE.Group of faces with *BufferGeometryUtils*, extract the THREE.group of edges, put them the good material and add them on the scene.
+* *B3DLoader* read the binary BATI3D data and extract all the information needed. 
+* *BinaryStream*, *PlatformInfo* are used by *B3DLoader* to read the binary BATI3D data.
+* *DSLoader* is used to read the orthophoto images (no use now).
+* *BufferGeometryUtils* convert the information extract by the *B3DLoader* to a THREE.Group of THREE.BufferGeometry. We change the way of created the THREE.BufferGeometry : the coordinates (EPSG:2154) are convert to EPSG:4978, put in the order (x, y, z) and not to (x, z, y) and we add the 'normal' for the THREE.MeshPhongMaterial can be well applied. We use a THREE.MeshPhongMaterial for the faces and create the edges associated.
+
+We have some problems with the orthophoto images application so we don't use it.
+
+###### BD TOPO® Loader
+
+The BD TOPO® is a *"3D vector description (structured in objects) of the elements of the territory and its infrastructures, of metric precision, exploitable on scales ranging from 1: 5 000 to 1: 50 000."* [source](http://professionnels.ign.fr/bdtopo). The BD TOPO® is accessible with a WFS flux and iTowns already use it on the [globe wfs extruded](http://www.itowns-project.org/itowns/examples/globe_wfs_extruded.html) to load the buildings.
+
+We do the same as the [iTowns example](http://www.itowns-project.org/itowns/examples/globe_wfs_extruded.html), but we need to change the way to create the visible object and manage the layer.
+
+We created a new class Feature2MeshStyle based on Feature2Mesh. We change the creation of the object, the roofs and the walls are separated, the edges are created and a THREE.MeshPhongMaterial is applied instead of a vertexColor. The parameters of the faces and edges material depend on the style object update by the *symbolizer*.
+
+During the symbolization of the BD TOPO® we had some problems with the opacity of the walls, roofs and edges who is not apply on the buildings. The problem came from the update function *'FeatureProcessing.update'*  who make the mesh opacity equal to the Layer opacity. So, we created  *'FeatureProcessingBDTopo.update'* who don't change the mesh's customized parameters.
+
+We use a flux to have the BD TOPO® so he is not put on the scene like the other objects so we created a function, *'ForBuildings'*, on the *ModelLoader* to access at the Mesh of each BD TOPO®'s tiles and can edit them. 
+
 **[Back to the top](#summary)**
 
 
