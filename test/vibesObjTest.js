@@ -1,6 +1,7 @@
 /* global itowns, describe, it */
-var chai = require('chai');
-
+var chai;
+var assert = chai.assert;
+var expect = chai.expect;
 var parts;
 
 var manager = itowns.LayerManager.prototype;
@@ -12,6 +13,12 @@ describe('LayerManager._readFile()', function () {
     it('Expected .obj or .gibes file', function () {
         chai.expect(function () { manager._readFile(f); }).to.throw('Unvalid format');
     });
+    it('the file loaded is not .obj', function () {
+        assert.notTypeOf(f, '.obj');
+    });
+    it('the file loaded is not .gibes', function () {
+        assert.notTypeOf(f, '.gibes');
+    });
 });
 
 parts = [
@@ -21,11 +28,13 @@ parts = [
 var f1 = new File(parts, 'file.obj');
 
 describe('LayerManager._readFile()', function () {
+    it('file loaded should be a file.obj', function () {
+        expect(f1).to.have.property('name', 'file.obj');
+    });
     it('.obj file loaded successfully', function () {
         chai.expect(manager._readFile(f1)).to.equal(0);
     });
 });
-
 
 parts = [
     new Blob(['{"name":"croutitower","coordX":4202010,"coordY":178050,"coordZ":4779009,"rotateX":-3.093,"rotateY":0.851,"rotateZ":-1.634,"scale":300}'], { type: 'text/plain' }),
@@ -34,6 +43,9 @@ parts = [
 var f2 = new File(parts, 'sample.obj');
 
 describe('LayerManager._readFile()', function () {
+    it('file loaded should not be empty', function () {
+        expect(f2).not.to.be.a('');
+    });
     it('.gibes file loaded successfully', function () {
         chai.expect(manager._readFile(f2)).to.equal(0);
     });

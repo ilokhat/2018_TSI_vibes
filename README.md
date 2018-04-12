@@ -90,7 +90,10 @@ The main challenge of this project is that it has to be included into the archit
 
 ![archi_itowns](VIBES/itowns_archi.png)
 
+<p align="center">*legend : iTowns architecture (version du 5/03/2018).*</p>
+
 Two sorts of development can be carried out in iTowns :
+
 * develop a new example, based on the existing classes of the core of iTowns.
 * add new functionalities directly to the core.
 
@@ -152,6 +155,7 @@ Therefore, the idea of our project is to re-make the concept of PLU++ inside the
 TODO : what is a style (definition in litterature), specificities in 3D, definition of 'generic' styles (discrete, typical, sketchy)...
 
 **[Back to the top](#summary)**
+
 
 
 ## Conception and development
@@ -243,6 +247,8 @@ The 3D stylization will be done according to the following activity diagram :
 The architecture of our project must be included in iTowns. The following schema shows the different functionalities of iTowns, with the ones that interest us in red :  
 
 ![archi_itowns](VIBES/itowns_archi2.png)
+
+<p align="center">*legend : iTowns architecture (version du 5/03/2018).*</p>
 
 The goal is to make this tool as general as possible, which means it must not depend on just one example. On the contrary, it should be usable on any example containing a 3D object on an instance of the globe, as a full-fledged functionality of iTowns. Therefore, we will create a new class Symbolizer, which will manage the 3D render. We will also extend the loading functionalities of iTowns in order to handle .obj files and other formats, using a new class called ModelLoader.
 (TODO: à compléter avec les autres classes)
@@ -343,7 +349,7 @@ The Javascript library [dat.GUI](https://github.com/dataarts/dat.gui) allows to 
 
 ##### Saving and loading a style
 
-Our tool must also allow to save the current style in a *.vibes* file (see [above](#style-format)) and re-load it later. We used [FileSaver.js](https://github.com/eligrey/FileSaver.js/) to save the file as a Blob object.  (TODO: update)
+Our tool must also allow to save the current style in a *.vibes* file (see [above](#style-format)) and re-load it later. We used at first we use a npm package function but after [problems with the test](##CI/CD) we use a home made fonction to save the file as a Blob object.   
 
 We used the Javascript object *FileReader* to load a file and get the data in it. This data can then be parsed in JSON and read directly to be applied to the meshes.  
 When a stylesheet is loaded, the values of the GUI are updated to match the current stylisation of the object.

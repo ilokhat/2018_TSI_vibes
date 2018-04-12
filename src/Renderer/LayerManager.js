@@ -403,7 +403,7 @@ function loadFileException(message) {
 
 LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
     // moving the object after clicked on it using the keys (4,6,2,8,7,3 or a,z,q,s,w,x)
-    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         if ((key.key == 'a') || (key.key == '4')) {
             _this._xmoins(-10);
         }
@@ -426,7 +426,7 @@ LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
 };
 
 LayerManager.prototype._xplus = function xplus(a) {
-    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateX(a);
@@ -438,7 +438,7 @@ LayerManager.prototype._xplus = function xplus(a) {
 };
 
 LayerManager.prototype._xmoins = function _xmoins(a) {
-    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateX(a);
@@ -451,7 +451,7 @@ LayerManager.prototype._xmoins = function _xmoins(a) {
 };
 
 LayerManager.prototype._yplus = function yplus(a) {
-    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateY(a);
@@ -464,7 +464,7 @@ LayerManager.prototype._yplus = function yplus(a) {
 };
 
 LayerManager.prototype._ymoins = function _ymoins(a) {
-    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateY(a);
@@ -477,7 +477,7 @@ LayerManager.prototype._ymoins = function _ymoins(a) {
 };
 
 LayerManager.prototype._zplus = function zplus(a) {
-    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateZ(a);
@@ -490,7 +490,7 @@ LayerManager.prototype._zplus = function zplus(a) {
 };
 
 LayerManager.prototype._zmoins = function _zmoins(a) {
-    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2) {
+    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
         obj.translateZ(a);
