@@ -18,13 +18,13 @@
 
   ​
 ## Introduction
-  
+
 ### Context  
-  
+
 (TODO : Context)
-  
+
 ### Goals of the project
-  
+
 The VIBES (Visualization in iTowns of Buildings Elegantly Stylized) project consists in implementing geovisualisation techniques to stylize buildings on the platform iTowns. This project aims to provide a visual support for city planning, among other purposes.  
 
 The user should be able to :
@@ -95,7 +95,7 @@ Two sorts of development can be carried out in iTowns :
 * add new functionalities directly to the core.
 
 This choice depends on the purpose of the tool. Our stylization tool is intended to be applied in multiple examples, therefore the main functionalities should be integrated in the source of iTowns. This implies that they should be as generic as possible, and respect the iTowns standards. An example will also be created, only to demonstrate how our tool should be used, but the goal is to make this example as simple as possible and to avoid including too much logic in it.
-  
+
 (TODO : image du diapo)
 ​    
 ### PLU++
@@ -155,7 +155,7 @@ TODO : what is a style (definition in litterature), specificities in 3D, definit
 
 
 ## Conception and development
-  
+
 ### Style format
 
 In order to save and re-use the style of an object, we need to find a way to store this information so it can be accessed easily. The obvious solution, in a JavaScript project, is JSON.  
@@ -235,11 +235,11 @@ TODO : update style format
 The 3D stylization will be done according to the following activity diagram :
 
 ![ActivityDiagram](VIBES/3DStylizationProcess.png) 
-  
+
 ### Architecture
-  
+
 #### Global architecture  
-  
+
 The architecture of our project must be included in iTowns. The following schema shows the different functionalities of iTowns, with the ones that interest us in red :  
 
 ![archi_itowns](VIBES/itowns_archi2.png)
@@ -252,16 +252,16 @@ The goal is to make this tool as general as possible, which means it must not de
 #### Classes
 
 (TODO: petite intro)
-  
+
 * **ModelLoader.js** : the class to loads different sort of 3D objects (just *.OBJ* for now).
 * **Symbolizer.js** : the class that carries all the stylization functionalities.
 * **LayerManager.js** : the class that manages the user interface.
 * **VibesTest.js** : the example file (linked to the HTML document) where we call the previous classes.
 
 (TODO : explain how our classes communicate - promises, etc)
-  
+
 ##### Class ModelLoader  
-  
+
 This class has 2 attributes :
 * **view** : the iTowns view, passed as parameter of the constructor.
 * **model** : initialized as null, this attribute will carry the object loaded and the edges extracted from it (see [after](#edges-extraction)).  
@@ -290,7 +290,7 @@ To answer this issue, we needed to add a layer management functionality : instea
 
 (image menu layer)  
 ​  
-  
+
 **[Back to the top](#summary)**
 
 ## Results
@@ -347,18 +347,18 @@ Our tool must also allow to save the current style in a *.vibes* file (see [abov
 
 We used the Javascript object *FileReader* to load a file and get the data in it. This data can then be parsed in JSON and read directly to be applied to the meshes.  
 When a stylesheet is loaded, the values of the GUI are updated to match the current stylisation of the object.
-   
+
 **[Back to the top](#summary)**  
-   
+
 #### Advanced functionalities
-  
+
 ##### Layer Management
-  
+
 ###### User interaction with layers
-  
+
 Add a layer ? (d&d ou click pour BDTOPO / BATI3D) => the layer appears on the list
 Select a layer (click or check)
-  
+
 When one layer (or more) is checked, three buttons appear :
 * **Stylize object** : open a symbolizer to stylize all the meshes of the objects at once.
 * **Stylize parts** : open a symbolizer to stylize the meshes of the objects independently (the objects must have the same number of meshes).
@@ -367,7 +367,7 @@ When one layer (or more) is checked, three buttons appear :
 These buttons disappear when there is no more layers checked (if they are all unchecked or deleted).
 ​    
 (TODO : diagramme d'activité)
-  
+
 ###### Geolocation
 
 An important issue concerning the layers is how to **geolocalize** them. This is easy when the data itself is georeferenced, but formats like .OBJ do not provide this information. Therefore, in this case, the user should tell where the object is located, but the question is how.  
@@ -412,11 +412,11 @@ Therefore, we went for an intermediary solution, where a default position (on pl
 ```
 
 It can be drag and dropped at any time, and will be applied to all the checked layers in the GUI.
-  
+
 ##### Stylization  
-  
+
 ###### General functioning of the symbolizer
-  
+
 Each initializer method builds the structure of the GUI, with the appropriate folders and call the 'add' functions.  
 The 'add' functions create buttons and sliders to the menu with dat.GUI, and define the 'change' functions as callbacks.  
 The 'change' functions perform the concrete stylization on the object/edges.  
@@ -429,9 +429,9 @@ The public methods are the two different GUI initialization :
 * **initGui** : opens one Symbolizer for each mesh.
 
 (image croutitower with initGuiAll and with initGui)
-  
+
 ###### Edge stylization
-  
+
 * **Edge extraction**  
   
 The edges are extracted from the geometry thanks to a *THREE.EdgesGeometry* object, then converted into *THREE.LineSegments* and added to a group of lines that will be placed in the scene at the same coordinates as the object.  
@@ -440,7 +440,7 @@ These edges are initialized with a *THREE.LineBasicMaterial* that can be stylize
 
 The parameters we can currently change are : **color**, **opacity**, **width**.
 We also plan on adding a parameter to change the style of the edges (continuous or dotted line), but we faced a problem related to the Three.js library. Indeed, this parameter require a function of Three.js that was moved in the *THREE.Line* class in a later version than the one included in iTowns, and we could not make this function work at its previous location. This is one of the problem we need to solve in the next sprints.  
-  
+
 * **Simple parameters**
 * **Dashed edges**
 * **Sketchy edges**
@@ -450,13 +450,13 @@ An edge is a linear geometry, so we cannot simply apply a texture on it. A solut
 The implementation is in progress.  
 
 (TODO: update + image exemple sketchy edge)
-  
+
 ###### Face stylization
-  
+
 * **Simple parameters**
   
 (TODO: résumer très rapidement les param de stylization simple des faces)
-  
+
 * **Face texturation**
   
 The PLU++ project allows to apply texture on the faces of the object, but also on the edges, in order to diversify the possible styles. The images we used as sample textures were taken from this project and from the croutitower example.  
@@ -468,16 +468,27 @@ The source image must be located in the right folder in iTowns (*examples/textur
 When a texture is applied, a new slider appears on the GUI to change the repetition of the texture.  
 
 (image menu + image exemple)
-  
+
 * **Shader application**
   
 ##### Environment
-  
+
 Customizing the stylization of the environment in iTowns is a little more challenging than the other parameters, as it implies acting on elements that are already implemented. Unlike PLU++, the environment is already set, so we cannot re-use the functions.
 
 ###### Lights
 
-Possible addition : changing light direction, color, intensity...
+In order to make the integration of 3D mesh more realistic, we had a light located nearly above the building. Its a ThreeJS PointLight that gets emitted from a single point in all directions. We woud have prefered use a DirectionalLight like the one already implemented internally iniTowns but we never achieved to make it work.  The drawback of PointLight is that two identical object in the 3D scene located at different places will have different shadows.
+
+  ```javascript
+  var plight = new THREE.PointLight(0xffffff, 1, 0, 1);
+  var coordLight = coord.clone(); // Building coordinates
+  coordLight.setAltitude(coordLight.altitude() + 350);
+  plight.position.copy(coordLight.as(this.view.referenceCrs).xyz());
+  plight.position.y += 70;
+  ```
+
+Moreover, we had in the dat. gui a subfolder named "Light" which contain slider that are linked to light position (x,y,z) and color. For example, the user turn the light's scene to yellow and can move it to see shadow rotation. This can be a first approximation of a daylight.
+
 
 ###### Shadows
 
@@ -493,15 +504,7 @@ In a native iTowns application, there is no easy way to implement buildings shad
   var plane = new THREE.Mesh(planeGeometry, planeMaterial);
   ```
 
-- a light located above the building. Its a ThreeJS PointLight that gets emitted from a single point in all directions. We woud have prefered use a DirectionalLight like the one already implemented internally iniTowns but we never achieved to make it work.  The drawback of PointLight is that two identical object in the 3D scene located at different places will have different shadows.
-
-  ```javascript
-  var plight = new THREE.PointLight(0xffffff, 1, 0, 1);
-  var coordLight = coord.clone(); // Building coordinates
-  coordLight.setAltitude(coordLight.altitude() + 350);
-  plight.position.copy(coordLight.as(this.view.referenceCrs).xyz());
-  plight.position.y += 70;
-  ```
+- The light decripted above.
 
 Finally, we add  an option "Display shades" in our dat.gui to let to the user the choice of displaying our shadows. Here is a screenshot of one building with it shadow.
 
@@ -510,13 +513,13 @@ Finally, we add  an option "Display shades" in our dat.gui to let to the user th
 ###### Camera
 
 Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), camera reinitialization.  
-  
+
 ##### Loaders
 
 ###### OBJ Loader
 
 TODO : describe how we load OBJ data.
-  
+
 ###### BATI3D Loader
 
 The BATI3D is a IGN production who give the 3D building of France by 500mx500m tile (in the localization where the data exists). 
@@ -531,7 +534,7 @@ The dificulty is to make the load work on the itowns glob view instead of the it
 ###### BDTOPO Loader
 
 TODO : describe how we load BDTOPO data (WFS extruded).
-      
+​      
 **[Back to the top](#summary)**
 
 
@@ -550,62 +553,90 @@ the pictures below show the results of the test units:
 
 <img src="VIBES/mochaTest.png" style="width: 400px;"/>
 <img src="VIBES/unit_tests_console.png" style="width: 400px;"/>
-  
+
 ### Continuous Integration [![Build Status](https://travis-ci.org/arnaudgregoire/vibes.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)
 
 For run all the test we use [TravisCI](https://travis-ci.org/arnaudgregoire/vibes). The initial iTowns project use already TravisCI for the unit test and deploy it on its website. So we change the [*'.travis.yml'*](/.travis.yml) for do only the tests with ont the deployment. 
 
 At the begining all work well, but after add the salving of style *.vibes* and position *.gibes* it fail.
 We have some problems with the npm package for save the files, [*'file-saver'*](https://www.npmjs.com/package/file-saver), during the compilation of itowns on [*'itowns-testing.js'*](/test/itowns-testing.js#L113). We start to une an other package, [*'savery'*](https://www.npmjs.com/package/savery) but it have the same problem. So we use an other save function write on the example and give it to the *Symbolyzer*.
-  
+
  ### Deployment
-   
- (TODO: Arnaud <3)
+
+In this project we worked on the repository https://github.com/arnaudgregoire/vibes. Mathieu Bredif wanted to gather itowns examples on the repository https://github.com/itownsResearch. Thats why we created a second repository https://github.com/itownsResearch/2018_TSI_vibes which host the online version of vibes at https://itownsresearch.github.io/2018_TSI_vibes/examples/vibesObj.html.
+
+In order to publish on our website a given version of vibes, we developped a publish script (./publish.sh at root folder) that follow the workflow decripted below : 
+
+- First we force push the new version of arnaudgregoire/vibes on itownsresearch. By doing that, all files from itownsResearch/2018_TSI_vibes are replaced by arnaudgregoire/vibes files.
+
+  ```sh	
+  git push -f https://github.com/itownsResearch/2018_TSI_vibes master:master
+  ```
+
+- Then we clone a version of the itownsresearch repository. We install all the dependency and we build the dist folder which contain all builded javascript files. We will need those file in order to maintain our website without any node server, just pure html5.
+
+  ```shell
+  git clone https://github.com/itownsResearch/2018_TSI_vibes
+  cd 2018_TSI_vibes
+  npm install
+  npm run build
+  ```
+
+- Once we built our application, we commit and push the js files contained in the dist folder. This way, this preserve a readeable tree of commit, preventing thousand lines of differences between javascript built files.
+
+  ```sh
+  git add -f dist/*.js
+  git commit -m "dist"
+  git push -f
+  ```
+
+  ​	
+
 
 **[Back to the top](#summary)**
 
-  
+
 ## Conclusion
-  
+
 ### General review
-  
-...
-  
+
+During 6 weeks,  we worked together with real efficiency. We achieved in all goals that were fixed by our backer Sidonie Christophe.  We left behind us a fully functionnal and documented repository (https://github.com/itownsResearch/2018_TSI_vibes) and an online demo at https://itownsresearch.github.io/2018_TSI_vibes/examples/vibesObj.html. We used a SCRUM way of development using most commonly used tools in professional world like Trello, Github or Travis. Moreover, we used all knowledges that we learnt this year, particulary in the field of Continuous integration and continuous deployment, design pattern, team management, Node & Javascript frontend and backend, 3D visualisation and above all itowns. That leads us today to thank all professors that oversees our year, making it great and giving us a real  technical background for our future work.
+
 ### Personal reviews
-  
+
 * **Houssem Adouni**
   
  ...
-    
+​    
 * **El-Hadi Bouchaour**
   
  ...
-    
+​    
 * **Arnaud Grégoire**
   
- ...
-    
+As a simple developper, i worked on threeJS mesh integration in iTowns. Moreover, i worked on shadows and lights in iTowns Scene. Furthermore i made the drag&drop and all interactions between computer system files and browsers. In addition to that, i made a sets of examples. Besides, i although make the continuous deployment on  https://itownsresearch.github.io/2018_TSI_vibes/ . 
+​    
 * **Rose Mathelier**
-  
+
  ...
-    
+​    
 * **Laurie Nino**
   
  ...
-    
+​    
 * **Adel Ouhabi**
   
  ...
-    
+​    
 * **Ludivine Schlegel**
   
  ...
- 
+
  ### Limits and perspectives
-  
+
 ...
-    
-  
+​    
+
 **[Back to the top](#summary)**
 
 
@@ -620,10 +651,14 @@ We have some problems with the npm package for save the files, [*'file-saver'*](
 * **Ludivine Schlegel**
 
 ## Project backers
-  
+
 * **Mathieu Bredif**
 * **Sidonie Chistophe**
 * **Alexandre Devaux**
 
-  ​
+
 **[Back to the top](#summary)**
+
+```
+
+```
