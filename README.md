@@ -21,9 +21,9 @@
 
 ### Context  
 
-In order to make easier the urban plans consultation process  and to implement techniques of buildings stylization in the iTowns geovisualization platform, we should adapt the architecture of iTowns to be able to integrate a process of data stylization and visualization, in the most modular and configurable way possible,therefore we need to separate the data model and the specification of the style from the rendering process itself. 
+In order to make easier the urban plans consultation process and to implement techniques of buildings stylization in the iTowns geovisualization platform, we need to adapt the architecture of iTowns to be able to integrate a process of data stylization and visualization, in the most modular and configurable way possible,therefore we should separate the data model and the specification of the style from the rendering process itself. 
 
-It is also necessary to implement adapted interfaces  to the parameterization of the style.
+It is also necessary to implement adapted interfaces to the parameterization of the style.
 
 ### Goals of the project
 
@@ -92,16 +92,16 @@ The main challenge of this project is that it has to be included into the archit
 
 ![archi_itowns](VIBES/itowns_archi.png)
 
-<p align="center">*legend : iTowns architecture (version du 5/03/2018).*</p>
+*<p align="center">legend : iTowns architecture (version du 5/03/2018).</p>*
 
 Two sorts of development can be carried out in iTowns :
 
 * develop a new example, based on the existing classes of the core of iTowns.
 * add new functionalities directly to the core.
 
-This choice depends on the purpose of the tool. Our stylization tool is intended to be applied in multiple examples, therefore the main functionalities should be integrated in the source of iTowns. This implies that they should be as generic as possible, and respect the iTowns standards. An example will also be created, only to demonstrate how our tool should be used, but the goal is to make this example as simple as possible and to avoid including too much logic in it.
+![archi_itowns](VIBES/examples_iTowns.png)
 
-(TODO : image du diapo)
+This choice depends on the purpose of the tool. Our stylization tool is intended to be applied in multiple examples, therefore the main functionalities should be integrated in the source of iTowns. This implies that they should be as generic as possible, and respect the iTowns standards. An example will also be created, only to demonstrate how our tool should be used, but the goal is to make this example as simple as possible and to avoid including too much logic in it.
 ​    
 ### PLU++
 
@@ -154,7 +154,6 @@ Therefore, the idea of our project is to re-make the concept of PLU++ inside the
 
 ### Definition of a style
 
-<<<<<<< HEAD
 The definition of the term style depends on the field of research.
 In cartography, the term style is defined by an identification of visual characteristics on a map. The style is a way to show different types of render. The result can be shown in 3D thanks to the position of a virtual camera and light sources. A material is attribute to each object to determinate the appearance in the final render.
 
@@ -176,9 +175,6 @@ The goal of the VIBES project is to modify the style of building and show them a
 
 These 'generic' styles were described by Anouk Vinesse in the PLU++ project.
 
-=======
-TODO : what is a style (definition in litterature), specificities in 3D, definition of 'generic' styles (discrete, typical, sketchy)...
->>>>>>> elhadi
 
 **[Back to the top](#summary)**
 
@@ -293,9 +289,8 @@ The architecture of our project must be included in iTowns. The following schema
 
 ![archi_itowns](VIBES/itowns_archi2.png)
 
-<p align="center">*legend : iTowns architecture (version du 5/03/2018).*</p>
+*<p align="center">legend : iTowns architecture (version du 5/03/2018).</p>*
 
-<<<<<<< HEAD
 The goal is to make this tool as general as possible, which means it must not depend on just one example. On the contrary, it should be usable on any example containing a 3D object on an instance of the globe, as a full-fledged functionality of iTowns. Therefore, we created a new class Symbolizer, which manages the 3D render. We also extended the loading functionalities of iTowns in order to handle .obj files and other formats, using a new class called ModelLoader. These two classes are called by an other class called LayerManager. 
 
 The final architecture of our project is the following :
@@ -306,66 +301,79 @@ The classes in orange are the ones we created from scratch.
 The classes in blue are the iTowns classes we re-used directly  
 The classes in pink are iTowns classes we duplicated to make some slight modifications. (see [BDTopo](#BDTOPO-loader) for more details).  
 The classes in green are classes from iTowns-legacy we re-used to load BATI3D (see [Bati3D](#BATI3D-loader) for more details).  
-=======
-The goal is to make this tool as general as possible, which means it must not depend on just one example. On the contrary, it should be usable on any example containing a 3D object on an instance of the globe, as a full-fledged functionality of iTowns. Therefore, we will create a new class Symbolizer, which will manage the 3D render. We will also extend the loading functionalities of iTowns in order to handle .obj files and other formats, using a new class called ModelLoader.
-(TODO: à compléter avec les autres classes)
->>>>>>> elhadi
 
-(TODO : image architecture with our functionalities)
+ 
 
 #### Classes
 
-(TODO: petite intro)
+The core of our project are the 3 classes and the example represented in orange :  
 
 * **ModelLoader.js** : the class to loads different sort of 3D objects (just *.OBJ* for now).
+
 * **Symbolizer.js** : the class that carries all the stylization functionalities.
+
 * **LayerManager.js** : the class that manages the user interface.
+
 * **VibesTest.js** : the example file (linked to the HTML document) where we call the previous classes.
 
-(TODO : explain how our classes communicate - promises, etc)
+
+This schema describes the links between these classes :
+
+![ObjetDiagram](VIBES/Objet.png) 
+
+* The LayerManager is instanciated in the exemple.  
+
+* The LayerManager initialize event listeners : 2 buttons on the GUI (to load BD Topo and BATI3D), and a drag and drop listener (to load OBJs).  
+
+* When one of these listeners is trigerred, ModelLoader is called (*'load layer'* arrow).  
+
+* After the layer is loaded, it appears on the view and the LayerManager *handles* it (*'callback'* arrow). This means that the layer is added to a list of checkboxes, and buttons to activate the Symbolizer are created : the layer is ready to be stylized.  
+
+* When the user activates the Symbolizer (*'stylize layer'* arrow), the stylization controllers appear on the GUI, which allows the user to modify the visual aspect of the object.  
+
+* Stylization changes are displayed in the view.  
+
 
 ##### Class ModelLoader  
 
+![ModelLoader](VIBES/ModelLoader.png)  
+
 This class has 2 attributes :
-* **view** : the iTowns view, passed as parameter of the constructor.
-* **model** : initialized as null, this attribute will carry the object loaded and the edges extracted from it (see [after](#edges-extraction)).  
+* **The iTowns view**
+* **The object to load** : the model that carries the object loaded and the edges extracted from it (see [after](#edges-extraction)), and special attributes to handle BD Topo.
 
-It contains one public method for each format. These functions convert the 3D object into a group of meshes adapted to the symbolizer, and call an internal method to load the object in iTowns. The final object (and its edges) are stored in the attribute *model*.  
-(TODO: update - describe the methods in ModelLoader, the inputs and outputs, etc.)
+It contains one public method for each format : **loadOBJ()**, **loadBATI3D()**, and **loadBDTopo()**.  
 
-A callback function should be passed in the parameters of the public method, to specify what should be done when the loading is complete.  
+These functions convert the 3D object into a group of meshes adapted to the symbolizer, and call internal methods to load the object in iTowns. The final object (and its edges) are stored in the attribute *model*, except the tiles from BD Topo, which are handled differently.  
+
+  
 
 ##### Class Symbolizer
 
-This class has 5 attributes, all passed as parameters of the constructor :
-* **view** : the iTowns view.
-* **obj** : the object to stylize (a group of *THREE.Mesh*).
-* **edges** : the edges to stylize (a group of *THREE.LineSegments*).
-* **menu** : the GUI where the user interface will be created.
-* **nb** : the ID of the symbolizer.  
+![Symbolizer](VIBES/Symbolizer.png)  
 
-Fonctionnement expliqué + bas (TODO: dire ça mieux et en anglais)
+This class has the following attributes :  
+* **The iTowns view**
+* **Attributes related to the GUI management** : the menu and the Symbolizer folder.
+* **The objects to stylize** : the object itself (a list containg a group of *THREE.Mesh* for each layer), the edges, the possible quads (useful for the sketchy stylization), and special attributes for the stylization of  the BD Topo extruded features.
+* **Attributes related to the environment ** : the light and a plane to receive the shadows.
+
+To initialize the Symbolizer, the user needs to call either initGui() or initGuiAll(). The operation of these methods is explained with more details [here](#general-functioning-of-the-symbolizer).
+
+  
 
 ##### Class LayerManager
 
-<<<<<<< HEAD
 ![LayerManager](VIBES/LayerManager.png)  
 
 The ModelLoader and the Symbolizer could suffice to perform a stylization on an object. However, it is desirable to apply the same stylization on several objects. This is the interest of the LayerManager : providing an interface similar to those we can find in a GIS, so the user can manipulate his layers.
 
 ![LayerMenu](VIBES/LayerMenu.png)  
-=======
-In the first version, our tool was only able to stylize one object. But what if the user wants to apply a style to several objects ?   
->>>>>>> elhadi
 
-To answer this issue, we needed to add a layer management functionality : instead of opening a symbolizer directly after the loading, the layer is added to a list of checkboxes, similar to those we can find in GIS, where the user can manipulate it.
+The methods of this class manage the elements of the GUI and the event listeners, as described [here](#user-interaction-with-layers).
 
-<<<<<<< HEAD
 This class also allows to move the loaded object using check keys, as described [here](#geolocation).​  
 
-=======
-(image menu layer)  
->>>>>>> elhadi
 ​  
 
 **[Back to the top](#summary)**
@@ -402,7 +410,7 @@ The loaded object should now appear on the globe at the chosen position. We chos
 
 We implemented a drag and drop functionality to easily load the 3D object (on .obj format), with a fixed geolocation for now. The example models are located in examples/model. We have been using croutitower.obj, test.obj and destroyer.obj for our first tests.
 
-![3D object format .obj](VIBES/croutitowerobj.png)
+![croutitower](VIBES/croutitowerobj.png)
 
 ##### Applying a style to a mesh with Three.js
 
@@ -414,11 +422,13 @@ The basic implemented parameters are : **color**, **opacity**, **emissive color*
 
 ##### Creating a user interface to dynamically modify the stylization
 
-The Javascript library [dat.GUI](https://github.com/dataarts/dat.gui) allows to create a user simple interface with buttons, sliders, checkboxes, etc. It is already used in iTowns, in the GuiTools class, to handle color and elevation layers on the globe. Thus, we will re-use this menu and add our own stylization parameters on it. Each element of the menu has an event listener with a callback function that performs the corresponding stylization on the mesh.    ![graphical user interface](VIBES/gui.png)
+The Javascript library [dat.GUI](https://github.com/dataarts/dat.gui) allows to create a user simple interface with buttons, sliders, checkboxes, etc. It is already used in iTowns, in the GuiTools class, to handle color and elevation layers on the globe. Thus, we will re-use this menu and add our own stylization parameters on it. Each element of the menu has an event listener with a callback function that performs the corresponding stylization on the mesh.  
+
+![gui](VIBES/gui.png)
 
 ##### Saving and loading a style
 
-Our tool must also allow to save the current style in a *.vibes* file (see [above](#style-format)) and re-load it later. We used at first we use a npm package function but after [problems with the test](##CI/CD) we use a home made fonction to save the file as a Blob object.   
+Our tool must also allow to save the current style in a *.vibes* file (see [above](#style-format)) and re-load it later. We used at first we use a npm package function but after [problems with the test](#continuous-integration) we use a home made fonction to save the file as a Blob object.   
 
 We used the Javascript object *FileReader* to load a file and get the data in it. This data can then be parsed in JSON and read directly to be applied to the meshes.  
 When a stylesheet is loaded, the values of the GUI are updated to match the current stylisation of the object.
@@ -463,7 +473,7 @@ The answer to this issue is twofold :
 * The user should be able to enter (somehow) the parameters to locate the object he wants to stylize.
 * He also should be able to adjust the position he chose (slight translations, rotations, scaling) later.  
 
-##### Adjustments and relative positionning
+* **Adjustments and relative positionning**
 
 There are two ways to move objects:
 
@@ -475,9 +485,9 @@ The first one can be done by using the keyboard keys after clicking on the objec
 
 The second way the user can use the sliders on the GUI which are shown in the picture below : Translate X, Translate Y and Translate Z
 
-![Oject adjustments and relative positioning](VIBES/deplacemtrelatif.png)
+![deplacementrelatif](VIBES/deplacemtrelatif.png)
 
-##### Absolute positionning
+* **Absolute positionning**
 
 But this method cannot be used to georeference an object completely - we cannot use a slider to move a mesh from one end of the world to the other. Until this step, the coordinates were hard-coded in the example, which is not satisfying.  
 
@@ -504,25 +514,20 @@ It can be drag and dropped at any time, and will be applied to all the checked l
 
 ###### General functioning of the symbolizer
 
-Each initializer method builds the structure of the GUI, with the appropriate folders and call the 'add' functions.  
-The 'add' functions create buttons and sliders to the menu with dat.GUI, and define the 'change' functions as callbacks.  
-The 'change' functions perform the concrete stylization on the object/edges.  
-(TODO : replace this paragraph by a schema)
-
-(TODO : describe what the Symbolizer actually does, with images and everything...)
-
-The public methods are the two different GUI initialization :
+The Symbolizer is the central class of Vibes, as it carries the concrete stylization functionalities.  
+An object can be stylized in two ways : a global stylization, or a detailled stylization. In the second case, we stylize the object mesh by mesh, whereas in the first, we apply the same style everywhere. Therefore, there is two methods to initialize the Symbolizer :
 * **initGuiAll** : opens one Symbolizer for all the meshes of the object.
-* **initGui** : opens one Symbolizer for each mesh.
+* **initGui** : opens one Symbolizer for each mesh.  
+  
+The process of stylization in the Symbolizer works as follows :  
 
-(image croutitower with initGuiAll and with initGui)
+![symbolizer_all](VIBES/SymbAll.png)
 
-<<<<<<< HEAD
+![symbolizer_parts](VIBES/SymbParts.png)  
+
 Each initializer method builds the structure of the GUI, with the appropriate folders and add the controllers to it (buttons and sliders). These controllers all carry callback functions that perform the concrete stylization on the object or edges when they are triggered.  
 
 
-=======
->>>>>>> elhadi
 ###### Edge stylization
 
 * **Edge extraction**  
@@ -542,13 +547,16 @@ An edge is a linear geometry, so we cannot simply apply a texture on it. A solut
 
 The implementation is in progress.  
 
-![Sketchy edges](VIBES/sket.png)
+(TODO: update + image exemple sketchy edge)
+
+  
 
 ###### Face stylization
 
 * **Simple parameters**
   
-(TODO: résumer très rapidement les param de stylization simple des faces)
+When the 3D object is loaded, it is converted to meshes. The material of these meshes are initialized with a *THREE.MeshPhongMaterial* object so they can be stylized using a Symbolizer.
+The parameters which can be currently change are : **opacity**, **color**, **emissive**, **specular**, **shininess**.
 
 * **Face texturation**
   
@@ -560,17 +568,42 @@ The source image must be located in the right folder in iTowns (*examples/textur
 
 When a texture is applied, a new slider appears on the GUI to change the repetition of the texture.  
 
-(image menu + image exemple)
+![ActivityDiagram](VIBES/texture_faces.png)
+
 
 * **Shader application**
-  
+To allow the user to apply a more customized render, a next step could be the application of a shader in the faces of an object. This could be done the same way as we did to create sketchy edges, with the *THREE.ShaderMaterial*.  
+
+Like for the texturation with the image, some default shaders would be located in a folder in iTowns, with a json file containg the lists of names, in order to make them appear in the GUI as a drop-down list. Then the user would be able to add its owns shaders.  
+
+For each shader, three files would be required :
+
+* The **vertex** shader : *ShaderName_vert.glsl*
+* The **fragment** shader : *ShaderName_frag.glsl*
+* A JSON file containg the **uniforms** : *ShaderName_uni.json*
+
+ This functionality might be implemented in the last week of the project.
+
+
+
 ##### Environment
 
 Customizing the stylization of the environment in iTowns is a little more challenging than the other parameters, as it implies acting on elements that are already implemented. Unlike PLU++, the environment is already set, so we cannot re-use the functions.
 
 ###### Lights
 
-Possible addition : changing light direction, color, intensity...
+In order to make the integration of 3D mesh more realistic, we had a light located nearly above the building. Its a ThreeJS PointLight that gets emitted from a single point in all directions. We woud have prefered use a DirectionalLight like the one already implemented internally iniTowns but we never achieved to make it work.  The drawback of PointLight is that two identical object in the 3D scene located at different places will have different shadows.
+
+  ```javascript
+  var plight = new THREE.PointLight(0xffffff, 1, 0, 1);
+  var coordLight = coord.clone(); // Building coordinates
+  coordLight.setAltitude(coordLight.altitude() + 350);
+  plight.position.copy(coordLight.as(this.view.referenceCrs).xyz());
+  plight.position.y += 70;
+  ```
+
+Moreover, we had in the dat. gui a subfolder named "Light" which contain slider that are linked to light position (x,y,z) and color. For example, the user turn the light's scene to yellow and can move it to see shadow rotation. This can be a first approximation of a daylight.
+
 
 ###### Shadows
 
@@ -586,15 +619,7 @@ In a native iTowns application, there is no easy way to implement buildings shad
   var plane = new THREE.Mesh(planeGeometry, planeMaterial);
   ```
 
-- a light located above the building. Its a ThreeJS PointLight that gets emitted from a single point in all directions. We woud have prefered use a DirectionalLight like the one already implemented internally iniTowns but we never achieved to make it work.  The drawback of PointLight is that two identical object in the 3D scene located at different places will have different shadows.
-
-  ```javascript
-  var plight = new THREE.PointLight(0xffffff, 1, 0, 1);
-  var coordLight = coord.clone(); // Building coordinates
-  coordLight.setAltitude(coordLight.altitude() + 350);
-  plight.position.copy(coordLight.as(this.view.referenceCrs).xyz());
-  plight.position.y += 70;
-  ```
+- The light decripted above.
 
 Finally, we add  an option "Display shades" in our dat.gui to let to the user the choice of displaying our shadows. Here is a screenshot of one building with it shadow.
 
@@ -602,21 +627,35 @@ Finally, we add  an option "Display shades" in our dat.gui to let to the user th
 
 ###### Camera
 
-<<<<<<< HEAD
+Once the question of geolocation was resolved, we had to manage the camera orientation.
+In iTowns, some function can help to manage the camera. For instance, to follow the mouvement of the 3D object on the scene, a function is called when its coordinates change:
+
+  ```javascript
+  globeView.controls.setCameraTargetPosition(this.obj[0].position, false);
+  ```
+
+The same function is use when the object is load on the scene.
+
+The position of the object became camera's position. This system is manage in the class Symbolizer.
+
+Also, it is posible to modify the camera's coordinates and the zoom scale (parameters **Longitude**, **Latitude** and **Zoom**) and reinitialize the parameters with the menu.
+
+In addition, different camera points of view are proposed : **oblique**, **immersive**, **globe**. 
+
 ![Camera](VIBES/camera.png)
-=======
-Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), camera reinitialization.  
->>>>>>> elhadi
 
 ##### Loaders
 
+We have three different loader for loads three types of object (.obj, the BATI3d and the BDTopo). 
+
 ###### OBJ Loader
 
-TODO : describe how we load OBJ data.
+The *'.obj'* is a standard for recording 3D objects. *three.js* have already a loader to convert *'.obj'* to THREE.Group.
+
+We use the npm package *'three-obj-loader'* to load the *'.obj'* and we created a function for personalize them. So, we put it at the giving location, apply the giving rotation and scaling, create and apply the initial THREE.MeshPhongMaterial on the faces and extract the edges and initialize its style. Then, we manage the light and the shadow for the group. Finally, we add the light, the shadow, the faces and the edges to the scene and after use the giving callback function with the faces and the edges.
 
 ###### BATI3D Loader
 
-<<<<<<< HEAD
 The BATI3D is an IGN production that gives the 3D building of France by 500mx500m tile (in the localization where the data exists).
 
 One tile match one folder whose name depend on the top left corner coordinates (ex:'EXPORT_1302-13722'). The 3D model is save as '.3DS' and link to the corresponding orthophoto images. The 3D model has each point geolocated with the *Lambert93* coordinates (EPSG:2154).
@@ -640,27 +679,18 @@ We reuse the classes: Cartography3D,  clipMap,  dalleClasse,  Shader, B3DLoader,
 We have some problems with the orthophoto images application so we don't use it.
 
 ###### BD TOPO® Loader
-=======
-The BATI3D is a IGN production who give the 3D building of France by 500mx500m tile (in the localization where the data exists). 
-One tile match one folder whose name depend on the top lef corner coordinates (ex:'EXPORT_1302-13722'). The 3D model is save as '.3DS' and link to the corrresponding orthophoto images. The 3D model has each point geolocated with the Lambert93 coordinates (EPSG:2154).
->>>>>>> elhadi
 
-For load the IGN's BATI3D, we were guided by the iGN project : [*itowns-legacy*](https://github.com/iTowns/itowns-legacy) who has an sample of BATI3D and load it on a itowns plan view.
+The BD TOPO® is a *"3D vector description (structured in objects) of the elements of the territory and its infrastructures, of metric precision, exploitable on scales ranging from 1: 5 000 to 1: 50 000."* [source](http://professionnels.ign.fr/bdtopo). The BD TOPO® is accessible with a WFS flux and iTowns already use it on the [globe wfs extruded](http://www.itowns-project.org/itowns/examples/globe_wfs_extruded.html) to load the buildings.
 
-We reuse the classes : Cartography3D,  clipMap,  dalleClasse,  Shader, B3DLoader,  BinaryStream,  DDSLoader,  PlatformInfo and the function BufferGeometryUtils extracted from  Utils.
+We do the same as the [iTowns example](http://www.itowns-project.org/itowns/examples/globe_wfs_extruded.html), but we need to change the way to create the visible object and manage the layer.
 
-The dificulty is to make the load work on the itowns glob view instead of the itowns plan view.
+We created a new class Feature2MeshStyle based on Feature2Mesh. We change the creation of the object, the roofs and the walls are separated, the edges are created and a THREE.MeshPhongMaterial is applied instead of a vertexColor. The parameters of the faces and edges material depend on the style object update by the *symbolizer*.
 
-###### BDTOPO Loader
+During the symbolization of the BD TOPO® we had some problems with the opacity of the walls, roofs and edges who is not apply on the buildings. The problem came from the update function *'FeatureProcessing.update'*  who make the mesh opacity equal to the Layer opacity. So, we created  *'FeatureProcessingBDTopo.update'* who don't change the mesh's customized parameters.
 
-<<<<<<< HEAD
 We use a flux to have the BD TOPO® so he is not put on the scene like the other objects so we created a function, *'ForBuildings'*, on the *ModelLoader* to access at the Mesh of each BD TOPO®'s tiles and can edit them. 
 
 
-=======
-TODO : describe how we load BDTOPO data (WFS extruded).
-      
->>>>>>> elhadi
 **[Back to the top](#summary)**
 
 
@@ -674,11 +704,10 @@ interfaces system such as BDD, TDD, Exports, QUnit and Require-style allow
 In our project we choose to continue working with the BDD (Behavior Driven Development ) interface which provide a syntax including describe() , context(), it(), specify(), before(), after(), beforeEach(), and afterEach(), it focus on what the application should do, and on how it will do it.
 
 As we mentioned above we continued working and adding some tests to the previous test folder of the Itowns project, a part of these unit tests run using the CLI (commande line interface) and the others need the browser to be executed since our application uses the Dom element,and the nodeJs server does not have access to the Dom,we had to run these kind of tests on the browser. to do that we made a simple HTML page which our test runner page (/mochaTest.html).
-The page loads Mocha, the testing libraries and our test file(test/browsertest.js) and finally to run the tests, we simply needed to open the runner in a browser.
-
+The page loads Mocha, the testing libraries and our test file(/tests/vibesObjTest.js) and finally to run the tests, we simply needed to open the runner in a browser.
 the pictures below show the results of the test units:
 
-![test on browse](VIBES/browsertest.png)
+![browsertest](VIBES/browsertest.png)
 <img src="VIBES/unit_tests_console.png" style="width: 400px;"/>
 
 ### Continuous Integration [![Build Status](https://travis-ci.org/arnaudgregoire/vibes.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)
@@ -688,50 +717,77 @@ For run all the test we use [TravisCI](https://travis-ci.org/arnaudgregoire/vibe
 At the begining all work well, but after add the salving of style *.vibes* and position *.gibes* it fail.
 We have some problems with the npm package for save the files, [*'file-saver'*](https://www.npmjs.com/package/file-saver), during the compilation of itowns on [*'itowns-testing.js'*](/test/itowns-testing.js#L113). We start to une an other package, [*'savery'*](https://www.npmjs.com/package/savery) but it have the same problem. So we use an other save function write on the example and give it to the *Symbolyzer*.
 
- ### Deployment
+### Deployment
 
- (TODO: Arnaud <3)
+In this project we worked on the repository https://github.com/arnaudgregoire/vibes. Mathieu Bredif wanted to gather itowns examples on the repository https://github.com/itownsResearch. Thats why we created a second repository https://github.com/itownsResearch/2018_TSI_vibes which host the online version of vibes at https://itownsresearch.github.io/2018_TSI_vibes/examples/vibesObj.html.
+
+In order to publish on our website a given version of vibes, we developped a publish script (./publish.sh at root folder) that follow the workflow decripted below : 
+
+- First we force push the new version of arnaudgregoire/vibes on itownsresearch. By doing that, all files from itownsResearch/2018_TSI_vibes are replaced by arnaudgregoire/vibes files.
+
+  ```sh	
+  git push -f https://github.com/itownsResearch/2018_TSI_vibes master:master
+  ```
+
+- Then we clone a version of the itownsresearch repository. We install all the dependency and we build the dist folder which contain all builded javascript files. We will need those file in order to maintain our website without any node server, just pure html5.
+
+  ```shell
+  git clone https://github.com/itownsResearch/2018_TSI_vibes
+  cd 2018_TSI_vibes
+  npm install
+  npm run build
+  ```
+
+- Once we built our application, we commit and push the js files contained in the dist folder. This way, this preserve a readeable tree of commit, preventing thousand lines of differences between javascript built files.
+
+  ```sh
+  git add -f dist/*.js
+  git commit -m "dist"
+  git push -f
+  ```
 
 **[Back to the top](#summary)**
 
 
 ## Conclusion
 
+
 ### General review
 
-...
+During 6 weeks,  we worked together with real efficiency. We achieved in all goals that were fixed by our backer Sidonie Christophe.  We left behind us a fully functionnal and documented repository (https://github.com/itownsResearch/2018_TSI_vibes) and an online demo at https://itownsresearch.github.io/2018_TSI_vibes/examples/vibesObj.html. We used a SCRUM way of development using most commonly used tools in professional world like Trello, Github or Travis. Moreover, we used all knowledges that we learnt this year, particulary in the field of Continuous integration and continuous deployment, design pattern, team management, Node & Javascript frontend and backend, 3D visualisation and above all itowns. That leads us today to thank all professors that oversees our year, making it great and giving us a real  technical background for our future work.
 
 ### Personal reviews
 
 * **Houssem Adouni**
   
  ...
-    
+​    
 * **El-Hadi Bouchaour**
   
  ...
-    
+​    
 * **Arnaud Grégoire**
   
- ...
-    
+As a simple developper, i worked on threeJS mesh integration in iTowns. Moreover, i worked on shadows and lights in iTowns Scene. Furthermore i made the drag&drop and all interactions between computer system files and browsers. In addition to that, i made a sets of examples. Besides, i although make the continuous deployment on  https://itownsresearch.github.io/2018_TSI_vibes/ . 
+​    
 * **Rose Mathelier**
-  
+
  ...
-    
+​    
 * **Laurie Nino**
   
  ...
-    
+​    
 * **Adel Ouhabi**
   
  ...
-    
+​    
 * **Ludivine Schlegel**
   
  ...
 
- ### Limits and perspectives
+
+### Limits and perspectives
 
 Our teamworked together during this project in order to achieve the set objectives, wesucceeded in implementing of a various of functionalities and techniques ofbuildings stylization, and we almost reached all what was fixed as goals, howeverthere was some difficulties that we faced and encountered when developing ourproject. We can summarize them in the following points:
 
@@ -739,6 +795,7 @@ Our teamworked together during this project in order to achieve the set objectiv
 - the shadow…
 - ​
 - The majority of the unit tests that we intended to run them on nodejs need access to the Dom element, but the nodeJs server does not have access to it, so we tried to run them on the browser.  
+  ​    
 
 **[Back to the top](#summary)**
 
@@ -759,5 +816,9 @@ Our teamworked together during this project in order to achieve the set objectiv
 * **Sidonie Chistophe**
 * **Alexandre Devaux**
 
-  ​
+
 **[Back to the top](#summary)**
+
+```
+
+```
