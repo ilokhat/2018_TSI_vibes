@@ -18,13 +18,15 @@
 
   ​
 ## Introduction
-  
+
 ### Context  
-  
-(TODO : Context)
-  
+
+In order to make easier the urban plans consultation process  and to implement techniques of buildings stylization in the iTowns geovisualization platform, we should adapt the architecture of iTowns to be able to integrate a process of data stylization and visualization, in the most modular and configurable way possible,therefore we need to separate the data model and the specification of the style from the rendering process itself. 
+
+It is also necessary to implement adapted interfaces  to the parameterization of the style.
+
 ### Goals of the project
-  
+
 The VIBES (Visualization in iTowns of Buildings Elegantly Stylized) project consists in implementing geovisualisation techniques to stylize buildings on the platform iTowns. This project aims to provide a visual support for city planning, among other purposes.  
 
 The user should be able to :
@@ -98,7 +100,7 @@ Two sorts of development can be carried out in iTowns :
 * add new functionalities directly to the core.
 
 This choice depends on the purpose of the tool. Our stylization tool is intended to be applied in multiple examples, therefore the main functionalities should be integrated in the source of iTowns. This implies that they should be as generic as possible, and respect the iTowns standards. An example will also be created, only to demonstrate how our tool should be used, but the goal is to make this example as simple as possible and to avoid including too much logic in it.
-  
+
 (TODO : image du diapo)
 ​    
 ### PLU++
@@ -159,7 +161,7 @@ TODO : what is a style (definition in litterature), specificities in 3D, definit
 
 
 ## Conception and development
-  
+
 ### Style format
 
 In order to save and re-use the style of an object, we need to find a way to store this information so it can be accessed easily. The obvious solution, in a JavaScript project, is JSON.  
@@ -239,11 +241,11 @@ TODO : update style format
 The 3D stylization will be done according to the following activity diagram :
 
 ![ActivityDiagram](VIBES/3DStylizationProcess.png) 
-  
+
 ### Architecture
-  
+
 #### Global architecture  
-  
+
 The architecture of our project must be included in iTowns. The following schema shows the different functionalities of iTowns, with the ones that interest us in red :  
 
 ![archi_itowns](VIBES/itowns_archi2.png)
@@ -258,16 +260,16 @@ The goal is to make this tool as general as possible, which means it must not de
 #### Classes
 
 (TODO: petite intro)
-  
+
 * **ModelLoader.js** : the class to loads different sort of 3D objects (just *.OBJ* for now).
 * **Symbolizer.js** : the class that carries all the stylization functionalities.
 * **LayerManager.js** : the class that manages the user interface.
 * **VibesTest.js** : the example file (linked to the HTML document) where we call the previous classes.
 
 (TODO : explain how our classes communicate - promises, etc)
-  
+
 ##### Class ModelLoader  
-  
+
 This class has 2 attributes :
 * **view** : the iTowns view, passed as parameter of the constructor.
 * **model** : initialized as null, this attribute will carry the object loaded and the edges extracted from it (see [after](#edges-extraction)).  
@@ -296,7 +298,7 @@ To answer this issue, we needed to add a layer management functionality : instea
 
 (image menu layer)  
 ​  
-  
+
 **[Back to the top](#summary)**
 
 ## Results
@@ -353,18 +355,18 @@ Our tool must also allow to save the current style in a *.vibes* file (see [abov
 
 We used the Javascript object *FileReader* to load a file and get the data in it. This data can then be parsed in JSON and read directly to be applied to the meshes.  
 When a stylesheet is loaded, the values of the GUI are updated to match the current stylisation of the object.
-   
+
 **[Back to the top](#summary)**  
-   
+
 #### Advanced functionalities
-  
+
 ##### Layer Management
-  
+
 ###### User interaction with layers
-  
+
 Add a layer ? (d&d ou click pour BDTOPO / BATI3D) => the layer appears on the list
 Select a layer (click or check)
-  
+
 When one layer (or more) is checked, three buttons appear :
 * **Stylize object** : open a symbolizer to stylize all the meshes of the objects at once.
 * **Stylize parts** : open a symbolizer to stylize the meshes of the objects independently (the objects must have the same number of meshes).
@@ -373,7 +375,7 @@ When one layer (or more) is checked, three buttons appear :
 These buttons disappear when there is no more layers checked (if they are all unchecked or deleted).
 ​    
 (TODO : diagramme d'activité)
-  
+
 ###### Geolocation
 
 An important issue concerning the layers is how to **geolocalize** them. This is easy when the data itself is georeferenced, but formats like .OBJ do not provide this information. Therefore, in this case, the user should tell where the object is located, but the question is how.  
@@ -418,11 +420,11 @@ Therefore, we went for an intermediary solution, where a default position (on pl
 ```
 
 It can be drag and dropped at any time, and will be applied to all the checked layers in the GUI.
-  
+
 ##### Stylization  
-  
+
 ###### General functioning of the symbolizer
-  
+
 Each initializer method builds the structure of the GUI, with the appropriate folders and call the 'add' functions.  
 The 'add' functions create buttons and sliders to the menu with dat.GUI, and define the 'change' functions as callbacks.  
 The 'change' functions perform the concrete stylization on the object/edges.  
@@ -435,9 +437,9 @@ The public methods are the two different GUI initialization :
 * **initGui** : opens one Symbolizer for each mesh.
 
 (image croutitower with initGuiAll and with initGui)
-  
+
 ###### Edge stylization
-  
+
 * **Edge extraction**  
   
 The edges are extracted from the geometry thanks to a *THREE.EdgesGeometry* object, then converted into *THREE.LineSegments* and added to a group of lines that will be placed in the scene at the same coordinates as the object.  
@@ -446,7 +448,7 @@ These edges are initialized with a *THREE.LineBasicMaterial* that can be stylize
 
 The parameters we can currently change are : **color**, **opacity**, **width**.
 We also plan on adding a parameter to change the style of the edges (continuous or dotted line), but we faced a problem related to the Three.js library. Indeed, this parameter require a function of Three.js that was moved in the *THREE.Line* class in a later version than the one included in iTowns, and we could not make this function work at its previous location. This is one of the problem we need to solve in the next sprints.  
-  
+
 * **Simple parameters**
 * **Dashed edges**
 * **Sketchy edges**
@@ -456,13 +458,13 @@ An edge is a linear geometry, so we cannot simply apply a texture on it. A solut
 The implementation is in progress.  
 
 (TODO: update + image exemple sketchy edge)
-  
+
 ###### Face stylization
-  
+
 * **Simple parameters**
   
 (TODO: résumer très rapidement les param de stylization simple des faces)
-  
+
 * **Face texturation**
   
 The PLU++ project allows to apply texture on the faces of the object, but also on the edges, in order to diversify the possible styles. The images we used as sample textures were taken from this project and from the croutitower example.  
@@ -474,11 +476,11 @@ The source image must be located in the right folder in iTowns (*examples/textur
 When a texture is applied, a new slider appears on the GUI to change the repetition of the texture.  
 
 (image menu + image exemple)
-  
+
 * **Shader application**
   
 ##### Environment
-  
+
 Customizing the stylization of the environment in iTowns is a little more challenging than the other parameters, as it implies acting on elements that are already implemented. Unlike PLU++, the environment is already set, so we cannot re-use the functions.
 
 ###### Lights
@@ -516,13 +518,13 @@ Finally, we add  an option "Display shades" in our dat.gui to let to the user th
 ###### Camera
 
 Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), camera reinitialization.  
-  
+
 ##### Loaders
 
 ###### OBJ Loader
 
 TODO : describe how we load OBJ data.
-  
+
 ###### BATI3D Loader
 
 The BATI3D is a IGN production who give the 3D building of France by 500mx500m tile (in the localization where the data exists). 
@@ -556,29 +558,29 @@ the pictures below show the results of the test units:
 
 <img src="VIBES/mochaTest.png" style="width: 400px;"/>
 <img src="VIBES/unit_tests_console.png" style="width: 400px;"/>
-  
+
 ### Continuous Integration [![Build Status](https://travis-ci.org/arnaudgregoire/vibes.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)
 
 For run all the test we use [TravisCI](https://travis-ci.org/arnaudgregoire/vibes). The initial iTowns project use already TravisCI for the unit test and deploy it on its website. So we change the [*'.travis.yml'*](/.travis.yml) for do only the tests with ont the deployment. 
 
 At the begining all work well, but after add the salving of style *.vibes* and position *.gibes* it fail.
 We have some problems with the npm package for save the files, [*'file-saver'*](https://www.npmjs.com/package/file-saver), during the compilation of itowns on [*'itowns-testing.js'*](/test/itowns-testing.js#L113). We start to une an other package, [*'savery'*](https://www.npmjs.com/package/savery) but it have the same problem. So we use an other save function write on the example and give it to the *Symbolyzer*.
-  
+
  ### Deployment
-   
+
  (TODO: Arnaud <3)
 
 **[Back to the top](#summary)**
 
-  
+
 ## Conclusion
-  
+
 ### General review
-  
+
 ...
-  
+
 ### Personal reviews
-  
+
 * **Houssem Adouni**
   
  ...
@@ -606,12 +608,17 @@ We have some problems with the npm package for save the files, [*'file-saver'*](
 * **Ludivine Schlegel**
   
  ...
- 
+
  ### Limits and perspectives
+
+Despite of the progress done in the development and the implementation of various functionalities and  techniques of buildings stylization in our project  , we need to mention some of the difficulties that we encoutered during this project, we can summarize them in the following points:
+
+- The version of itowns is not updated 
+- The majority of the unit tests that we intended to run them on nodejs need the access to the Dom element, but the nodeJs server does not have access to it ,so we tried to run them on the browser.
+-  
+
   
-...
-    
-  
+
 **[Back to the top](#summary)**
 
 
@@ -626,7 +633,7 @@ We have some problems with the npm package for save the files, [*'file-saver'*](
 * **Ludivine Schlegel**
 
 ## Project backers
-  
+
 * **Mathieu Bredif**
 * **Sidonie Chistophe**
 * **Alexandre Devaux**
