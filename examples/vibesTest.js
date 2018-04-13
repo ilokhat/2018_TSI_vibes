@@ -89,7 +89,6 @@ globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function 
     })
     result.innerHTML += "<br> To move object click on it or select it from GUI <br> use keys a and z or 4 and 6 to move it from West-East <br> use keys q and s or 8 and 2 to move it from North-South <br> use keys w and x or 7 and 3 to move it from Top-Down ";
     // globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
-    loader.loadBDTopo();
 });
 //var loader2 = new itowns.ModelLoader(globeView);
  // loader.loadBati3D();

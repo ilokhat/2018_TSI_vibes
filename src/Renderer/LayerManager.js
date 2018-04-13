@@ -12,6 +12,7 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.document = doc;
     this.menu = menu;
     this.coord = coord;
+    this.coordCRS = coord.as('EPSG:4326');
     this.rotateX = rotateX;
     this.rotateY = rotateY;
     this.rotateZ = rotateZ;
@@ -28,7 +29,7 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.stylizePartsBtn = null;
     this.deleteBtn = null;
     this.bati3dBtn = null;
-    this.coordCRS = coord.as('EPSG:4326');
+    this.bdTopoBtn = null;
     this.symbolizerInit = null;
     _this = this;
 }
@@ -36,87 +37,17 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
 var showBDTopo = (parent) => { parent.visible = true; };
 var hideBDTopo = (parent) => { parent.visible = false; };
 
-
-function createBati3dBtn() {
-    _this.loader.loadBati3D();
-    _this.bati3dBtn = _this.menu.gui.add({ bati3D: () => {
-        var bati3D_faces = _this.view.scene.getObjectByName('bati3D_faces');
-        var bati3D_lines = _this.view.scene.getObjectByName('bati3D_lines');
-        if (bati3D_faces != undefined && bati3D_lines != undefined) {
-            _this.loader._setVisibility(_this.view, true);
-            // _this.loader.checked = true;
-            var model = [bati3D_faces, bati3D_lines];
-            _this.handleLayer(model);
-            _this.menu.gui.remove(_this.bati3dBtn);
-        }
-    },
-    }, 'bati3D').name('Load Bati3D');
-}
-
-function manageCamera() {
-    // Create a folder on the menu to manage the camera
-    var camFolder = _this.menu.gui.addFolder('Camera');
-    // Get initial coordinates
-    var initialCamX = _this.coordCRS.longitude();
-    var initialCamY = _this.coordCRS.latitude();
-    let camX = initialCamX;
-    let camY = initialCamY;
-    // Replace the camera at its initial place
-    camFolder.add({ resetCam: () => {
-        _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: initialCamX, latitude: initialCamY, zoom: 15, tilt: 30, heading: 30 }, false);
-    },
-    }, 'resetCam').name('Reset camera');
-    // Different point of view choises
-    camFolder.add({ plan: ' ' }, 'plan', ['Horizon', 'Plongeante', 'Globe']).name('Vue').onChange((value) => {
-        if (value === 'Horizon') {
-            _this.view.controls.setTilt(100, false);
-            _this.view.controls.setZoom(12, false);
-        }
-        else if (value === 'Plongeante') {
-            _this.view.controls.setTilt(10, false);
-            _this.view.controls.setZoom(17, false);
-        }
-        else {
-            _this.view.controls.setZoom(1, false);
-        }
-    });
-    // Change parameter 'longitude' of the camera
-    camFolder.add({ moveCamX: initialCamX }, 'moveCamX').name('Longitude').onChange((value) => {
-        camX = value;
-        _this.view.controls.setCameraTargetGeoPosition({ longitude: camX, latitude: camY }, false);
-    });
-    // Change parameter 'latitude' of the camera
-    camFolder.add({ moveCamY: initialCamY }, 'moveCamY').name('Latitude').onChange((value) => {
-        camY = value;
-        _this.view.controls.setCameraTargetGeoPosition({ longitude: camX, latitude: camY }, false);
-    });
-    // Change zoom scale of the camera
-    camFolder.add({ zoom: 15 }, 'zoom').name('Zoom').onChange((value) => {
-        _this.view.controls.setZoom(value, false);
-    });
-}
+// ********** GUI INITIALIZATION **********
 
 LayerManager.prototype.initListener = function initListener() {
-    this.document.addEventListener('keypress', _this.checkKeyPress, false);
+    // Gui initialization
     createBati3dBtn();
-    // bati3D visibility
-    _this.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
-        if (_this.loader.bDTopoLoaded) {
-            var b = _this.view._layers[0]._attachedLayers.filter(b => b.id == 'WFS Buildings');
-            if (_this.loader.bdTopoVisibility) {
-                b[0].visible = false;
-                _this.loader.bdTopoVisibility = false;
-            } else {
-                b[0].visible = true;
-                _this.loader.bdTopoVisibility = true;
-                _this.menu.gui.remove(_this.bdTopoBtn);
-                _this.handleBdTopo();
-            }
-        }
-    },
-    }, 'bdTopo').name('Load BDTopo');
+    createBdTopoBtn();
     manageCamera();
+    // Check key press listeners
     this.document.addEventListener('keypress', _this.checkKeyPress, false);
+    this.document.addEventListener('keypress', _this.checkKeyPress, false);
+    // Drag and drop listeners
     this.document.addEventListener('click', _this.picking, false);
     this.document.addEventListener('drop', _this.documentDrop, false);
     var prevDefault = e => e.preventDefault();
@@ -167,6 +98,7 @@ LayerManager.prototype._readFile = function readFile(file) {
         });
         reader.readAsText(file);
         return 0;
+    // Load stylesheet
     } else if (file.name.endsWith('.vibes')) {
         reader.addEventListener('load', () => {
             _this.listLayers.forEach((/* layer */) => {
@@ -187,6 +119,60 @@ LayerManager.prototype._readFile = function readFile(file) {
         throw new loadFileException('Unvalid format');
     }
 };
+
+// ********** LAYER HANDLERS **********
+
+LayerManager.prototype.handleLayer = function handleLayer(model) {
+    // Add a checkbox to the GUI, named after the layer
+    var name = model[0].name.split('_')[0];
+    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name(name.split('-').join(' ')).onChange((checked) => {
+        if (checked) {
+            // Add layer and controller to the list
+            _this.listLayers.push(model);
+            _this.listControllers.push(controller);
+            // Creates buttons to start symbolizers
+            if (!_this.guiInitialized) {
+                _this.guiInitialize();
+            }
+        }
+        else {
+            // Remove layer controller from the list
+            removeFromList(_this.listLayers, model);
+            removeFromList(_this.listControllers, controller);
+            // If there is no more layers, clean the GUI
+            if (_this.listLayers.length == 0) {
+                _this._cleanGUI();
+            }
+        }
+    });
+};
+
+LayerManager.prototype.handleBdTopo = function handleBdTopo() {
+    // Add a checkbox to the GUI, named after the layer
+    var name = 'BDTopo';
+    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name('BDTopo').onChange((checked) => {
+        if (checked) {
+            // Add layer and controller to the list
+            _this.listLayers.push('BDTopo');
+            _this.listControllers.push(controller);
+            // Creates buttons to start symbolizers
+            if (!_this.guiInitialized) {
+                _this.guiInitialize();
+            }
+        }
+        else {
+            // Remove layer controller from the list
+            removeFromList(_this.listLayers, 'BDTopo');
+            removeFromList(_this.listControllers, controller);
+            // If there is no more layers, clean the GUI
+            if (_this.listLayers.length == 0) {
+                _this._cleanGUI();
+            }
+        }
+    });
+};
+
+// ********** FUNCTIONS TO MANAGE CONTROLLERS **********
 
 LayerManager.prototype.guiInitialize = function guiInitialize() {
     _this.stylizeObjectBtn = _this.layerFolder.add({ symbolizer: () => {
@@ -252,56 +238,6 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
     }, 'delete').name('Delete layer');
     // GUI initialized
     _this.guiInitialized = true;
-};
-
-LayerManager.prototype.handleLayer = function handleLayer(model) {
-    // Add a checkbox to the GUI, named after the layer
-    var name = model[0].name.split('_')[0];
-    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name(name.split('-').join(' ')).onChange((checked) => {
-        if (checked) {
-            // Add layer and controller to the list
-            _this.listLayers.push(model);
-            _this.listControllers.push(controller);
-            // Creates buttons to start symbolizers
-            if (!_this.guiInitialized) {
-                _this.guiInitialize();
-            }
-        }
-        else {
-            // Remove layer controller from the list
-            removeFromList(_this.listLayers, model);
-            removeFromList(_this.listControllers, controller);
-            // If there is no more layers, clean the GUI
-            if (_this.listLayers.length == 0) {
-                _this._cleanGUI();
-            }
-        }
-    });
-};
-
-LayerManager.prototype.handleBdTopo = function handleBdTopo() {
-    // Add a checkbox to the GUI, named after the layer
-    var name = 'BDTopo';
-    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name('BDTopo').onChange((checked) => {
-        if (checked) {
-            // Add layer and controller to the list
-            _this.listLayers.push('BDTopo');
-            _this.listControllers.push(controller);
-            // Creates buttons to start symbolizers
-            if (!_this.guiInitialized) {
-                _this.guiInitialize();
-            }
-        }
-        else {
-            // Remove layer controller from the list
-            removeFromList(_this.listLayers, 'BDTopo');
-            removeFromList(_this.listControllers, controller);
-            // If there is no more layers, clean the GUI
-            if (_this.listLayers.length == 0) {
-                _this._cleanGUI();
-            }
-        }
-    });
 };
 
 LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
@@ -391,17 +327,8 @@ LayerManager.prototype._cleanGUI = function cleanGUI() {
     _this.guiInitialized = false;
 };
 
-function removeFromList(list, elmt) {
-    var i = list.indexOf(elmt);
-    if (i != -1) {
-        list.splice(i, 1);
-    }
-}
 
-function loadFileException(message) {
-    this.message = message;
-    this.name = 'loadFileException';
-}
+// ********** OBJECT MOVEMENTS **********
 
 LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
     // moving the object after clicked on it using the keys (4,6,2,8,7,3 or a,z,q,s,w,x)
@@ -521,9 +448,104 @@ LayerManager.prototype.picking = function picking(event) {
     }
 };
 
+// ********** UTILS FUNCTIONS **********
+
+function createBati3dBtn() {
+    _this.loader.loadBati3D();
+    _this.bati3dBtn = _this.menu.gui.add({ bati3D: () => {
+        var bati3D_faces = _this.view.scene.getObjectByName('bati3D_faces');
+        var bati3D_lines = _this.view.scene.getObjectByName('bati3D_lines');
+        if (bati3D_faces != undefined && bati3D_lines != undefined) {
+            _this.loader._setVisibility(_this.view, true);
+            _this.loader.checked = true;
+            var model = [bati3D_faces, bati3D_lines];
+            _this.handleLayer(model);
+            _this.menu.gui.remove(_this.bati3dBtn);
+        }
+    },
+    }, 'bati3D').name('Load Bati3D');
+}
+
+function createBdTopoBtn() {
+     _this.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
+        if (!_this.loader.bDTopoLoaded) {
+            _this.loader.loadBDTopo();
+        }
+        // if (_this.loader.bDTopoLoaded) {
+        var b = _this.view._layers[0]._attachedLayers.filter(b => b.id == 'WFS Buildings');
+        if (_this.loader.bdTopoVisibility) {
+            b[0].visible = false;
+            _this.loader.bdTopoVisibility = false;
+        } else {
+            b[0].visible = true;
+            _this.loader.bdTopoVisibility = true;
+            _this.menu.gui.remove(_this.bdTopoBtn);
+            _this.handleBdTopo();
+        }
+        // }
+    },
+    }, 'bdTopo').name('Load BDTopo');
+}
+
+function manageCamera() {
+    // Create a folder on the menu to manage the camera
+    var camFolder = _this.menu.gui.addFolder('Camera');
+    // Get initial coordinates
+    var initialCamX = _this.coordCRS.longitude();
+    var initialCamY = _this.coordCRS.latitude();
+    let camX = initialCamX;
+    let camY = initialCamY;
+    // Replace the camera at its initial place
+    camFolder.add({ resetCam: () => {
+        _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: initialCamX, latitude: initialCamY, zoom: 15, tilt: 30, heading: 30 }, false);
+    },
+    }, 'resetCam').name('Reset camera');
+    // Different point of view choises
+    camFolder.add({ plan: ' ' }, 'plan', ['Horizon', 'Plongeante', 'Globe']).name('Vue').onChange((value) => {
+        if (value === 'Horizon') {
+            _this.view.controls.setTilt(100, false);
+            _this.view.controls.setZoom(12, false);
+        }
+        else if (value === 'Plongeante') {
+            _this.view.controls.setTilt(10, false);
+            _this.view.controls.setZoom(17, false);
+        }
+        else {
+            _this.view.controls.setZoom(1, false);
+        }
+    });
+    // Change parameter 'longitude' of the camera
+    camFolder.add({ moveCamX: initialCamX }, 'moveCamX').name('Longitude').onChange((value) => {
+        camX = value;
+        _this.view.controls.setCameraTargetGeoPosition({ longitude: camX, latitude: camY }, false);
+    });
+    // Change parameter 'latitude' of the camera
+    camFolder.add({ moveCamY: initialCamY }, 'moveCamY').name('Latitude').onChange((value) => {
+        camY = value;
+        _this.view.controls.setCameraTargetGeoPosition({ longitude: camX, latitude: camY }, false);
+    });
+    // Change zoom scale of the camera
+    camFolder.add({ zoom: 15 }, 'zoom').name('Zoom').onChange((value) => {
+        _this.view.controls.setZoom(value, false);
+    });
+}
+
 function getParent(obj) {
     if (obj.parent.parent != null) return getParent(obj.parent);
     return obj;
 }
+
+function removeFromList(list, elmt) {
+    var i = list.indexOf(elmt);
+    if (i != -1) {
+        list.splice(i, 1);
+    }
+}
+
+function loadFileException(message) {
+    this.message = message;
+    this.name = 'loadFileException';
+}
+
 
 export default LayerManager;
