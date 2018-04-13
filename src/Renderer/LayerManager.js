@@ -500,7 +500,7 @@ function createBati3dBtn() {
 }
 
 function createBdTopoBtn() {
-     _this.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
+    _this.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
         if (!_this.loader.bDTopoLoaded) {
             _this.loader.loadBDTopo();
         }

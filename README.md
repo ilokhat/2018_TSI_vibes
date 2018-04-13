@@ -410,7 +410,7 @@ The loaded object should now appear on the globe at the chosen position. We chos
 
 We implemented a drag and drop functionality to easily load the 3D object (on .obj format), with a fixed geolocation for now. The example models are located in examples/model. We have been using croutitower.obj, test.obj and destroyer.obj for our first tests.
 
-(image croutitower)
+![croutitower](VIBES/croutitowerobj.png)
 
 ##### Applying a style to a mesh with Three.js
 
@@ -424,7 +424,7 @@ The basic implemented parameters are : **color**, **opacity**, **emissive color*
 
 The Javascript library [dat.GUI](https://github.com/dataarts/dat.gui) allows to create a user simple interface with buttons, sliders, checkboxes, etc. It is already used in iTowns, in the GuiTools class, to handle color and elevation layers on the globe. Thus, we will re-use this menu and add our own stylization parameters on it. Each element of the menu has an event listener with a callback function that performs the corresponding stylization on the mesh.  
 
-(TODO : add image menu dat.GUI basic stylization)  
+![gui](VIBES/gui.png)
 
 ##### Saving and loading a style
 
@@ -485,7 +485,7 @@ The first one can be done by using the keyboard keys after clicking on the objec
 
 The second way the user can use the sliders on the GUI which are shown in the picture below : Translate X, Translate Y and Translate Z
 
-<img src="VIBES/move-object.png" style="width: 400px;"/>
+![deplacementrelatif](VIBES/deplacemtrelatif.png)
 
 * **Absolute positionning**
 
@@ -703,12 +703,16 @@ interfaces system such as BDD, TDD, Exports, QUnit and Require-style allow
 
 In our project we choose to continue working with the BDD (Behavior Driven Development ) interface which provide a syntax including describe() , context(), it(), specify(), before(), after(), beforeEach(), and afterEach(), it focus on what the application should do, and on how it will do it.
 
-As we mentioned above we continued working and adding some tests to the previous test folder of the Itowns project, a part of these unit tests run using the CLI (commande line interface) and the others need the browser to be executed since our application uses the Dom element,and the nodeJs server does not have access to the Dom,we had to run these kind of tests on the browser. to do that we made a simple HTML page which our test runner page (/mochaTest.html).
-The page loads Mocha, the testing libraries and our test file(/tests/vibesObjTest.js) and finally to run the tests, we simply needed to open the runner in a browser.
+As we mentioned above we continued working and adding some tests to the previous test folder of the Itowns project, a part of these unit tests run using the CLI (commande line interface) and the others need the browser to be executed since our application uses the Dom element,and the nodeJs server does not have access to the Dom,we had to run these kind of tests on the browser. to do that we made a simple HTML page which our test runner page (/browsermochaTest.html).
+The page loads Mocha, the testing libraries and our test file(test/browsertest.js) and finally to run the tests, we simply needed to open the runner in a browser.
 the pictures below show the results of the test units:
 
-<img src="VIBES/mochaTest.png" style="width: 400px;"/>
+![browsertest](VIBES/browsertest.png)
 <img src="VIBES/unit_tests_console.png" style="width: 400px;"/>
+
+### Functional Tests
+
+During the development we created a test protocol to make sure the develop functionality works well. When we added a new functionality we updated this protocol. [The protocol is accessible there.](Functional_Test.md)
 
 ### Continuous Integration [![Build Status](https://travis-ci.org/arnaudgregoire/vibes.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)
 
@@ -789,8 +793,13 @@ As a simple developper, i worked on threeJS mesh integration in iTowns. Moreover
 
 ### Limits and perspectives
 
-...
-​    
+Our teamworked together during this project in order to achieve the set objectives, wesucceeded in implementing of a various of functionalities and techniques ofbuildings stylization, and we almost reached all what was fixed as goals, howeverthere was some difficulties that we faced and encountered when developing ourproject. We can summarize them in the following points:
+
+- the threejs version ...
+- the shadow…
+- ​
+- The majority of the unit tests that we intended to run them on nodejs need access to the Dom element, but the nodeJs server does not have access to it, so we tried to run them on the browser.  
+  ​    
 
 **[Back to the top](#summary)**
 

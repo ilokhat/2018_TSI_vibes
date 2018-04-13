@@ -644,10 +644,14 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
     // Create or remove specific controllers according to the style chosen (sketchy, dashed, continuous)
     if (value === 'Sketchy') {
         // Initial GUI parameters
-        var color = this.edges[0].children[0].material.color;
-        var width = this.edges[0].children[0].material.linewidth;
-        var threshold = 100.0;
-        var stroke = 'dashed';
+        var color;
+        // = this.edges[0].children[0].material.color;
+        var width;
+        // = this.edges[0].children[0].material.linewidth;
+        var threshold;
+        // = 100.0;
+        var stroke;
+        // = 'dashed';
         // Checks if sketchy parameters controllers already exists
         var isSketchy = false;
         for (k = 0; k < folder.__controllers.length; k++) {
@@ -895,105 +899,105 @@ Symbolizer.prototype._changeStyleEdge = function changeStyleEdge(value, folder) 
 };
 
 Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(stroke, color, width, threshold) {
-    // Create shaders to render sketchy edges
-    var vertex =
-    `
-    attribute vec3  position2;
-    uniform   vec2  resolution;
-    uniform   float thickness;
-    uniform   float texthreshold;
-    varying   vec3 v_uv;
-    varying   float choixTex;
-
-    void main() {
-
-        // Calcul positions ECRAN des sommets de l'arête
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-        vec4 Position2 = projectionMatrix * modelViewMatrix * vec4(position2,1.0);
-
-        vec2 dir = (gl_Position.xy/gl_Position.w - Position2.xy/Position2.w) * resolution;
-
-        // Choix texture selon taille écran de l'arête
-        if (length(dir) < texthreshold){
-            choixTex = 1.0;
-        } else {
-            choixTex = 2.0;
-        }
-
-        // Calcul des normales
-        vec2 normal = normalize(dir);
-        normal = uv.x * uv.y * vec2(-normal.y, normal.x);
-
-        // Déplacement points pour faire un quad (largeur selon taille écran : rapport longueur largeur constant)
-        gl_Position.xy += ((length(dir)/thickness) * normal * 0.5) * (gl_Position.w / resolution);
-
-        gl_Position.z =  -gl_Position.w;
-
-        v_uv = vec3(uv,1.) * gl_Position.w;
-
-    }
-    `;
-    var fragment =
-    `
-    varying vec3  v_uv;
-    varying float choixTex;
-    uniform sampler2D texture1;
-    uniform sampler2D texture2;
-    uniform vec3 color;
-    
-    void main() {
-
-        vec2 uv = v_uv.xy/v_uv.z;
-        vec4 baseColor;
-
-        // Détermination textures (choisie dans le vertex shader)
-        if (choixTex == 1.0){
-            baseColor = texture2D(texture1, (uv+1.)*0.5);   
-        } else {
-            baseColor = texture2D(texture2, (uv+1.)*0.5);   
-        }
-
-        //if ( baseColor.a < 0.3 ) discard;
-        // Application de la texture
-        gl_FragColor = vec4(baseColor.a*baseColor.xyz,baseColor.a)+vec4(color,0.0);
-
-    }
-    `;
     // Initializations
     var texture1;
     var texture2;
     var loader = new THREE.TextureLoader();
     var path1 = './strokes/'.concat(stroke).concat('_small.png');
     var path2 = './strokes/'.concat(stroke).concat('.png');
-    // Load textures
-    loader.load(
-        path1,
-        (t1) => {
-            // Save texture 1
-            texture1 = t1;
-            loader.load(
-                path2,
-                (t2) => {
-                    // Save texture 2
-                    texture2 = t2;
-                    // Create shader material
-                    var material = new THREE.ShaderMaterial({
-                        uniforms: {
-                            texthreshold: { value: threshold },
-                            thickness: { value: width },
-                            resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-                            texture1: { type: 't', value: texture1 },
-                            texture2: { type: 't', value: texture2 },
-                            color: { type: 'v3', value: [color.r, color.g, color.b] },
-                        },
-                        vertexShader: vertex,
-                        fragmentShader: fragment,
-                    });
-                    material.transparent = true;
-                    material.polygonOffset = true;
-                    material.polygonOffsetUnits = -150.0;
-                    // If the quads are not created we create them
-                    if (this.quads == null) {
+    // If the quads are not created we create them
+    if (this.quads == null) {
+        // Create shaders to render sketchy edges
+        var vertex =
+        `
+        attribute vec3  position2;
+        uniform   vec2  resolution;
+        uniform   float thickness;
+        uniform   float texthreshold;
+        varying   vec3 v_uv;
+        varying   float choixTex;
+
+        void main() {
+
+            // Calcul positions ECRAN des sommets de l'arête
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+            vec4 Position2 = projectionMatrix * modelViewMatrix * vec4(position2,1.0);
+
+            vec2 dir = (gl_Position.xy/gl_Position.w - Position2.xy/Position2.w) * resolution;
+
+            // Choix texture selon taille écran de l'arête
+            if (length(dir) < texthreshold){
+                choixTex = 1.0;
+            } else {
+                choixTex = 2.0;
+            }
+
+            // Calcul des normales
+            vec2 normal = normalize(dir);
+            normal = uv.x * uv.y * vec2(-normal.y, normal.x);
+
+            // Déplacement points pour faire un quad (largeur selon taille écran : rapport longueur largeur constant)
+            gl_Position.xy += ((length(dir)/thickness) * normal * 0.5) * (gl_Position.w / resolution);
+
+            gl_Position.z =  -gl_Position.w;
+
+            v_uv = vec3(uv,1.) * gl_Position.w;
+
+        }
+        `;
+        var fragment =
+        `
+        varying vec3  v_uv;
+        varying float choixTex;
+        uniform sampler2D texture1;
+        uniform sampler2D texture2;
+        uniform vec3 color;
+        
+        void main() {
+
+            vec2 uv = v_uv.xy/v_uv.z;
+            vec4 baseColor;
+
+            // Détermination textures (choisie dans le vertex shader)
+            if (choixTex == 1.0){
+                baseColor = texture2D(texture1, (uv+1.)*0.5);   
+            } else {
+                baseColor = texture2D(texture2, (uv+1.)*0.5);   
+            }
+
+            //if ( baseColor.a < 0.3 ) discard;
+            // Application de la texture
+            gl_FragColor = vec4(baseColor.a*baseColor.xyz,baseColor.a)+vec4(color,0.0);
+
+        }
+        `;
+        // Load textures
+        loader.load(
+            path1,
+            (t1) => {
+                // Save texture 1
+                texture1 = t1;
+                loader.load(
+                    path2,
+                    (t2) => {
+                        // Save texture 2
+                        texture2 = t2;
+                        // Create shader material
+                        var material = new THREE.ShaderMaterial({
+                            uniforms: {
+                                texthreshold: { value: threshold },
+                                thickness: { value: width },
+                                resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+                                texture1: { type: 't', value: texture1 },
+                                texture2: { type: 't', value: texture2 },
+                                color: { type: 'v3', value: [color.r, color.g, color.b] },
+                            },
+                            vertexShader: vertex,
+                            fragmentShader: fragment,
+                        });
+                        material.transparent = true;
+                        material.polygonOffset = true;
+                        material.polygonOffsetUnits = -150.0;
                         // Quad groups initialization
                         this.quads = new THREE.Group();
                         this.quads.name = 'quads';
@@ -1028,22 +1032,37 @@ Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(str
                             // Add the group to the general group
                             this.quads.add(quadGroup);
                         }
-                    }
-                    // Else, we apply the material on the existing quads
-                    else {
-                        this.quads.traverse((subGroup) => {
-                            subGroup.traverse((child) => {
-                                child.visible = true;
-                                child.material = material;
-                                child.material.needsUpdate = true;
+
+                        // Add the group of quads to the scene
+                        this.view.scene.add(this.quads);
+                    });
+            });
+    }
+    // Else, we apply the material on the existing quads
+    else {
+        this.quads.children.forEach((subGroup) => {
+            subGroup.children.forEach((child) => {
+                child.visible = true;
+                child.material.uniforms.color.value = color;
+                child.material.uniforms.thickness.value = width;
+                child.material.uniforms.texthreshold.value = threshold;
+                loader.load(
+                    path1,
+                    (t1) => {
+                        texture1 = t1;
+                        loader.load(
+                            path2,
+                            (t2) => {
+                                texture2 = t2;
+                                child.material.uniforms.texture1.value = texture1;
+                                child.material.uniforms.texture2.value = texture2;
                             });
-                        });
-                    }
-                    // Add the group of quads to the scene
-                    this.view.scene.add(this.quads);
-                    this.view.notifyChange(true);
-                });
+                    });
+                child.material.needsUpdate = true;
+            });
         });
+    }
+    this.view.notifyChange(true);
 };
 
 Symbolizer.prototype._addStyleEdgeAll = function addStyleEdgeAll(folder) {
@@ -1860,10 +1879,10 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
                 this.edges[i].updateMatrixWorld();
                 // Reset quads position if they exist
                 if (this.quads != null) {
-                    this.quads.position.copy(this.obj[i].position);
-                    this.quads.rotation.copy(this.obj[i].rotation);
-                    this.quads.scale.copy(this.obj[i].scale);
-                    this.quads.updateMatrixWorld();
+                    this.quads.children[i].position.copy(this.obj[i].position);
+                    this.quads.children[i].rotation.copy(this.obj[i].rotation);
+                    this.quads.children[i].scale.copy(this.obj[i].scale);
+                    this.quads.children[i].updateMatrixWorld();
                 }
             }
             this.view.notifyChange(true);
@@ -1889,8 +1908,8 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
                     this.light.updateMatrixWorld();
                     // Scale quads if they exist
                     if (this.quads != null) {
-                        this.quads.scale.copy(this.obj[i].scale);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].scale.copy(this.obj[i].scale);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -1917,8 +1936,8 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Translate quads if they exist
                     if (this.quads != null) {
-                        this.quads.position.copy(this.obj[i].position);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].position.copy(this.obj[i].position);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -1937,8 +1956,8 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Translate quads if they exist
                     if (this.quads != null) {
-                        this.quads.position.copy(this.obj[i].position);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].position.copy(this.obj[i].position);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -1957,8 +1976,8 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Translate quads if they exist
                     if (this.quads != null) {
-                        this.quads.position.copy(this.obj[i].position);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].position.copy(this.obj[i].position);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -1989,8 +2008,8 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Rotate quads if they exist
                     if (this.quads != null) {
-                        this.quads.rotation.copy(this.obj[i].rotation);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].rotation.copy(this.obj[i].rotation);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -2009,8 +2028,8 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Rotate quads if they exist
                     if (this.quads != null) {
-                        this.quads.rotation.copy(this.obj[i].rotation);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].rotation.copy(this.obj[i].rotation);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -2029,8 +2048,8 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Rotate quads if they exist
                     if (this.quads != null) {
-                        this.quads.rotation.copy(this.obj[i].rotation);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].rotation.copy(this.obj[i].rotation);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -2082,8 +2101,8 @@ Symbolizer.prototype._changeCoordinates = function changeCoordinates(vectCoord) 
                 this.edges[i].updateMatrixWorld();
                 // Modification of quads position if they exist
                 if (this.quads != null) {
-                    this.quads.position.copy(this.obj[i].position);
-                    this.quads.updateMatrixWorld();
+                    this.quads.children[i].position.copy(this.obj[i].position);
+                    this.quads.children[i].updateMatrixWorld();
                 }
             }
         }
