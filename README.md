@@ -99,9 +99,9 @@ Two sorts of development can be carried out in iTowns :
 * develop a new example, based on the existing classes of the core of iTowns.
 * add new functionalities directly to the core.
 
-This choice depends on the purpose of the tool. Our stylization tool is intended to be applied in multiple examples, therefore the main functionalities should be integrated in the source of iTowns. This implies that they should be as generic as possible, and respect the iTowns standards. An example will also be created, only to demonstrate how our tool should be used, but the goal is to make this example as simple as possible and to avoid including too much logic in it.
+![archi_itowns](VIBES/examples_iTowns.png)
 
-(TODO : image du diapo)
+This choice depends on the purpose of the tool. Our stylization tool is intended to be applied in multiple examples, therefore the main functionalities should be integrated in the source of iTowns. This implies that they should be as generic as possible, and respect the iTowns standards. An example will also be created, only to demonstrate how our tool should be used, but the goal is to make this example as simple as possible and to avoid including too much logic in it.
 ​    
 ### PLU++
 
@@ -154,7 +154,27 @@ Therefore, the idea of our project is to re-make the concept of PLU++ inside the
 
 ### Definition of a style
 
-TODO : what is a style (definition in litterature), specificities in 3D, definition of 'generic' styles (discrete, typical, sketchy)...
+The definition of the term style depends on the field of research.
+In cartography, the term style is defined by an identification of visual characteristics on a map. The style is a way to show different types of render. The result can be shown in 3D thanks to the position of a virtual camera and light sources. A material is attribute to each object to determinate the appearance in the final render.
+
+#### Visual variables on cartographic representation
+
+In the book "Semiologie Graphique" written by Jacques Bretin in 1967, the style is defined as a graphical traduction of an information.
+The author describe, in his book, visual variables as the ways to manage the symbology of the 3D object on the scene.
+Bertin defined seven initial variables :  **position**, **size**, **shape**, **orientation**, **color hue**, **color value** and **texture**. These variables can help the viewer to have a simple idea of how the object is represented in a map.
+It is why they will to be included in the project to manage the style of 3D object.
+
+#### 3D Buildings stylization
+
+In the iTowns project, the buildings style is described as a photo-realistic representation. The 3D object will look like as well as possible to the reality.
+The goal of the VIBES project is to modify the style of building and show them as an abstract representation. The abstract representation can be describe with different 'generic' styles :
+
+ * **Discret** : this style presente very fine or dashed lines and transparency.
+ * **Typical** : this style is similar to the hues of real buildings with characteristic elements like door, windows or chimney. It looks like photo-realistic style.  
+ * **Sketchy** : this style represente buildings as if they were drawn with pastel and bright colors. 
+
+These 'generic' styles were described by Anouk Vinesse in the PLU++ project.
+
 
 **[Back to the top](#summary)**
 
@@ -175,23 +195,26 @@ Therefore, there will also be two types of style formats :
 * Generic style, applicable to any mesh :
 
 ```json
-{
-    "edges" : {
-        "opacity": 1,
-        "color": "#ffffff",
-        "width": 1
-    },
-    "faces" : [
-        {
-            "opacity": 1,
-            "color": "ffffff",
-            "emissive": "ffffff",
-            "specular": "ffffff",
-            "shininess": 30,
-            "texture": "./textures/texture.png"
-        }
-    ],
-
+{  
+   "edges":{  
+      "opacity":1,
+      "color":"#ed0606",
+      "width":2.525429673798667,
+      "style":"Dashed",
+      "dashSize":0.2877972641178534,
+      "gapSize":0.05
+   },
+   "faces":[  
+      {  
+         "opacity":1,
+         "color":"#dadeda",
+         "emissive":"#938383",
+         "specular":"#111111",
+         "shininess":67.34479130129779,
+         "texture":"./textures/bricks.jpg",
+         "textureRepeat":0.374991231146966
+      }
+   ]
 }
 ```
 
@@ -199,38 +222,54 @@ Therefore, there will also be two types of style formats :
 
 ```json
 {
-    "edges" : {
-            "opacity": 1,
-            "color": "#ffffff",
-            "width": 1
+  "edges": {
+    "opacity": 1,
+    "color": "#000000",
+    "width": 0.5050859347597334,
+    "style": "Continuous"
+  },
+  "faces": [
+     {
+      "name": "Tower1_Tower",
+      "opacity": 1,
+      "color": "#a06b6b",
+      "emissive": "#614848",
+      "specular": "#111111",
+      "shininess": 31.55357142857143,
+      "texture": "./textures/bricks.jpg",
+      "textureRepeat": 0.1
     },
-    "faces" : [
-        {
-            "name": "nom_element1",
-            "opacity": 1,
-            "color": "#ffffff",
-            "emissive": "#ffffff",
-            "specular": "#ffffff",
-            "shininess": 30,
-            "texture": "./textures/texture.png"
-        },{
-            "name": "nom_element2",
-            "opacity": 1,
-            "color": "#ffffff",
-            "emissive": "#ffffff",
-            "specular": "#ffffff",
-            "shininess": 30,
-            "texture": "./textures/texture.png"
-        },{
-            "name": "nom_element3",
-            "opacity": 1,
-            "color": "#ffffff",
-            "emissive": "#ffffff",
-            "specular": "#ffffff",
-            "shininess": 30,
-            "texture": "./textures/texture.png"
-        }
-    ]
+    {
+      "name": "Tower1_window",
+      "opacity": 1,
+      "color": "#ffffff",
+      "emissive": "#d4a9a9",
+      "specular": "#f2dbdb",
+      "shininess": 30,
+      "texture": "./textures/glass.png",
+      "textureRepeat": 1.5901250000000002
+    },
+    {
+      "name": "Tower1_Tower_Fence_posts_Tube_1",
+      "opacity": 1,
+      "color": "#ffffff",
+      "emissive": "#000000",
+      "specular": "#111111",
+      "shininess": 30,
+      "texture": null,
+      "textureRepeat": null
+    },
+    {
+      "name": "Tower1_Tower_Fence_posts_Tube_2",
+      "opacity": 1,
+      "color": "#ffffff",
+      "emissive": "#000000",
+      "specular": "#111111",
+      "shininess": 30,
+      "texture": null,
+      "textureRepeat": null
+    } 
+  ]
 }
 ```
 
@@ -253,9 +292,9 @@ The architecture of our project must be included in iTowns. The following schema
 *<p align="center">legend : iTowns architecture (version du 5/03/2018).</p>*
 
 The goal is to make this tool as general as possible, which means it must not depend on just one example. On the contrary, it should be usable on any example containing a 3D object on an instance of the globe, as a full-fledged functionality of iTowns. Therefore, we created a new class Symbolizer, which manages the 3D render. We also extended the loading functionalities of iTowns in order to handle .obj files and other formats, using a new class called ModelLoader. These two classes are called by an other class called LayerManager. 
-  
+
 The final architecture of our project is the following :
-  
+
 ![Architecture](VIBES/Architecture.png) 
 
 The classes in orange are the ones we created from scratch.  
@@ -328,13 +367,13 @@ To initialize the Symbolizer, the user needs to call either initGui() or initGui
 ![LayerManager](VIBES/LayerManager.png)  
 
 The ModelLoader and the Symbolizer could suffice to perform a stylization on an object. However, it is desirable to apply the same stylization on several objects. This is the interest of the LayerManager : providing an interface similar to those we can find in a GIS, so the user can manipulate his layers.
-  
+
 ![LayerMenu](VIBES/LayerMenu.png)  
 
 The methods of this class manage the elements of the GUI and the event listeners, as described [here](#user-interaction-with-layers).
 
 This class also allows to move the loaded object using check keys, as described [here](#geolocation).​  
- 
+
 ​  
 
 **[Back to the top](#summary)**
@@ -411,8 +450,20 @@ When one layer (or more) is checked, three buttons appear :
 * **Delete layers** : delete the objects.
 
 These buttons disappear when there is no more layers checked (if they are all unchecked or deleted).
-​    
-(TODO : diagramme d'activité)
+
+The following figure shows the sequence diagram for displaying the Symbolizer.
+
+<p align="center"> <img src="VIBES/sequence_symbo.png" styele="width: 400px;" /></p>
+
+*<p align="center">legend : sequence diagram for viewing the Symbolizer.</p>*
+
+While the following figure shows us the user's interaction with the Symbolizer.
+
+<p align="center"> <img src="VIBES/sequence_stylize.png" styele="width: 400px;" /></p>
+
+*<p align="center">legend : sequence diagram for interaction with the Symbolizer.</p>*
+
+
 
 ###### Geolocation
 
@@ -475,8 +526,8 @@ The process of stylization in the Symbolizer works as follows :
 ![symbolizer_parts](VIBES/SymbParts.png)  
 
 Each initializer method builds the structure of the GUI, with the appropriate folders and add the controllers to it (buttons and sliders). These controllers all carry callback functions that perform the concrete stylization on the object or edges when they are triggered.  
-  
-  
+
+
 ###### Edge stylization
 
 * **Edge extraction**  
@@ -504,8 +555,8 @@ The implementation is in progress.
 
 * **Simple parameters**
   
-(TODO: résumer très rapidement les param de stylization simple des faces)
-  
+When the 3D object is loaded, it is converted to meshes. The material of these meshes are initialized with a *THREE.MeshPhongMaterial* object so they can be stylized using a Symbolizer.
+The parameters which can be currently change are : **opacity**, **color**, **emissive**, **specular**, **shininess**.
 
 * **Face texturation**
   
@@ -517,7 +568,7 @@ The source image must be located in the right folder in iTowns (*examples/textur
 
 When a texture is applied, a new slider appears on the GUI to change the repetition of the texture.  
 
-(image menu + image exemple)
+![ActivityDiagram](VIBES/texture_faces.png)
 
 
 * **Shader application**
@@ -576,7 +627,22 @@ Finally, we add  an option "Display shades" in our dat.gui to let to the user th
 
 ###### Camera
 
-Possible addition : different cameras PoV (birds-eye-view, oblique, immersive), camera reinitialization.  
+Once the question of geolocation was resolved, we had to manage the camera orientation.
+In iTowns, some function can help to manage the camera. For instance, to follow the mouvement of the 3D object on the scene, a function is called when its coordinates change:
+
+  ```javascript
+  globeView.controls.setCameraTargetPosition(this.obj[0].position, false);
+  ```
+
+The same function is use when the object is load on the scene.
+
+The position of the object became camera's position. This system is manage in the class Symbolizer.
+
+Also, it is posible to modify the camera's coordinates and the zoom scale (parameters **Longitude**, **Latitude** and **Zoom**) and reinitialize the parameters with the menu.
+
+In addition, different camera points of view are proposed : **oblique**, **immersive**, **globe**. 
+
+![Camera](VIBES/camera.png)
 
 ##### Loaders
 
@@ -599,9 +665,9 @@ For load the IGN's BATI3D, we were guided by the iGN project : [*itowns-legacy*]
 The difficulty is to make the load work on the itowns glob view instead of the itowns plan view. Another difficulty is the points coordinates who is expressed in *Lambert93* and iTowns use only the Geocentric coordinate system *WGS84* (EPSG:4978) and the Geodetic coordinate system *WSG84* (EPSG:4326).
 
 We reuse the classes: Cartography3D,  clipMap,  dalleClasse,  Shader, B3DLoader,  BinaryStream,  DDSLoader,  PlatformInfo and the function BufferGeometryUtils extracted from  Utils.
-  
+
 ![Cartography3DDetails](VIBES/Cartography3D.png)  
-  
+
 * *Cartography3D* initialize the creation of the BATI3D object. We change the refocusing of the tile, the way of loading the tile who initially depend on the camera position and now it depends only on the area and the tile available.
 * *clipMap* create the grid of all *dalleClasse* use. 
 * *dalleClasse* (tileClass) load the BATI3D data with the B3DLoader, create the THREE.Group of faces with *BufferGeometryUtils*, extract the THREE.group of edges, put them the good material and add them on the scene.
@@ -623,8 +689,8 @@ We created a new class Feature2MeshStyle based on Feature2Mesh. We change the cr
 During the symbolization of the BD TOPO® we had some problems with the opacity of the walls, roofs and edges who is not apply on the buildings. The problem came from the update function *'FeatureProcessing.update'*  who make the mesh opacity equal to the Layer opacity. So, we created  *'FeatureProcessingBDTopo.update'* who don't change the mesh's customized parameters.
 
 We use a flux to have the BD TOPO® so he is not put on the scene like the other objects so we created a function, *'ForBuildings'*, on the *ModelLoader* to access at the Mesh of each BD TOPO®'s tiles and can edit them. 
-  
-  
+
+
 **[Back to the top](#summary)**
 
 
