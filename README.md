@@ -157,19 +157,21 @@ Therefore, the idea of our project is to re-make the concept of PLU++ inside the
 The definition of the term style depends on the field of research.
 In cartography, the term style is defined by an identification of visual characteristics on a map. The style is a way to show different types of render. The result can be shown in 3D thanks to the position of a virtual camera and light sources. A material is attribute to each object to determinate the appearance in the final render.
 
-* Visual variables on cartographic representation
+#### Visual variables on cartographic representation
+
 In the book "Semiologie Graphique" written by Jacques Bretin in 1967, the style is defined as a graphical traduction of an information.
 The author describe, in his book, visual variables as the ways to manage the symbology of the 3D object on the scene.
 Bertin defined seven initial variables :  **position**, **size**, **shape**, **orientation**, **color hue**, **color value** and **texture**. These variables can help the viewer to have a simple idea of how the object is represented in a map.
 It is why they will to be included in the project to manage the style of 3D object.
 
-* 3D Buildings stylization
+#### 3D Buildings stylization
+
 In the iTowns project, the buildings style is described as a photo-realistic representation. The 3D object will look like as well as possible to the reality.
 The goal of the VIBES project is to modify the style of building and show them as an abstract representation. The abstract representation can be describe with different 'generic' styles :
 
- - **Discret** : this style presente very fine or dashed lines and transparency.
- - **Typical** : this style is similar to the hues of real buildings with characteristic elements like door, windows or chimney. It looks like photo-realistic style.  
- - **Sketchy** : this style represente buildings as if they were drawn with pastel and bright colors. 
+ * **Discret** : this style presente very fine or dashed lines and transparency.
+ * **Typical** : this style is similar to the hues of real buildings with characteristic elements like door, windows or chimney. It looks like photo-realistic style.  
+ * **Sketchy** : this style represente buildings as if they were drawn with pastel and bright colors. 
 
 These 'generic' styles were described by Anouk Vinesse in the PLU++ project.
 
@@ -640,8 +642,7 @@ Also, it is posible to modify the camera's coordinates and the zoom scale (param
 
 In addition, different camera points of view are proposed : **oblique**, **immersive**, **globe**. 
 
-<img src="VIBES/camera_immersive.png" style="width: 400px;"/>
-<img src="VIBES/camera_oblique.png" style="width: 400px;"/> 
+![Camera](VIBES/camera.png)
 
 ##### Loaders
 
