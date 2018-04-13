@@ -812,7 +812,7 @@ As a simple developper, i worked on threeJS mesh integration in iTowns. Moreover
 ​    
 * **Laurie Nino**
   
- ...
+As a developer, I worked on the texturation of the faces and the objects geolocation (the way to modify x, y, z putting new coordinates). I also worked on the camera movements; modification of camera parameters (longitude, latitude, scale zoom) and creation of different points of view.
 ​    
 * **Adel Ouhabi**
   
