@@ -585,6 +585,8 @@ the pictures below show the results of the test units:
 <img src="VIBES/mochaTest.png" style="width: 400px;"/>
 <img src="VIBES/unit_tests_console.png" style="width: 400px;"/>
 
+
+
 ### Continuous Integration [![Build Status](https://travis-ci.org/arnaudgregoire/vibes.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)
 
 For run all the test we use [TravisCI](https://travis-ci.org/arnaudgregoire/vibes). The initial iTowns project use already TravisCI for the unit test and deploy it on its website. So we change the [*'.travis.yml'*](/.travis.yml) for do only the tests with ont the deployment. 
