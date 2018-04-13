@@ -650,7 +650,6 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
         // = 100.0;
         var stroke;
         // = 'dashed';
-        console.log('QUADS2', this.quads);
         // Checks if sketchy parameters controllers already exists
         var isSketchy = false;
         for (k = 0; k < folder.__controllers.length; k++) {
@@ -1878,10 +1877,10 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
                 this.edges[i].updateMatrixWorld();
                 // Reset quads position if they exist
                 if (this.quads != null) {
-                    this.quads.position.copy(this.obj[i].position);
-                    this.quads.rotation.copy(this.obj[i].rotation);
-                    this.quads.scale.copy(this.obj[i].scale);
-                    this.quads.updateMatrixWorld();
+                    this.quads.children[i].position.copy(this.obj[i].position);
+                    this.quads.children[i].rotation.copy(this.obj[i].rotation);
+                    this.quads.children[i].scale.copy(this.obj[i].scale);
+                    this.quads.children[i].updateMatrixWorld();
                 }
             }
             this.view.notifyChange(true);
@@ -1905,8 +1904,8 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Scale quads if they exist
                     if (this.quads != null) {
-                        this.quads.scale.copy(this.obj[i].scale);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].scale.copy(this.obj[i].scale);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -1933,8 +1932,8 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Translate quads if they exist
                     if (this.quads != null) {
-                        this.quads.position.copy(this.obj[i].position);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].position.copy(this.obj[i].position);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -1953,8 +1952,8 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Translate quads if they exist
                     if (this.quads != null) {
-                        this.quads.position.copy(this.obj[i].position);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].position.copy(this.obj[i].position);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -1973,8 +1972,8 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Translate quads if they exist
                     if (this.quads != null) {
-                        this.quads.position.copy(this.obj[i].position);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].position.copy(this.obj[i].position);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -2005,8 +2004,8 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Rotate quads if they exist
                     if (this.quads != null) {
-                        this.quads.rotation.copy(this.obj[i].rotation);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].rotation.copy(this.obj[i].rotation);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -2025,8 +2024,8 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Rotate quads if they exist
                     if (this.quads != null) {
-                        this.quads.rotation.copy(this.obj[i].rotation);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].rotation.copy(this.obj[i].rotation);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -2045,8 +2044,8 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
                     this.edges[i].updateMatrixWorld();
                     // Rotate quads if they exist
                     if (this.quads != null) {
-                        this.quads.rotation.copy(this.obj[i].rotation);
-                        this.quads.updateMatrixWorld();
+                        this.quads.children[i].rotation.copy(this.obj[i].rotation);
+                        this.quads.children[i].updateMatrixWorld();
                     }
                 }
             }
@@ -2098,8 +2097,8 @@ Symbolizer.prototype._changeCoordinates = function changeCoordinates(vectCoord) 
                 this.edges[i].updateMatrixWorld();
                 // Modification of quads position if they exist
                 if (this.quads != null) {
-                    this.quads.position.copy(this.obj[i].position);
-                    this.quads.updateMatrixWorld();
+                    this.quads.children[i].position.copy(this.obj[i].position);
+                    this.quads.children[i].updateMatrixWorld();
                 }
             }
         }
