@@ -27,6 +27,8 @@ function Symbolizer(view, obj, edges, bdTopo, menu, nb, light, plane, saveDataIn
     if (bdTopo != null) this.bdTopoStyle = bdTopo.bdTopoStyle;
     this.applyStyle();
     saveData = saveDataInit();
+    console.log(this.plane);
+    console.log(this.light);
 }
 
 // ******************** SAVING AND LOADING FUNCTIONALITIES ********************
@@ -1758,21 +1760,21 @@ Symbolizer.prototype._addMoveLight = function addMoveLight(folder) {
     var prevValueY = 0;
     var prevValueZ = 0;
     // Add controller for X translation of light
-    folder.add({ MovecoordX: 0 }, 'MovecoordX', -50, 50, 0.1).name('Translation X').onChange((value) => {
+    folder.add({ MovecoordX: 0 }, 'MovecoordX', -1000, 1000, 1).name('Translation X').onChange((value) => {
         this.light.position.x += value - prevValueX;
         prevValueX = value;
         this.light.updateMatrixWorld();
         this.view.notifyChange(true);
     });
     // Add controller for Y translation of light
-    folder.add({ MovecoordY: 0 }, 'MovecoordY', -50, 50, 0.1).name('Translation Y').onChange((value) => {
+    folder.add({ MovecoordY: 0 }, 'MovecoordY', -1000, 1000, 1).name('Translation Y').onChange((value) => {
         this.light.position.y += value - prevValueY;
         prevValueY = value;
         this.light.updateMatrixWorld();
         this.view.notifyChange(true);
     });
     // Add controller for Z translation of light
-    folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -50, 50, 0.1).name('Translation Z').onChange((value) => {
+    folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -1000, 1000, 1).name('Translation Z').onChange((value) => {
         this.light.position.z += value - prevValueZ;
         prevValueZ = value;
         this.light.updateMatrixWorld();
@@ -1881,8 +1883,10 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
                     // Scale objects and edges
                     this.obj[i].scale.set(value, value, value);
                     this.edges[i].scale.set(value, value, value);
+                    this.plane.updateMatrixWorld();
                     this.obj[i].updateMatrixWorld();
                     this.edges[i].updateMatrixWorld();
+                    this.light.updateMatrixWorld();
                     // Scale quads if they exist
                     if (this.quads != null) {
                         this.quads.scale.copy(this.obj[i].scale);
