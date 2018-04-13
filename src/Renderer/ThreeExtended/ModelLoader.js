@@ -15,7 +15,6 @@ function ModelLoader(view) {
     // Constructor
     this.view = view;
     this.model = [new THREE.Group(), new THREE.Group()];
-    this.obj = new THREE.Group();
     this.checked = false;
     this.bdTopoVisibility = false;
     this.bdTopoStyle = {
@@ -47,6 +46,8 @@ function ModelLoader(view) {
     _this = this;
 }
 
+// ********** OBJ **********
+
 ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale, callback, menu) {
     // OBJ loader
     var loader = new THREE.OBJLoader();
@@ -60,7 +61,7 @@ ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, r
     promise.then(() => callback(this.model, menu));
 };
 
-function controleName(name, view) {
+function controlName(name, view) {
     var i = 1;
     var verif;
     var j;
@@ -138,7 +139,7 @@ ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX
     // Update coordinate of the object
     obj.updateMatrixWorld();
     // set & check name
-    var name = controleName(obj.materialLibraries[0].substring(0, obj.materialLibraries[0].length - 4), this.view);
+    var name = controlName(obj.materialLibraries[0].substring(0, obj.materialLibraries[0].length - 4), this.view);
     obj.name = name.concat('_faces');
     lines.name = name.concat('_lines');
     // add to scene
@@ -161,6 +162,8 @@ ModelLoader.prototype._placeModel = function placeModel(obj, coord, rotateX, rot
     return obj;
 };
 
+// ********** BATI3D **********
+
 ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
     if (obj != null) {
         for (var i = 0; i < obj.children.length; i++) {
@@ -174,7 +177,6 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
             self.model[0].add(obj.children[i]);
             self.model[1].add(line);
         }
-        _this.obj = obj;
     }
     // pour le dernier :
     if (islast) {
@@ -214,6 +216,8 @@ ModelLoader.prototype._setVisibility = function _setVisibility(self, v) {
         self.notifyChange(true);
     }
 };
+
+// ********** BDTOPO **********
 
 function altitudeBuildings(properties) {
     return properties.z_min - properties.hauteur;
