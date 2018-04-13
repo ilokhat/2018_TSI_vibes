@@ -91,8 +91,8 @@ LayerManager.prototype._readFile = function readFile(file) {
         // Create a plane that receives shadows (but does not cast them)
         var planeID = this.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
         var planeGeometry = new THREE.PlaneBufferGeometry(2000, 2000, 32, 32);
-        // var planeMaterial = new THREE.ShadowMaterial({ side: THREE.DoubleSide, depthTest: false });
-        var planeMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, depthTest: false });
+        var planeMaterial = new THREE.ShadowMaterial({ side: THREE.DoubleSide, depthTest: false });
+        // var planeMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, depthTest: false });
         planeMaterial.transparent = true;
         planeMaterial.opacity = 0.5;
         this.plane = new THREE.Mesh(planeGeometry, planeMaterial);
