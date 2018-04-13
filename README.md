@@ -333,7 +333,7 @@ The loaded object should now appear on the globe at the chosen position. We chos
 
 We implemented a drag and drop functionality to easily load the 3D object (on .obj format), with a fixed geolocation for now. The example models are located in examples/model. We have been using croutitower.obj, test.obj and destroyer.obj for our first tests.
 
-(image croutitower)
+![3D object format .obj](VIBES/croutitowerobj.png)
 
 ##### Applying a style to a mesh with Three.js
 
@@ -345,9 +345,7 @@ The basic implemented parameters are : **color**, **opacity**, **emissive color*
 
 ##### Creating a user interface to dynamically modify the stylization
 
-The Javascript library [dat.GUI](https://github.com/dataarts/dat.gui) allows to create a user simple interface with buttons, sliders, checkboxes, etc. It is already used in iTowns, in the GuiTools class, to handle color and elevation layers on the globe. Thus, we will re-use this menu and add our own stylization parameters on it. Each element of the menu has an event listener with a callback function that performs the corresponding stylization on the mesh.  
-
-(TODO : add image menu dat.GUI basic stylization)  
+The Javascript library [dat.GUI](https://github.com/dataarts/dat.gui) allows to create a user simple interface with buttons, sliders, checkboxes, etc. It is already used in iTowns, in the GuiTools class, to handle color and elevation layers on the globe. Thus, we will re-use this menu and add our own stylization parameters on it. Each element of the menu has an event listener with a callback function that performs the corresponding stylization on the mesh.    ![graphical user interface](VIBES/gui.png)
 
 ##### Saving and loading a style
 
@@ -384,7 +382,7 @@ The answer to this issue is twofold :
 * The user should be able to enter (somehow) the parameters to locate the object he wants to stylize.
 * He also should be able to adjust the position he chose (slight translations, rotations, scaling) later.  
 
-* **Adjustments and relative positionning**
+##### Adjustments and relative positionning
 
 There are two ways to move objects:
 
@@ -396,9 +394,9 @@ The first one can be done by using the keyboard keys after clicking on the objec
 
 The second way the user can use the sliders on the GUI which are shown in the picture below : Translate X, Translate Y and Translate Z
 
-<img src="VIBES/move-object.png" style="width: 400px;"/>
+![Oject adjustments and relative positioning](VIBES/deplacemtrelatif.png)
 
-* **Absolute positionning**
+##### Absolute positionning
 
 But this method cannot be used to georeference an object completely - we cannot use a slider to move a mesh from one end of the world to the other. Until this step, the coordinates were hard-coded in the example, which is not satisfying.  
 
@@ -457,7 +455,7 @@ An edge is a linear geometry, so we cannot simply apply a texture on it. A solut
 
 The implementation is in progress.  
 
-(TODO: update + image exemple sketchy edge)
+![Sketchy edges](VIBES/sket.png)
 
 ###### Face stylization
 
@@ -611,13 +609,12 @@ We have some problems with the npm package for save the files, [*'file-saver'*](
 
  ### Limits and perspectives
 
-Despite of the progress done in the development and the implementation of various functionalities and  techniques of buildings stylization in our project  , we need to mention some of the difficulties that we encoutered during this project, we can summarize them in the following points:
+Our teamworked together during this project in order to achieve the set objectives, wesucceeded in implementing of a various of functionalities and techniques ofbuildings stylization, and we almost reached all what was fixed as goals, howeverthere was some difficulties that we faced and encountered when developing ourproject. We can summarize them in the following points:
 
-- The version of itowns is not updated 
-- The majority of the unit tests that we intended to run them on nodejs need the access to the Dom element, but the nodeJs server does not have access to it ,so we tried to run them on the browser.
--  
-
-  
+- the threejs version ...
+- the shadow…
+- ​
+- The majority of the unit tests that we intended to run them on nodejs need access to the Dom element, but the nodeJs server does not have access to it, so we tried to run them on the browser.  
 
 **[Back to the top](#summary)**
 
