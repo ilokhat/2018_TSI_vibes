@@ -551,10 +551,11 @@ interfaces system such as BDD, TDD, Exports, QUnit and Require-style allow
 In our project we choose to continue working with the BDD (Behavior Driven Development ) interface which provide a syntax including describe() , context(), it(), specify(), before(), after(), beforeEach(), and afterEach(), it focus on what the application should do, and on how it will do it.
 
 As we mentioned above we continued working and adding some tests to the previous test folder of the Itowns project, a part of these unit tests run using the CLI (commande line interface) and the others need the browser to be executed since our application uses the Dom element,and the nodeJs server does not have access to the Dom,we had to run these kind of tests on the browser. to do that we made a simple HTML page which our test runner page (/mochaTest.html).
-The page loads Mocha, the testing libraries and our test file(/tests/vibesObjTest.js) and finally to run the tests, we simply needed to open the runner in a browser.
+The page loads Mocha, the testing libraries and our test file(test/browsertest.js) and finally to run the tests, we simply needed to open the runner in a browser.
+
 the pictures below show the results of the test units:
 
-<img src="VIBES/mochaTest.png" style="width: 400px;"/>
+![test on browse](VIBES/browsertest.png)
 <img src="VIBES/unit_tests_console.png" style="width: 400px;"/>
 
 ### Continuous Integration [![Build Status](https://travis-ci.org/arnaudgregoire/vibes.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)

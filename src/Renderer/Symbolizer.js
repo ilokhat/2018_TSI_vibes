@@ -253,10 +253,10 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
         else {
             // Sketchy
             vibes.edges.style = 'Sketchy';
-            vibes.edges.color = this.quads.children[0].material.uniforms.color.value;
-            vibes.edges.threshold = this.quads.children[0].material.uniforms.texthreshold.value;
-            vibes.edges.sketchyWidth = this.quads.children[0].material.uniforms.thickness.value;
-            var edgeTexturePath = this.quads.children[0].material.uniforms.texture2.value.image.src.split('/');
+            vibes.edges.color = this.quads.children[0].children[0].material.uniforms.color.value;
+            vibes.edges.threshold = this.quads.children[0].children[0].material.uniforms.texthreshold.value;
+            vibes.edges.sketchyWidth = this.quads.children[0].children[0].material.uniforms.thickness.value;
+            var edgeTexturePath = this.quads.children[0].children[0].material.uniforms.texture2.value.image.src.split('/');
             vibes.edges.stroke = edgeTexturePath[edgeTexturePath.length - 1].split('.')[0];
         }
         // Iteration over the children of each object (they all have the same children)
@@ -372,9 +372,9 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
         else {
             // Sketchy
             vibes.edges.style = 'Sketchy';
-            vibes.edges.threshold = this.quads.children[0].material.uniforms.texthreshold.value;
-            vibes.edges.sketchyWidth = this.quads.children[0].material.uniforms.thickness.value;
-            var edgeTexturePath = this.quads.children[0].material.uniforms.texture2.value.image.src.split('/');
+            vibes.edges.threshold = this.quads.children[0].children[0].material.uniforms.texthreshold.value;
+            vibes.edges.sketchyWidth = this.quads.children[0].children[0].material.uniforms.thickness.value;
+            var edgeTexturePath = this.quads.children[0].children[0].material.uniforms.texture2.value.image.src.split('/');
             vibes.edges.stroke = edgeTexturePath[edgeTexturePath.length - 1].split('.')[0];
         }
         var texturePath = null;
@@ -658,16 +658,27 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
             // Controller to change the threshold
             folder.add({ sketchyThreshold: 100.0 }, 'sketchyThreshold', 10.0, 200.0).name('Threshold').onChange((value) => {
                 threshold = value;
+                color = this.quads.children[0].children[0].material.uniforms.color.value;
+                width = this.quads.children[0].children[0].material.uniforms.thickness.value;
+                var edgeTexturePath = this.quads.children[0].children[0].material.uniforms.texture2.value.image.src.split('/');
+                stroke = edgeTexturePath[edgeTexturePath.length - 1].split('.')[0];
                 this._createSketchyMaterial(stroke, color, width, threshold);
             });
             // Controller to change the stroke
             folder.add({ sketchyStroke: 'dashed' }, 'sketchyStroke', ['dashed', 'brush', 'irregular', 'thick', 'two', 'wavy']).name('Stroke').onChange((value) => {
                 stroke = value;
+                color = this.quads.children[0].children[0].material.uniforms.color.value;
+                width = this.quads.children[0].children[0].material.uniforms.thickness.value;
+                threshold = this.quads.children[0].children[0].material.uniforms.texthreshold.value;
                 this._createSketchyMaterial(stroke, color, width, threshold);
             });
             // Adapt color controller to sketchy edge
             folder.__controllers[0].onChange((value) => {
                 color = new THREE.Color(value);
+                width = this.quads.children[0].children[0].material.uniforms.thickness.value;
+                threshold = this.quads.children[0].children[0].material.uniforms.texthreshold.value;
+                var edgeTexturePath = this.quads.children[0].children[0].material.uniforms.texture2.value.image.src.split('/');
+                stroke = edgeTexturePath[edgeTexturePath.length - 1].split('.')[0];
                 this._createSketchyMaterial(stroke, color, width, threshold);
             });
             // Adapt width controller to sketchy edge
@@ -675,6 +686,10 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
             folder.__controllers[2].__max = 100.0;
             folder.__controllers[2].onChange((value) => {
                 width = value;
+                color = this.quads.children[0].children[0].material.uniforms.color.value;
+                threshold = this.quads.children[0].children[0].material.uniforms.texthreshold.value;
+                var edgeTexturePath = this.quads.children[0].children[0].material.uniforms.texture2.value.image.src.split('/');
+                stroke = edgeTexturePath[edgeTexturePath.length - 1].split('.')[0];
                 this._createSketchyMaterial(stroke, color, width, threshold);
             });
         }
@@ -734,10 +749,10 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
             // If not, add dashSize and gapSize controllers to the GUI
             if (!isDashed) {
                 folder.add({ dashSize: 0.05 }, 'dashSize', 0.01, 1).name('Dash Size').onChange((value) => {
-                    this._changeDashSize(value, i, j);
+                    this._changeDashSize(value);
                 });
                 folder.add({ gapSize: 0.05 }, 'gapSize', 0.01, 1).name('Gap Size').onChange((value) => {
-                    this._changeGapSize(value, i, j);
+                    this._changeGapSize(value);
                 });
             }
         }
@@ -774,8 +789,6 @@ Symbolizer.prototype._changeStyleEdge = function changeStyleEdge(value, folder) 
     var j;
     // Create new material
     var newMaterial;
-    // Adapt the GUI
-    this._addStyleEdgeParams(value, folder);
     if (value === 'Dashed') {
         // Create dashed material
         newMaterial = new THREE.LineDashedMaterial({
@@ -875,6 +888,8 @@ Symbolizer.prototype._changeStyleEdge = function changeStyleEdge(value, folder) 
             this.bdTopo(f3);
         }
     }
+    // Adapt the GUI
+    this._addStyleEdgeParams(value, folder);
 };
 
 Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(stroke, color, width, threshold) {
@@ -975,12 +990,15 @@ Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(str
                     material.transparent = true;
                     material.polygonOffset = true;
                     material.polygonOffsetUnits = -150.0;
-                    // Quad group initialization
-                    var quadGroup = new THREE.Group();
                     // If the quads are not created we create them
                     if (this.quads == null) {
+                        // Quad groups initialization
+                        this.quads = new THREE.Group();
+                        this.quads.name = 'quads';
                         // Iteration over the edges
                         for (var i = 0; i < this.edges.length; i++) {
+                            // Sub-group of quads (one for each layer)
+                            var quadGroup = new THREE.Group();
                             for (var j = 0; j < this.edges[i].children.length; j++) {
                                 // Position of the edges
                                 var edgePos = this.edges[i].children[j].geometry.getAttribute('position').array;
@@ -997,32 +1015,30 @@ Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(str
                                     // Add quad to the group
                                     quadGroup.add(quadMesh);
                                 }
-                                this.quads = quadGroup;
                             }
                             // Name the group after the layer
-                            if (this.obj.length > 0) {
-                                quadGroup.name = 'quads_'.concat(this.obj[0].name.split('_')[0]);
-                            }
-                            else if (this.bdTopo) {
-                                quadGroup.name = 'quads_bdTopo';
-                            }
+                            quadGroup.name = 'quads_'.concat(this.obj[0].name.split('_')[0]);
                             // Set group position
                             quadGroup.position.copy(this.obj[i].position);
                             quadGroup.rotation.copy(this.obj[i].rotation);
                             quadGroup.scale.copy(this.obj[i].scale);
                             quadGroup.updateMatrixWorld();
+                            // Add the group to the general group
+                            this.quads.add(quadGroup);
                         }
                     }
                     // Else, we apply the material on the existing quads
                     else {
-                        this.quads.traverse((child) => {
-                            child.visible = true;
-                            child.material = material;
-                            child.material.needsUpdate = true;
+                        this.quads.traverse((subGroup) => {
+                            subGroup.traverse((child) => {
+                                child.visible = true;
+                                child.material = material;
+                                child.material.needsUpdate = true;
+                            });
                         });
                     }
                     // Add the group of quads to the scene
-                    this.view.scene.add(quadGroup);
+                    this.view.scene.add(this.quads);
                     this.view.notifyChange(true);
                 });
         });
