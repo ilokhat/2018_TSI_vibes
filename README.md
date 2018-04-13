@@ -585,7 +585,9 @@ the pictures below show the results of the test units:
 <img src="VIBES/mochaTest.png" style="width: 400px;"/>
 <img src="VIBES/unit_tests_console.png" style="width: 400px;"/>
 
+### Functional Tests
 
+During the development we created a test protocol to make sure the develop functionality works well. When we added a new functionality we updated this protocol. [The protocol is accessible there.](Functional_Test.md)
 
 ### Continuous Integration [![Build Status](https://travis-ci.org/arnaudgregoire/vibes.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)
 
