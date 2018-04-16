@@ -69,9 +69,9 @@ function saveDataInit() {
 var loader = new itowns.ModelLoader(globeView);
 
 // Symbolizer
-var symbolizer = function(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane) {
+var symbolizer = function(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane, quads) {
     // console.log(saveDataInit);
-    return new itowns.Symbolizer(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane, saveDataInit);
+    return new itowns.Symbolizer(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane, quads, saveDataInit);
 }
 
 // Layer management
