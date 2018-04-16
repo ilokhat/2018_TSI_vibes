@@ -205,7 +205,7 @@ function acceptFeature(properties) {
 ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
     var a = this.view.addLayer({
         type: 'geometry',
-        update: FeatureProcessingBDTopo.update, // fichier modifier à revoir !!! L50
+        update: FeatureProcessingBDTopo.update,
         convert: Feature2MeshStyle.convert({
             altitude: altitudeBuildings,
             extrude: extrudeBuildings,

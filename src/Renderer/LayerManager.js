@@ -36,7 +36,6 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     _this = this;
 }
 
-var showBDTopo = (parent) => { parent.visible = true; };
 var hideBDTopo = (parent) => { parent.visible = false; };
 
 // ********** GUI INITIALIZATION **********
@@ -234,14 +233,17 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
         _this.listLayers.forEach((layer) => {
             if (layer == 'BDTopo') {
                 this.loader.ForBuildings(hideBDTopo);
+                var b = _this.view._layers[0]._attachedLayers.filter(b => b.id == 'WFS Buildings');
+                b[0].visible = false;
                 _this.loader.bdTopoVisibility = false;
                 _this.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
                     if (_this.loader.bDTopoLoaded) {
+                        var b = _this.view._layers[0]._attachedLayers.filter(b => b.id == 'WFS Buildings');
                         if (_this.loader.bdTopoVisibility) {
-                            _this.loader.ForBuildings(hideBDTopo);
+                            b[0].visible = false;
                             _this.loader.bdTopoVisibility = false;
                         } else {
-                            _this.loader.ForBuildings(showBDTopo);
+                            b[0].visible = true;
                             _this.loader.bdTopoVisibility = true;
                             _this.menu.gui.remove(_this.bdTopoBtn);
                             _this.handleBdTopo();
@@ -249,7 +251,7 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                     }
                 },
                 }, 'bdTopo').name('bdTopo');
-                _this.view.scene.remove(_this.view.scene.getObjectByName('quads_bdTopo'));
+                // _this.view.scene.remove(_this.view.scene.getObjectByName('quads_bdTopo'));
             }
             else if (layer[0].name === 'bati3D_faces' || layer[0].name === 'bati3D_lines') {
                 createBati3dBtn();

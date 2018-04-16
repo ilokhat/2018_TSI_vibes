@@ -379,11 +379,11 @@ function coordinatesToMesh(coordinates, properties, options) {
                 meshes[1].material = new THREE.MeshPhongMaterial({
                     side: THREE.DoubleSide,
                     transparent: true,
-                    opacity: options.style.wall_faces.opacity,
-                    color: options.style.wall_faces.color,
-                    emissive: options.style.wall_faces.emissive,
-                    specular: options.style.wall_faces.specular,
-                    shininess: options.style.wall_faces.shininess,
+                    opacity: options.style.roof_faces.opacity,
+                    color: options.style.roof_faces.color,
+                    emissive: options.style.roof_faces.emissive,
+                    specular: options.style.roof_faces.specular,
+                    shininess: options.style.roof_faces.shininess,
                 });
                 meshes[1].material.needsUpdate = true;
                 // edges

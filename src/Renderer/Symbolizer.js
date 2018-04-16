@@ -46,15 +46,15 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
         this._addStyleEdgeParams(style.edges.style, folder.__folders.Edges);
         for (k in folder.__folders.Faces.__folders) {
             if (Object.prototype.hasOwnProperty.call(folder.__folders.Faces.__folders, k)) {
-                folder.__folders.Faces.__folders[k].__controllers[0].setValue(style.faces[count].opacity);
-                folder.__folders.Faces.__folders[k].__controllers[1].setValue(style.faces[count].color);
-                folder.__folders.Faces.__folders[k].__controllers[2].setValue(style.faces[count].emissive);
-                folder.__folders.Faces.__folders[k].__controllers[3].setValue(style.faces[count].specular);
-                folder.__folders.Faces.__folders[k].__controllers[4].setValue(style.faces[count].shininess);
+                folder.__folders.Faces.__folders[k].__controllers[2].setValue(style.faces[count].opacity);
+                folder.__folders.Faces.__folders[k].__controllers[3].setValue(style.faces[count].color);
+                folder.__folders.Faces.__folders[k].__controllers[4].setValue(style.faces[count].emissive);
+                folder.__folders.Faces.__folders[k].__controllers[5].setValue(style.faces[count].specular);
+                folder.__folders.Faces.__folders[k].__controllers[6].setValue(style.faces[count].shininess);
                 /*
                 if (style.faces[count].texture != null) {
                     this._addTextureRepetition(count, folder.__folders.Faces.__folders[k]);
-                    folder.__folders.Faces.__folders[k].__controllers[6].setValue(style.faces[count].textureRepeat);
+                    folder.__folders.Faces.__folders[k].__controllers[8].setValue(style.faces[count].textureRepeat);
                 }
                 */
             }
@@ -120,14 +120,14 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                     this._changeEmissive(style.faces[h].emissive, -10, 0);
                     this._changeSpecular(style.faces[h].specular, -10, 0);
                     this._changeShininess(style.faces[h].shininess, -10, 0);
-                    if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, -10, 0, folder.__folders.Faces);
+                    if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, 0, folder.__folders.Faces.__folders[style.faces[h].name]);
                 } else if (style.faces[h].name == 'roof_faces') {
                     this._changeOpacity(style.faces[h].opacity, -10, 1);
                     this._changeColor(style.faces[h].color, -10, 1);
                     this._changeEmissive(style.faces[h].emissive, -10, 1);
                     this._changeSpecular(style.faces[h].specular, -10, 1);
                     this._changeShininess(style.faces[h].shininess, -10, 1);
-                    if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, -10, 1, folder.__folders.Faces);
+                    if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, 1, folder.__folders.Faces.__folders[style.faces[h].name]);
                 }
                 h++;
             }
@@ -201,21 +201,59 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
             this._changeEmissive(style.faces[0].emissive, -10, 0);
             this._changeSpecular(style.faces[0].specular, -10, 0);
             this._changeShininess(style.faces[0].shininess, -10, 0);
-            if (style.faces[0].texture != null) this._changeTexture(style.faces[0].texture, -10, 0, folder.__folders.Faces);
+            if (style.faces[0].texture != null) this._changeTexture(style.faces[0].texture, 0, folder.__folders.Faces);
             this._changeOpacity(style.faces[0].opacity, -10, 1);
             this._changeColor(style.faces[0].color, -10, 1);
             this._changeEmissive(style.faces[0].emissive, -10, 1);
             this._changeSpecular(style.faces[0].specular, -10, 1);
             this._changeShininess(style.faces[0].shininess, -10, 1);
-            if (style.faces[0].texture != null) this._changeTexture(style.faces[0].texture, -10, 1, folder.__folders.Faces);
+            if (style.faces[0].texture != null) this._changeTexture(style.faces[0].texture, 1, folder.__folders.Faces);
         }
     }
 };
+Symbolizer.prototype.applyStylePart = function applyStylePart(style, folder, j) {
+    folder.__controllers[2].setValue(style.faces[0].opacity);
+    folder.__controllers[3].setValue(style.faces[0].color);
+    folder.__controllers[4].setValue(style.faces[0].emissive);
+    folder.__controllers[5].setValue(style.faces[0].specular);
+    folder.__controllers[6].setValue(style.faces[0].shininess);
+    // apply style
+    if (this.obj.length > 0) {
+        for (var i = 0; i < this.obj.length; i++) {
+            this._changeOpacity(style.faces[0].opacity, i, j);
+            this._changeColor(style.faces[0].color, i, j);
+            this._changeEmissive(style.faces[0].emissive, i, j);
+            this._changeSpecular(style.faces[0].specular, i, j);
+            this._changeShininess(style.faces[0].shininess, i, j);
+        }
+        if (style.faces[0].texture != null) {
+            this._changeTexture(style.faces[0].texture, j, folder);
+            this._changeTextureRepetition(style.faces[0].textureRepeat, j);
+        }
+        // If the loaded style has no texture, we apply the function with en empty path to remove the existing texture
+        else {
+            this._changeTexture('./textures/', j, folder);
+        }
+    }
+    if (this.bdTopo) {
+        // BDTopo Faces
+        this._changeOpacity(style.faces[0].opacity, -10, j);
+        this._changeColor(style.faces[0].color, -10, j);
+        this._changeEmissive(style.faces[0].emissive, -10, j);
+        this._changeSpecular(style.faces[0].specular, -10, j);
+        this._changeShininess(style.faces[0].shininess, -10, j);
+        // if (style.faces[0].texture != null) this._changeTexture(style.faces[0].texture, j, folder);
+    }
+};
 
-Symbolizer.prototype._readVibes = function readVibes(file, folder) {
+Symbolizer.prototype._readVibes = function readVibes(file, folder, j = -100) {
     var reader = new FileReader();
     if (file.name.endsWith('.vibes')) {
-        reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
+        if (j == -100) {
+            reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
+        } else {
+            reader.addEventListener('load', () => this.applyStylePart(JSON.parse(reader.result), folder, j), false);
+        }
         reader.readAsText(file);
         return 0;
     } else {
@@ -344,7 +382,7 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
     saveData(vibes, name.concat('_partie.vibes'));
 };
 
-Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
+Symbolizer.prototype._saveVibesAll = function saveVibesAll(target = 0) {
     var vibes;
     var name;
     if (this.obj.length > 0) {
@@ -380,9 +418,9 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
         var texturePath = null;
         var textureRepetition = null;
         // Checks if the mesh has a texture
-        if (this.obj[0].children[0].material.map != null) {
+        if (this.obj[0].children[target].material.map != null) {
             // Get texture path
-            var texturePathTab = this.obj[0].children[0].material.map.image.src.split('/');
+            var texturePathTab = this.obj[0].children[target].material.map.image.src.split('/');
             var j = 0;
             while (j < texturePathTab.length && texturePathTab[j] != 'textures') j++;
             texturePath = '.';
@@ -391,19 +429,20 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
                 j++;
             }
             // Get texture repetition
-            textureRepetition = this.obj[0].children[0].material.map.repeat.x;
+            textureRepetition = this.obj[0].children[target].material.map.repeat.x;
         }
         vibes.faces.push({
-            opacity: this.obj[0].children[0].material.opacity,
-            color: '#'.concat(this.obj[0].children[0].material.color.getHexString()),
-            emissive: '#'.concat(this.obj[0].children[0].material.emissive.getHexString()),
-            specular: '#'.concat(this.obj[0].children[0].material.specular.getHexString()),
-            shininess: this.obj[0].children[0].material.shininess,
+            opacity: this.obj[0].children[target].material.opacity,
+            color: '#'.concat(this.obj[0].children[target].material.color.getHexString()),
+            emissive: '#'.concat(this.obj[0].children[target].material.emissive.getHexString()),
+            specular: '#'.concat(this.obj[0].children[target].material.specular.getHexString()),
+            shininess: this.obj[0].children[target].material.shininess,
             texture: texturePath,
             textureRepeat: textureRepetition,
         });
     } else if (this.bdTopo) {
         name = 'bdTopo';
+        var nameEl = target == 0 ? 'wall_faces' : 'roof_faces';
         vibes = {
             edges: {
                 opacity: this.bdTopoStyle.edges.opacity,
@@ -412,12 +451,12 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
             },
             faces: [
                 {
-                    opacity: this.bdTopoStyle.wall_faces.opacity,
-                    color: this.bdTopoStyle.wall_faces.color,
-                    emissive: this.bdTopoStyle.wall_faces.emissive,
-                    specular: this.bdTopoStyle.wall_faces.specular,
-                    shininess: this.bdTopoStyle.wall_faces.shininess,
-                    texture: this.bdTopoStyle.wall_faces.texture,
+                    opacity: this.bdTopoStyle[nameEl].opacity,
+                    color: this.bdTopoStyle[nameEl].color,
+                    emissive: this.bdTopoStyle[nameEl].emissive,
+                    specular: this.bdTopoStyle[nameEl].specular,
+                    shininess: this.bdTopoStyle[nameEl].shininess,
+                    texture: this.bdTopoStyle[nameEl].texture,
                 },
             ],
         };
@@ -426,6 +465,7 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll() {
     // FILE_SAVER.saveAs(blob, name.concat('_globale.vibes'));
     saveData(vibes, name.concat('_globale.vibes'));
 };
+
 
 Symbolizer.prototype._addSave = function addSave(folder) {
     folder.add({ save: () => this._saveVibes() }, 'save').name('Save style');
@@ -444,6 +484,15 @@ Symbolizer.prototype._addLoad = function addLoad(folder) {
 Symbolizer.prototype._addSaveAll = function addSave(folder) {
     folder.add({ save: () => this._saveVibesAll() }, 'save').name('Save style');
     folder.add({ saveGibe: () => this._saveGibesAll() }, 'saveGibe').name('Save position');
+};
+Symbolizer.prototype._addSaveLoadPart = function addSaveLoadPart(folder, j) {
+    folder.add({ save: () => this._saveVibesAll(j) }, 'save').name('Save part style');
+    folder.add({ load: () => {
+        var button = document.createElement('input');
+        button.setAttribute('type', 'file');
+        button.addEventListener('change', () => this._readVibes(button.files[0], folder, j), false);
+        button.click();
+    } }, 'load').name('Load part style');
 };
 
 // ******************** EDGE STYLIZATION ********************
@@ -1705,6 +1754,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
             for (j = 0; j < this.obj[0].children.length; j++) {
                 // We create a folder for each child
                 folder = facesFolder.addFolder(this.obj[0].children[j].name);
+                this._addSaveLoadPart(folder, j);
                 this._addOpacity(folder, j);
                 this._addColor(folder, j);
                 this._addEmissive(folder, j);
@@ -1717,6 +1767,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
             for (var i = 0; i < 2; i++) {
                 j = (i + 1) * -10;
                 folder = facesFolder.addFolder(nameL[i]);
+                this._addSaveLoadPart(folder, i);
                 this._addOpacity(folder, j);
                 this._addColor(folder, j);
                 this._addEmissive(folder, j);

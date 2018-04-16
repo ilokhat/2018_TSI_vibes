@@ -61,12 +61,6 @@ function c3DEngine(rendererOrDiv, options = {}) {
                 type: THREE.PCFSoftShadowMap,
             },
         });
-        /* this.renderer.shadowMap = {
-            enabled: true,
-            type: THREE.PCFSoftShadowMap,
-        }; */
-        // eslint-disable-next-line no-console
-        console.log(this.renderer.shadowMap);
         if (this.renderer.shadowMap) {
             this.renderer.shadowMap.enabled = true;
             this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
