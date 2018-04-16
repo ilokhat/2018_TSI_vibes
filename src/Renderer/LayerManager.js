@@ -259,16 +259,22 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                 _this.loader._setVisibility(_this.view, false);
                 _this.loader.checked = false;
                 // Remove quads if they exist
-                _this.view.scene.getObjectByName('quads').children.getObjectByName('quads_'.concat(layer[0].name.split('_')[0]));
-                // _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
+                _this.view.scene.getObjectByName('quads').children.forEach((child) => {
+                    if (child.name === 'quads_'.concat(layer[0].name.split('_')[0])) {
+                        _this.view.scene.getObjectByName('quads').remove(child);
+                    }
+                });
             }
             else {
                 // Simple object
                 _this.view.scene.remove(layer[0]);
                 _this.view.scene.remove(layer[1]);
                 // Remove quads if they exist
-                _this.view.scene.getObjectByName('quads').children.getObjectByName('quads_'.concat(layer[0].name.split('_')[0]));
-                // _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
+                _this.view.scene.getObjectByName('quads').children.forEach((child) => {
+                    if (child.name === 'quads_'.concat(layer[0].name.split('_')[0])) {
+                        _this.view.scene.getObjectByName('quads').remove(child);
+                    }
+                });
             }
             _this.view.notifyChange(true);
         });
@@ -291,6 +297,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         // Merge elements of the list as one group
         var listObj = [];
         var listEdge = [];
+        var quads = _this.view.scene.getObjectByName('quads');
         var bdTopo = null;
         _this.listLayers.forEach((layer) => {
             if (layer != 'BDTopo' && layer.length >= 2) {
@@ -302,7 +309,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         });
         // Call Symbolizer
         _this.nbSymbolizer++;
-        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer, _this.light, _this.plane);
+        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer, _this.light, _this.plane, quads);
         _this.symbolizerInit = symbolizer;
         // Open symbolizer with 'stylize parts'
         if (complex) {
