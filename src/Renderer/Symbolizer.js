@@ -1794,7 +1794,6 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this.folder.open();
     this._addSaveAll(folder);
     this._addLoad(folder);
-    if (this.plane != null) this._addShades(folder);
     var positionFolder = folder.addFolder('Position');
     this._addResetPosition(positionFolder);
     this._addRotationsAll(positionFolder);
@@ -1815,6 +1814,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addShininessAll(facesFolder);
     if (this.light != null) {
         var lightFolder = folder.addFolder('Light');
+        if (this.plane != null) { this._addShades(lightFolder); }
         this._addColorLight(lightFolder);
         this._addMoveLight(lightFolder);
     }
