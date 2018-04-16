@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 // import savery from 'savery';
 import Fetcher from '../Core/Scheduler/Providers/Fetcher';
-import { patchMaterialForLogDepthSupport } from '../Core/Scheduler/Providers/3dTiles_Provider';
+// import { patchMaterialForLogDepthSupport } from '../Core/Scheduler/Providers/3dTiles_Provider';
 
 var saveData;
 
