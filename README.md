@@ -536,14 +536,46 @@ The edges are extracted from the geometry thanks to a *THREE.EdgesGeometry* obje
 
 These edges are initialized with a *THREE.LineBasicMaterial* that can be stylized the same way as the materials on the faces. However, unlike the faces, the edges can only be stylized as a whole, we did not separate them according to the mesh from where they were extracted.  
 
-The parameters we can currently change are : **color**, **opacity**, **width**.
-We also plan on adding a parameter to change the style of the edges (continuous or dotted line), but we faced a problem related to the Three.js library. Indeed, this parameter require a function of Three.js that was moved in the *THREE.Line* class in a later version than the one included in iTowns, and we could not make this function work at its previous location. This is one of the problem we need to solve in the next sprints.  
-
-* **Simple parameters**
-* **Dashed edges**
-* **Sketchy edges**
-  
 An edge is a linear geometry, so we cannot simply apply a texture on it. A solution, based on Mathieu Bredif's work, has already been found in the PLU++ project. It consists in creating a quadrilateral where the edge is, and apply the texture to it. This rectangle should always be facing the camera so the edge is always visible.  
+
+To be able to stylized the edges we have the basics  parameters such as : **color**, **opacity**, **width**. as we can textured the edges with different texture (continous ,dashed, sketchy ).
+
+- **Continous edges**
+
+  The "Continous" texture use the basic texture of the materials in ThreeJs that is, edges in th forms of a continous line.
+
+  <p align="center"> <img src="VIBES/continous.png" styele="width: 400px;" /></p>
+
+  *<p align="center">legend : "Continous" texture for edges.</p>*
+
+  ​
+
+* **Dashed edges**
+
+  The "dashed" texture sets the edges as a dotted line and this choice triggers the addition of two paramaters : **dash size**  , **grap size**.
+
+  To achieve the "Dashed" edges we encountered a problem with the Three.js library. Indeed, this parameter requires a function of Three.js that has been moved into class THREE.Line in a version later than the one included in iTowns, and we could not operate this function at its previous location. To solve the problemwe had to update the version of ThreeJs in Itowns.
+
+  <p align="center"> <img src="VIBES/dashed.png" styele="width: 400px;" /></p>
+
+  *<p align="center">legend : "dashed" texture for edges.</p>*
+
+* **Sketchy edges**
+
+  ​
+
+  The "Sketchy" texture setes the edges as a  drawn line and this choice  allows to add two other parameters : **stroke** to choose the shape of drawing, **Threshold**  
+
+  <p align="center"> <img src="VIBES/sketchy.png" styele="width: 400px;" /></p>
+
+  *<p align="center">legend : "Sketchy" texture for edges.</p>*
+
+  ​
+
+  ​
+
+  ​
+
 
 The implementation is in progress.  
 
@@ -703,12 +735,16 @@ interfaces system such as BDD, TDD, Exports, QUnit and Require-style allow
 
 In our project we choose to continue working with the BDD (Behavior Driven Development ) interface which provide a syntax including describe() , context(), it(), specify(), before(), after(), beforeEach(), and afterEach(), it focus on what the application should do, and on how it will do it.
 
-As we mentioned above we continued working and adding some tests to the previous test folder of the Itowns project, a part of these unit tests run using the CLI (commande line interface) and the others need the browser to be executed since our application uses the Dom element,and the nodeJs server does not have access to the Dom,we had to run these kind of tests on the browser. to do that we made a simple HTML page which our test runner page (/mochaTest.html).
-The page loads Mocha, the testing libraries and our test file(/tests/vibesObjTest.js) and finally to run the tests, we simply needed to open the runner in a browser.
+As we mentioned above we continued working and adding some tests to the previous test folder of the Itowns project, a part of these unit tests run using the CLI (commande line interface) and the others need the browser to be executed since our application uses the Dom element,and the nodeJs server does not have access to the Dom,we had to run these kind of tests on the browser. to do that we made a simple HTML page which our test runner page (/browsermochaTest.html).
+The page loads Mocha, the testing libraries and our test file(test/browsertest.js) and finally to run the tests, we simply needed to open the runner in a browser.
 the pictures below show the results of the test units:
 
 ![browsertest](VIBES/browsertest.png)
 <img src="VIBES/unit_tests_console.png" style="width: 400px;"/>
+
+### Functional Tests
+
+During the development we created a test protocol to make sure the develop functionality works well. When we added a new functionality we updated this protocol. [The protocol is accessible there.](Functional_Test.md)
 
 ### Continuous Integration [![Build Status](https://travis-ci.org/arnaudgregoire/vibes.svg?branch=master)](https://travis-ci.org/arnaudgregoire/vibes)
 
@@ -776,7 +812,7 @@ As a simple developper, i worked on threeJS mesh integration in iTowns. Moreover
 ​    
 * **Laurie Nino**
   
- ...
+As a developer, I worked on the texturation of the faces and the objects geolocation (the way to modify x, y, z putting new coordinates). I also worked on the camera movements; modification of camera parameters (longitude, latitude, scale zoom) and creation of different points of view.
 ​    
 * **Adel Ouhabi**
   

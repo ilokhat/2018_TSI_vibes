@@ -31,10 +31,11 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.bati3dBtn = null;
     this.bdTopoBtn = null;
     this.symbolizerInit = null;
+    this.light = null;
+    this.plane = null;
     _this = this;
 }
 
-var showBDTopo = (parent) => { parent.visible = true; };
 var hideBDTopo = (parent) => { parent.visible = false; };
 
 // ********** GUI INITIALIZATION **********
@@ -72,7 +73,37 @@ LayerManager.prototype._readFile = function readFile(file) {
             _this.loader.loadOBJ(reader.result, _this.coordCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale, _this.handleLayer, _this.menu);
             _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: _this.coordCRS.longitude(), latitude: _this.coordCRS.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
         }, false);
+            // Create a PointLight and turn on shadows for the light
+        this.light = new THREE.PointLight(0xffffff, 1, 0, 1);
+        var coordLight = this.coord.clone();
+        coordLight.setAltitude(coordLight.altitude() + 350);
+        this.light.position.copy(coordLight.as(this.view.referenceCrs).xyz());
+        this.light.position.y += 70;
+        this.light.updateMatrixWorld();
+        this.light.castShadow = true;            // default false
+        // Set up shadow properties for the light
+        this.light.shadow.mapSize.width = 512;  // default
+        this.light.shadow.mapSize.height = 512; // default
+        this.light.shadow.camera.near = 0.5;       // default
+        this.light.shadow.camera.far = 5000;
+        this.view.scene.add(this.light);
+        // Create a plane that receives shadows (but does not cast them)
+        var planeID = this.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
+        var planeGeometry = new THREE.PlaneBufferGeometry(2000, 2000, 32, 32);
+        var planeMaterial = new THREE.ShadowMaterial({ side: THREE.DoubleSide, depthTest: false });
+        // var planeMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, depthTest: false });
+        planeMaterial.transparent = true;
+        planeMaterial.opacity = 0.5;
+        this.plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        this.plane.position.copy(this.coord.as(this.view.referenceCrs).xyz());
+        this.plane.lookAt(this.plane.position.clone().add(this.coord.geodesicNormal));
+        this.plane.receiveShadow = true;
+        this.plane.traverse((obj) => { obj.layers.set(planeID); });
+        this.view.camera.camera3D.layers.enable(planeID);
+        this.plane.updateMatrixWorld();
+        this.view.scene.add(this.plane);
         reader.readAsDataURL(file);
+
         return 0;
     }
     // Load geolocation file
@@ -92,6 +123,13 @@ LayerManager.prototype._readFile = function readFile(file) {
                 var vectCoord = new THREE.Vector3().set(coordX, coordY, coordZ);
                 _this.coord.set('EPSG:4978', vectCoord);
                 var newCRS = _this.coord.as('EPSG:4326');
+                var coordLight = newCRS.clone();
+                coordLight.setAltitude(newCRS.altitude() + 350);
+                this.light.position.copy(coordLight.as(this.view.referenceCrs).xyz());
+                this.light.position.y += 50;
+                this.plane.position.copy(newCRS.as(this.view.referenceCrs).xyz());
+                this.plane.updateMatrixWorld();
+                this.light.updateMatrixWorld();
                 _this.loader._loadModel(layer[0], layer[1], newCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
                 _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: newCRS.longitude(), latitude: newCRS.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
             });
@@ -195,14 +233,17 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
         _this.listLayers.forEach((layer) => {
             if (layer == 'BDTopo') {
                 this.loader.ForBuildings(hideBDTopo);
+                var b = _this.view._layers[0]._attachedLayers.filter(b => b.id == 'WFS Buildings');
+                b[0].visible = false;
                 _this.loader.bdTopoVisibility = false;
                 _this.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
                     if (_this.loader.bDTopoLoaded) {
+                        var b = _this.view._layers[0]._attachedLayers.filter(b => b.id == 'WFS Buildings');
                         if (_this.loader.bdTopoVisibility) {
-                            _this.loader.ForBuildings(hideBDTopo);
+                            b[0].visible = false;
                             _this.loader.bdTopoVisibility = false;
                         } else {
-                            _this.loader.ForBuildings(showBDTopo);
+                            b[0].visible = true;
                             _this.loader.bdTopoVisibility = true;
                             _this.menu.gui.remove(_this.bdTopoBtn);
                             _this.handleBdTopo();
@@ -210,7 +251,7 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                     }
                 },
                 }, 'bdTopo').name('bdTopo');
-                _this.view.scene.remove(_this.view.scene.getObjectByName('quads_bdTopo'));
+                // _this.view.scene.remove(_this.view.scene.getObjectByName('quads_bdTopo'));
             }
             else if (layer[0].name === 'bati3D_faces' || layer[0].name === 'bati3D_lines') {
                 createBati3dBtn();
@@ -257,23 +298,17 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         var listEdge = [];
         var quads = _this.view.scene.getObjectByName('quads');
         var bdTopo = null;
-        var light = null;
-        var plane = null;
         _this.listLayers.forEach((layer) => {
             if (layer != 'BDTopo' && layer.length >= 2) {
                 listObj.push(layer[0]);
                 listEdge.push(layer[1]);
-                if (layer.length >= 4) {
-                    light = layer[2];
-                    plane = layer[3];
-                }
             } else if (layer == 'BDTopo') {
                 bdTopo = _this.loader;
             }
         });
         // Call Symbolizer
         _this.nbSymbolizer++;
-        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer, light, plane, quads);
+        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer, _this.light, _this.plane, quads);
         _this.symbolizerInit = symbolizer;
         // Open symbolizer with 'stylize parts'
         if (complex) {
