@@ -1,3 +1,9 @@
+/**
+ * FeatureProcessing adapted for a individual mesh style
+ * modification avril 2018
+ * projet VIBES
+ * @class FeatureProcessingBDTopo
+ */
 import * as THREE from 'three';
 import LayerUpdateState from '../Core/Layer/LayerUpdateState';
 import CancelledCommandException from '../Core/Scheduler/CancelledCommandException';
@@ -47,6 +53,7 @@ export default {
         for (const feat of features) {
             feat.traverse((o) => {
                 if (o.material) {
+                    // modification here for a mesh opacity different of the layer's opacity
                     o.material.wireframe = layer.wireframe;
                     if (layer.size) {
                         o.material.size = layer.size;
