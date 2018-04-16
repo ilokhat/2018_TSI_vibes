@@ -56,9 +56,21 @@ function c3DEngine(rendererOrDiv, options = {}) {
             antialias: options.antialias,
             alpha: options.alpha,
             logarithmicDepthBuffer: options.logarithmicDepthBuffer,
+            shadowMap: {
+                enabled: true,
+                type: THREE.PCFSoftShadowMap,
+            },
         });
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        /* this.renderer.shadowMap = {
+            enabled: true,
+            type: THREE.PCFSoftShadowMap,
+        }; */
+        // eslint-disable-next-line no-console
+        console.log(this.renderer.shadowMap);
+        if (this.renderer.shadowMap) {
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        }
     } catch (ex) {
         // eslint-disable-next-line no-console
         console.error('Failed to create WebGLRenderer', ex);
