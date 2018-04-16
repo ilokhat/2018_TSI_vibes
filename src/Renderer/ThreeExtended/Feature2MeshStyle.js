@@ -260,19 +260,43 @@ function coordinatesToMesh(coordinates, properties, options) {
         });
         meshes[1].material.needsUpdate = true;
         // add edges material
-        meshes[2].material = new THREE.LineBasicMaterial({
-            color: options.style.edges.color,
-            transparent: true,
-            opacity: options.style.edges.opacity,
-            linewidth: options.style.edges.width,
-        });
+        if (options.style.edges.style === 'Continuous') {
+            meshes[2].material = new THREE.LineBasicMaterial({
+                color: options.style.edges.color,
+                transparent: true,
+                opacity: options.style.edges.opacity,
+                linewidth: options.style.edges.width,
+            });
+        } else {
+            meshes[2].computeLineDistances();
+            meshes[2].material = new THREE.LineDashedMaterial({
+                color: options.style.edges.color,
+                transparent: true,
+                opacity: options.style.edges.opacity,
+                linewidth: options.style.edges.width,
+                gapSize: options.style.edges.gapSize,
+                dashSize: options.style.edges.dashSize,
+            });
+        }
         meshes[2].material.needsUpdate = true;
-        meshes[3].material = new THREE.LineBasicMaterial({
-            color: options.style.edges.color,
-            transparent: true,
-            opacity: options.style.edges.opacity,
-            linewidth: options.style.edges.width,
-        });
+        if (options.style.edges.style === 'Continuous') {
+            meshes[3].material = new THREE.LineBasicMaterial({
+                color: options.style.edges.color,
+                transparent: true,
+                opacity: options.style.edges.opacity,
+                linewidth: options.style.edges.width,
+            });
+        } else {
+            meshes[3].computeLineDistances();
+            meshes[3].material = new THREE.LineDashedMaterial({
+                color: options.style.edges.color,
+                transparent: true,
+                opacity: options.style.edges.opacity,
+                linewidth: options.style.edges.width,
+                gapSize: options.style.edges.gapSize,
+                dashSize: options.style.edges.dashSize,
+            });
+        }
         meshes[3].material.needsUpdate = true;
         return meshes;
     }

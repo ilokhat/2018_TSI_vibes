@@ -128,7 +128,8 @@ LayerManager.prototype._readFile = function readFile(file) {
                 this.light.position.copy(coordLight.as(this.view.referenceCrs).xyz());
                 this.light.position.y += 50;
                 this.plane.position.copy(newCRS.as(this.view.referenceCrs).xyz());
-                this.plane.updateMatrixWorld();
+                this.plane.visible = false;
+                this.plane.updateMatrixWorld();  
                 this.light.updateMatrixWorld();
                 _this.loader._loadModel(layer[0], layer[1], newCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
                 _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: newCRS.longitude(), latitude: newCRS.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
@@ -258,16 +259,22 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                 _this.loader._setVisibility(_this.view, false);
                 _this.loader.checked = false;
                 // Remove quads if they exist
-                _this.view.scene.getObjectByName('quads').children.getObjectByName('quads_'.concat(layer[0].name.split('_')[0]));
-                // _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
+                _this.view.scene.getObjectByName('quads').children.forEach((child) => {
+                    if (child.name === 'quads_'.concat(layer[0].name.split('_')[0])) {
+                        _this.view.scene.getObjectByName('quads').remove(child);
+                    }
+                });
             }
             else {
                 // Simple object
                 _this.view.scene.remove(layer[0]);
                 _this.view.scene.remove(layer[1]);
                 // Remove quads if they exist
-                _this.view.scene.getObjectByName('quads').children.getObjectByName('quads_'.concat(layer[0].name.split('_')[0]));
-                // _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
+                _this.view.scene.getObjectByName('quads').children.forEach((child) => {
+                    if (child.name === 'quads_'.concat(layer[0].name.split('_')[0])) {
+                        _this.view.scene.getObjectByName('quads').remove(child);
+                    }
+                });
             }
             _this.view.notifyChange(true);
         });
@@ -290,6 +297,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         // Merge elements of the list as one group
         var listObj = [];
         var listEdge = [];
+        var quads = _this.view.scene.getObjectByName('quads');
         var bdTopo = null;
         _this.listLayers.forEach((layer) => {
             if (layer != 'BDTopo' && layer.length >= 2) {
@@ -301,7 +309,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         });
         // Call Symbolizer
         _this.nbSymbolizer++;
-        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer, _this.light, _this.plane);
+        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer, _this.light, _this.plane, quads);
         _this.symbolizerInit = symbolizer;
         // Open symbolizer with 'stylize parts'
         if (complex) {

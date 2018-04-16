@@ -6,16 +6,17 @@
 import * as THREE from 'three';
 // import savery from 'savery';
 import Fetcher from '../Core/Scheduler/Providers/Fetcher';
+// import { patchMaterialForLogDepthSupport } from '../Core/Scheduler/Providers/3dTiles_Provider';
 
 var saveData;
 
 // Classe Symbolizer
 
-function Symbolizer(view, obj, edges, bdTopo, menu, nb, light, plane, saveDataInit) {
+function Symbolizer(view, obj, edges, bdTopo, menu, nb, light, plane, quads, saveDataInit) {
     // Constructor
     this.obj = obj;
     this.edges = edges;
-    this.quads = null;
+    this.quads = quads;
     if (bdTopo != null) this.bdTopo = bdTopo.ForBuildings;
     this.view = view;
     this.menu = menu;
@@ -113,6 +114,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                 this._changeOpacityEdge(style.edges.opacity, -10, 0);
                 this._changeColorEdge(style.edges.color, -10, 0);
                 this._changeWidthEdge(style.edges.width, -10, 0);
+                this._changeStyleEdge(style.edges.style, folder.__folders.Edges);
                 // BDTopo Faces
                 if (style.faces[h].name == 'wall_faces') {
                     this._changeOpacity(style.faces[h].opacity, -10, 0);
@@ -195,6 +197,11 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
             this._changeOpacityEdge(style.edges.opacity, -10, 0);
             this._changeColorEdge(style.edges.color, -10, 0);
             this._changeWidthEdge(style.edges.width, -10, 0);
+            this._changeStyleEdge(style.edges.style, folder.__folders.Edges);
+            if (style.edges.style === 'Dashed') {
+                this._changeGapSize(style.edges.gapSize);
+                this._changeDashSize(style.edges.dashSize);
+            }
             // BDTopo Faces
             this._changeOpacity(style.faces[0].opacity, -10, 0);
             this._changeColor(style.faces[0].color, -10, 0);
@@ -355,6 +362,9 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
                 opacity: this.bdTopoStyle.edges.opacity,
                 color: this.bdTopoStyle.edges.color,
                 width: this.bdTopoStyle.edges.width,
+                style: this.bdTopoStyle.edges.style,
+                gapSize: this.bdTopoStyle.edges.gapSize,
+                dashSize: this.bdTopoStyle.edges.dashSize,
             },
             faces: [
                 {
@@ -448,6 +458,9 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll(target = 0) {
                 opacity: this.bdTopoStyle.edges.opacity,
                 color: this.bdTopoStyle.edges.color,
                 width: this.bdTopoStyle.edges.width,
+                style: this.bdTopoStyle.edges.style,
+                gapSize: this.bdTopoStyle.edges.gapSize,
+                dashSize: this.bdTopoStyle.edges.dashSize,
             },
             faces: [
                 {
@@ -531,9 +544,13 @@ Symbolizer.prototype._addOpacityEdgeAll = function addOpacityEdgeAll(folder) {
                     this._changeOpacityEdge(value, i, j);
                 }
             }
+            if (this.bdTopo) {
+                this._changeOpacityEdge(value, -10, 0);
+                this._changeOpacityEdge(value, -10, 1);
+            }
         });
     }
-    if (this.bdTopo) {
+    else if (this.bdTopo) {
         initialOpacity = this.bdTopoStyle.edges.opacity;
         folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Edge opacity').onChange((value) => {
             this._changeOpacityEdge(value, -10, 0);
@@ -575,9 +592,13 @@ Symbolizer.prototype._addColorEdgeAll = function addColorEdgeAll(folder) {
                     this._changeColorEdge(value, i, j);
                 }
             }
+            if (this.bdTopo) {
+                this._changeColorEdge(value, -10, 0);
+                this._changeColorEdge(value, -10, 1);
+            }
         });
     }
-    if (this.bdTopo) {
+    else if (this.bdTopo) {
         initialColor = this.bdTopoStyle.edges.color;
         folder.addColor({ color: initialColor }, 'color').name('Edge color').onChange((value) => {
             this._changeColorEdge(value, -10, 0);
@@ -619,9 +640,13 @@ Symbolizer.prototype._addWidthEdgeAll = function addWidthEdgeAll(folder) {
                     this._changeWidthEdge(value, i, j);
                 }
             }
+            if (this.bdTopo) {
+                this._changeWidthEdge(value, -10, 0);
+                this._changeWidthEdge(value, -10, 1);
+            }
         });
     }
-    if (this.bdTopo) {
+    else if (this.bdTopo) {
         initialWidth = this.bdTopoStyle.edges.width;
         folder.add({ width: initialWidth }, 'width', 0, 5).name('Edge width').onChange((value) => {
             this._changeWidthEdge(value, -10, 0);
@@ -692,13 +717,9 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
     if (value === 'Sketchy') {
         // Initial GUI parameters
         var color;
-        // = this.edges[0].children[0].material.color;
         var width;
-        // = this.edges[0].children[0].material.linewidth;
         var threshold;
-        // = 100.0;
         var stroke;
-        // = 'dashed';
         // Checks if sketchy parameters controllers already exists
         var isSketchy = false;
         for (k = 0; k < folder.__controllers.length; k++) {
@@ -733,6 +754,11 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
                 var edgeTexturePath = this.quads.children[0].children[0].material.uniforms.texture2.value.image.src.split('/');
                 stroke = edgeTexturePath[edgeTexturePath.length - 1].split('.')[0];
                 this._createSketchyMaterial(stroke, color, width, threshold);
+                // Keeps the normal behavior with BD Topo
+                if (this.bdTopo) {
+                    this._changeColorEdge(color, -10, 0);
+                    this._changeColorEdge(color, -10, 1);
+                }
             });
             // Adapt width controller to sketchy edge
             folder.__controllers[2].__min = 10.0;
@@ -893,16 +919,6 @@ Symbolizer.prototype._changeStyleEdge = function changeStyleEdge(value, folder) 
                 this.edges[i].children[j].material.visible = false;
             }
         }
-        if (this.bdTopo) {
-            var f2 = (parent) => {
-                for (j = 0; j < parent.children.length; j++) {
-                    if (parent.children[j].name == 'wall_edges' || parent.children[j].name == 'roof_edges') {
-                        parent.children[j].material.visible = false;
-                    }
-                }
-            };
-            this.bdTopo(f2);
-        }
         // Apply sketchy style
         this._createSketchyMaterial(stroke, oldColor, width, threshold);
     }
@@ -953,7 +969,7 @@ Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(str
     var path1 = './strokes/'.concat(stroke).concat('_small.png');
     var path2 = './strokes/'.concat(stroke).concat('.png');
     // If the quads are not created we create them
-    if (this.quads == null) {
+    if (this.quads == undefined) {
         // Create shaders to render sketchy edges
         var vertex =
         `
@@ -1045,6 +1061,7 @@ Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(str
                         material.transparent = true;
                         material.polygonOffset = true;
                         material.polygonOffsetUnits = -150.0;
+                        // patchMaterialForLogDepthSupport(material);
                         // Quad groups initialization
                         this.quads = new THREE.Group();
                         this.quads.name = 'quads';
@@ -1087,6 +1104,9 @@ Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(str
     }
     // Else, we apply the material on the existing quads
     else {
+        this.quads.traverse((child) => {
+            child.visible = true;
+        });
         this.quads.children.forEach((subGroup) => {
             subGroup.children.forEach((child) => {
                 child.visible = true;
@@ -1153,8 +1173,8 @@ Symbolizer.prototype._addOpacity = function addOpacity(folder, j) {
                 this._changeOpacity(value, i, j);
             }
         });
-    } else if (this.bdTopo && j < 0) {
-        //  ['wall_faces': -10, 'roof_faces' = -20];
+    }
+    else if (this.bdTopo && j < 0) {
         var name = j == -10 ? 'wall_faces' : 'roof_faces';
         initialOpacity = this.bdTopoStyle[name].opacity;
         folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Opacity').onChange((value) => {
@@ -1794,7 +1814,6 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this.folder.open();
     this._addSaveAll(folder);
     this._addLoad(folder);
-    if (this.plane != null) this._addShades(folder);
     var positionFolder = folder.addFolder('Position');
     this._addResetPosition(positionFolder);
     this._addRotationsAll(positionFolder);
@@ -1815,6 +1834,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addShininessAll(facesFolder);
     if (this.light != null) {
         var lightFolder = folder.addFolder('Light');
+        if (this.plane != null) { this._addShades(lightFolder); }
         this._addColorLight(lightFolder);
         this._addMoveLight(lightFolder);
     }

@@ -32,7 +32,7 @@ function ModelLoader(view) {
     // style apply to the BDTopo
     this.bdTopoStyle = {
         wall_faces: {
-            texture: './textures/',
+            texture: null,
             opacity: 1,
             color: '#ffffff',
             emissive: '#ffffff',
@@ -41,7 +41,7 @@ function ModelLoader(view) {
             textureRepetition: 1,
         },
         roof_faces: {
-            texture: './textures/',
+            texture: null,
             opacity: 1,
             color: '#ffffff',
             emissive: '#ffffff',
@@ -54,6 +54,8 @@ function ModelLoader(view) {
             opacity: 1,
             width: 1,
             style: 'Continuous',
+            gapSize: null,
+            dashSize: null,
         },
     };
     _this = this;
