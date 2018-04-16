@@ -107,7 +107,6 @@ ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX
     lines.traverse(lines => lines.layers.set(linesID));
     this.view.camera.camera3D.layers.enable(linesID);
 
-    
     // Update coordinate of the object
     obj.updateMatrixWorld();
     // set & check name

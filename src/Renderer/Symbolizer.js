@@ -27,8 +27,6 @@ function Symbolizer(view, obj, edges, bdTopo, menu, nb, light, plane, saveDataIn
     if (bdTopo != null) this.bdTopoStyle = bdTopo.bdTopoStyle;
     this.applyStyle();
     saveData = saveDataInit();
-    console.log(this.plane);
-    console.log(this.light);
 }
 
 // ******************** SAVING AND LOADING FUNCTIONALITIES ********************
