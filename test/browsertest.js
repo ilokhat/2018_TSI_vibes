@@ -38,7 +38,6 @@ describe('LayerManager._readFile()', function () {
         expect(f1).to.have.property('name', 'file.obj');
     });
     it('.obj file loaded successfully', function () {
-
         chai.expect(manager._readFile(f1)).to.equal(0);
     });
 });
