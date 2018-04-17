@@ -1,7 +1,13 @@
 /* eslint no-eval: 0 */
+
 /**
- * Tool to apply 3D stylization on a mesh
+ * Generated On: april 2018
+ * Class: Feature2MeshStyle
+ * Description: Tool to apply 3D stylization on a mesh
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
  */
+
 
 import * as THREE from 'three';
 // import savery from 'savery';

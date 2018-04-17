@@ -5,6 +5,7 @@
  * project VIBES
  * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
  */
+
 import * as THREE from 'three';
 import Cartography3D from '../B3Dreader/Cartography3D';
 import Feature2MeshStyle from './Feature2MeshStyle';

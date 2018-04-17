@@ -1,8 +1,9 @@
 /**
- * part extract from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
- * edit on april 2018
+ * Edit On: april 2018
+ * Class: dalleClasse
+ * Description:  Part extracted from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
  * project VIBES
- * @class dalleClasse
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
  */
 
 import * as THREE from 'three';
