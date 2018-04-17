@@ -16,6 +16,7 @@ function ModelLoader(view) {
     this.view = view;
     this.model = [new THREE.Group(), new THREE.Group()];
     this.checked = false;
+    this.laodObj3d = null;
     this.bdTopoVisibility = false;
     this.bdTopoStyle = {
         wall_faces: {
@@ -50,10 +51,10 @@ function ModelLoader(view) {
 
 ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale, callback, menu) {
     // OBJ loader
-    var loader = new THREE.OBJLoader();
+    _this.laodObj3d = new THREE.OBJLoader();
     var promise = new Promise((resolve) => {
         var lines = new THREE.Group();
-        loader.load(url, (obj) => {
+        _this.laodObj3d.load(url, (obj) => {
             this._loadModel(obj, lines, coord, rotateX, rotateY, rotateZ, scale);
             resolve();
         });

@@ -3,6 +3,9 @@
  */
 
 import * as THREE from 'three';
+import MTLLoader from 'three-mtl-loader';
+import MTLFile from 'mtl-file-parser';
+
 
 var _this;
 
@@ -27,6 +30,7 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.symbolizer = symbolizer;
     this.stylizeObjectBtn = null;
     this.stylizePartsBtn = null;
+    this.mtlBtn = null;
     this.deleteBtn = null;
     this.bati3dBtn = null;
     this.bdTopoBtn = null;
@@ -169,6 +173,8 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
             // Add layer and controller to the list
             _this.listLayers.push(model);
             _this.listControllers.push(controller);
+
+                 
             // Creates buttons to start symbolizers
             if (!_this.guiInitialized) {
                 _this.guiInitialize();
@@ -293,6 +299,34 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
             if (layer != 'BDTopo' && layer.length >= 2) {
                 listObj.push(layer[0]);
                 listEdge.push(layer[1]);
+
+                // add mtl loader
+                _this.mtlBtn = _this.layerFolder.add({ symbolizer: () => {
+                    var button = document.createElement('input');
+                    button.setAttribute('type', 'file');
+                    button.addEventListener('change', () => {
+                        var mtlLoader = new MTLLoader();
+                        console.log('1');
+                        mtlLoader.load('models/'.concat(button.files[0].name.split('.')[0]).concat('/').concat(button.files[0].name), (materials) => {
+                            materials.preload();
+                            _this.loader.laodObj3d.setMaterials(materials);
+                           if (layer[0].name.split('_')[0] == button.files[0].name.split('.')[0]) { 
+                              layer[0].children.forEach((child) => {
+                                if (materials.materials[child.name] != undefined) {
+                                     child.material = _this.loader.laodObj3d.materials.materials[child.name];
+                                    }  
+                              });
+                          _this.view.notifyChange(true);  
+                           }                   
+                          
+                            });
+                    }, false);
+                    button.click();
+                    
+                },
+                }, 'symbolizer').name('MTL file');
+
+
             } else if (layer == 'BDTopo') {
                 bdTopo = _this.loader;
             }
@@ -301,6 +335,8 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         _this.nbSymbolizer++;
         var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer, _this.light, _this.plane);
         _this.symbolizerInit = symbolizer;
+
+        
         // Open symbolizer with 'stylize parts'
         if (complex) {
             symbolizer.initGui();
@@ -357,6 +393,7 @@ LayerManager.prototype._cleanGUI = function cleanGUI() {
     _this.menu.gui.__folders.Layers.remove(_this.stylizeObjectBtn);
     _this.menu.gui.__folders.Layers.remove(_this.stylizePartsBtn);
     _this.menu.gui.__folders.Layers.remove(_this.deleteBtn);
+    _this.menu.gui.__folders.Layers.remove(_this.mtlBtn);
     _this.guiInitialized = false;
 };
 

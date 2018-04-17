@@ -216,7 +216,7 @@ Symbolizer.prototype._readVibes = function readVibes(file, folder) {
     var reader = new FileReader();
     if (file.name.endsWith('.vibes')) {
         reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
-        reader.readAsText(file);
+        reader.readAsText(file);        
         return 0;
     } else {
         throw new loadFileException('Unvalid format');
@@ -340,7 +340,6 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
         };
     }
     // var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
-    // console.log(blob);
     saveData(vibes, name.concat('_partie.vibes'));
 };
 
