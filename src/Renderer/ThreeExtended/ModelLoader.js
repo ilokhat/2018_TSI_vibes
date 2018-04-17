@@ -22,9 +22,10 @@ function ModelLoader(view) {
     // Constructor
     this.view = view;
     this.model = [new THREE.Group(), new THREE.Group()];
-    this.checked = false; // if the BATI3D is loaded
-    this.bdTopoVisibility = false; // BDTopo visibility
-    // style apply to the BDTopo
+    this.checked = false;// if the BATI3D is loaded
+    this.laodObj3d = null;
+    this.bdTopoVisibility = false;// BDTopo visibility
+     // style apply to the BDTopo
     this.bdTopoStyle = {
         wall_faces: {
             texture: null,
@@ -71,10 +72,11 @@ function ModelLoader(view) {
  * @param {GuiTools} menu menu use for the callback
  */
 ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale, callback, menu) {
-    var loader = new THREE.OBJLoader();
+    // OBJ loader
+    _this.laodObj3d = new THREE.OBJLoader();
     var promise = new Promise((resolve) => {
         var lines = new THREE.Group();
-        loader.load(url, (obj) => {
+        _this.laodObj3d.load(url, (obj) => {
             this._loadModel(obj, lines, coord, rotateX, rotateY, rotateZ, scale);
             resolve();
         });

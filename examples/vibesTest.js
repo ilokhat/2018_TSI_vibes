@@ -75,8 +75,8 @@ var symbolizer = function(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, l
 }
 
 // Layer management
-var manager = new itowns.LayerManager(globeView, document, menuGlobe, coord, rotateX, rotateY, rotateZ, scale, loader, symbolizer)
-window.onload = () => manager.initListener();
+var manager = new itowns.LayerManager(globeView, document, menuGlobe, coord, rotateX, rotateY, rotateZ, scale, loader, symbolizer, saveDataInit)
+window.onload = () => manager.initGUI();
 
 // Listen for globe full initialisation event
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {
@@ -85,9 +85,9 @@ globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function 
     var result = document.getElementById('result')
     document.getElementById('viewerDiv').addEventListener('mousemove', function() { 
         result.innerHTML = "Longitude : " + globeView.controls.getCameraTargetGeoPosition().longitude() + "<br> Latitude : " + globeView.controls.getCameraTargetGeoPosition().latitude(); 
-        result.innerHTML += "<br> To move object click on it or select it from GUI and use:<br> keys a and z or 4 and 6 to move it from West-East <br> keys q and s or 8 and 2 to move it from North-South <br> keys w and x or 7 and 3 to move it from Top-Down ";
+        result.innerHTML += "<br> To move object click on it or select it from GUI and use:<br> keys A and Z or 4 and 6 to move it from West-East <br> keys Q and S or 8 and 2 to move it from North-South <br> keys W and X or 7 and 3 to move it from Top-Down ";
     })
-    result.innerHTML += "<br> To move object click on it or select it from GUI <br> use keys a and z or 4 and 6 to move it from West-East <br> use keys q and s or 8 and 2 to move it from North-South <br> use keys w and x or 7 and 3 to move it from Top-Down ";
+    result.innerHTML += "<br> To move object click on it or select it from GUI <br> use keys A and Z or 4 and 6 to move it from West-East <br> use keys Q and S or 8 and 2 to move it from North-South <br> use keys W and X or 7 and 3 to move it from Top-Down ";
     // globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
 });
 //var loader2 = new itowns.ModelLoader(globeView);
