@@ -76,7 +76,7 @@ var symbolizer = function(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, l
 
 // Layer management
 var manager = new itowns.LayerManager(globeView, document, menuGlobe, coord, rotateX, rotateY, rotateZ, scale, loader, symbolizer, saveDataInit)
-window.onload = () => manager.initListener();
+window.onload = () => manager.initGUI();
 
 // Listen for globe full initialisation event
 globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function init() {

@@ -38,7 +38,7 @@ var folders = {};
 
 // ********** GUI INITIALIZATION **********
 
-LayerManager.prototype.initListener = function initListener() {
+LayerManager.prototype.initGUI = function initGUI() {
     // Gui initialization
     folders.layerFolder = this.menu.gui.addFolder('Layers');
     folders.layerFolder.open();
@@ -133,8 +133,12 @@ LayerManager.prototype._readFile = function readFile(file) {
                 this.plane.visible = false;
                 this.plane.updateMatrixWorld();
                 this.light.updateMatrixWorld();
-                _this.loader._loadModel(layer[0], layer[1], newCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
+                _this.loader._placeModel(layer[0], newCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
+                _this.loader._placeModel(layer[1], newCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
                 _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: newCRS.longitude(), latitude: newCRS.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
+                layer[0].updateMatrixWorld();
+                layer[1].updateMatrixWorld();
+                _this.view.notifyChange(true);
             });
         });
         reader.readAsText(file);
@@ -173,7 +177,7 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
             _this.listControllers.push(controller);
             // Creates buttons to start symbolizers
             if (!_this.guiInitialized) {
-                _this.guiInitialize();
+                _this.initControllers();
                 _this.initPositions();
             }
         }
@@ -199,7 +203,7 @@ LayerManager.prototype.handleBdTopo = function handleBdTopo() {
             _this.listControllers.push(controller);
             // Creates buttons to start symbolizers
             if (!_this.guiInitialized) {
-                _this.guiInitialize();
+                _this.initControllers();
             }
         }
         else {
@@ -216,7 +220,7 @@ LayerManager.prototype.handleBdTopo = function handleBdTopo() {
 
 // ********** FUNCTIONS TO MANAGE CONTROLLERS **********
 
-LayerManager.prototype.guiInitialize = function guiInitialize() {
+LayerManager.prototype.initControllers = function initControllers() {
     buttons.stylizeObjectBtn = folders.layerFolder.add({ symbolizer: () => {
         _this.initSymbolizer(false);
     },
@@ -236,6 +240,7 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
         // Actually remove the model from the scene
         _this.listLayers.forEach((layer) => {
             var quads;
+            // Case BDTopo
             if (layer == 'BDTopo') {
                 this.loader.ForBuildings(hideBDTopo);
                 var b = _this.view._layers[0]._attachedLayers.filter(b => b.id == 'WFS Buildings');
@@ -256,8 +261,8 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                     }
                 },
                 }, 'bdTopo').name('Load BDTopo');
-                // _this.view.scene.remove(_this.view.scene.getObjectByName('quads_bdTopo'));
             }
+            // Case BATI3D
             else if (layer[0].name === 'bati3D_faces' || layer[0].name === 'bati3D_lines') {
                 createBati3dBtn();
                 _this.loader._setVisibility(_this.view, false);
@@ -267,16 +272,9 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                 if (quads != null) {
                     _this.view.scene.getObjectByName('quads').remove(quads);
                 }
-                /*
-                _this.view.scene.getObjectByName('quads').children.forEach((child) => {
-                    if (child.name === 'quads_'.concat(layer[0].name.split('_')[0])) {
-                        _this.view.scene.getObjectByName('quads').remove(child);
-                    }
-                });
-                */
             }
+            // Case OBJ
             else {
-                // Simple object
                 _this.view.scene.remove(layer[0]);
                 _this.view.scene.remove(layer[1]);
                 // Remove quads if they exist
@@ -284,13 +282,6 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
                 if (quads != null) {
                     _this.view.scene.getObjectByName('quads').remove(quads);
                 }
-                /*
-                _this.view.scene.getObjectByName('quads').children.forEach((child) => {
-                    if (child.name === 'quads_'.concat(layer[0].name.split('_')[0])) {
-                        _this.view.scene.getObjectByName('quads').remove(child);
-                    }
-                });
-                */
             }
             _this.view.notifyChange(true);
         });
