@@ -1,3 +1,11 @@
+/**
+ * Edit On: april 2018
+ * Class: Shader
+ * Description:  Part extracted from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
+ */
+
 const Shader = {
     shaderBati3DVS: [
         '#ifdef GL_ES',

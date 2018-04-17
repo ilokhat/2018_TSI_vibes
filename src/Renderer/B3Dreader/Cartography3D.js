@@ -1,3 +1,11 @@
+/**
+ * Edit On: april 2018
+ * Class: Cartography3D
+ * Description:  Part extracted from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
+ */
+
 import * as THREE from 'three';
 import clipMap from './clipMap';
 
@@ -11,6 +19,7 @@ var bbox = {
     ymin: 13722,
     ymax: 13724,
 };
+/** @module Cartography3D */
 const Cartography3D = {
     intialized: false,
     opacity: 1,
@@ -45,6 +54,10 @@ const Cartography3D = {
 
 
     // création d'une grille pour toutes les dalles de la limiteZone
+    /**
+     * Make the tile grid for the limitZone
+     * @function generateGrid
+     */
     generateGrid: function generateGrid() {
         this.grid = [];
         var nbdallesX = bbox.xmax - bbox.xmin;
@@ -60,6 +73,13 @@ const Cartography3D = {
     },
 
     // initialisation de la visualisation
+    /**
+     * function for initialise the BATI3D loading
+     * @function initCarto3D
+     * @param {Object} options
+     * @param {function} doAfter callback function run after the Bati3D tile creation (doAfter(objCreated, islast, ModelLoader))
+     * @param {ModelLoader} modelLoader ModelLoader use for load the Bati3D
+     */
     initCarto3D: function initCarto3D(options, doAfter, modelLoader) {
         this.dataURL = options.url;
         this.textureType = '.dds';
@@ -67,9 +87,11 @@ const Cartography3D = {
         this.modelLoader = modelLoader;
         _textureType = this.textureType;
         this.generateGrid();
+        // on parcour chaque case de la grille
         for (var i = 0; i < this.grid.length; i++) {
             for (var j = 0; j < this.grid[i].length; j++) {
                 var pos = new THREE.Vector3((i + bbox.xmin) * 500 + 250, 0, (j + bbox.ymin) * 500 + 250);
+                // si la donnée dans la zone de travail on charge la dalle
                 if (this.isDataAvailable(pos)) {
                     this.loadDallesAroundPosition(pos, (i == this.grid.length - 1 && j == this.grid[i].length - 1));
                     this.setInitStatus(true);
@@ -80,16 +102,31 @@ const Cartography3D = {
     },
 
     // change variable test initialisation
+    /**
+     * Change the initialization status of the Cartography3D
+     * @function setInitStatus
+     * @param {boolean} v initialization status
+     */
     setInitStatus: function setInitStatus(v) {
         this.intialized = v;
     },
 
     // return variable test initialisation
+    /**
+     * return if the the initialization status of the Cartography3D
+     * @function isCartoInitialized
+     * @returns {boolean} the initialization status of the Cartography3D
+     */
     isCartoInitialized: function isCartoInitialized() {
         return this.intialized;
     },
 
     // change visibilité des dalles
+    /**
+     * Change the tile visibility
+     * @function setVisibility
+     * @param {boolean} v if it is visible
+     */
     setVisibility: function setVisibility(v) {
         for (var dalle in this.listDalles) {
             if (Object.prototype.hasOwnProperty.call(this.listDalles, dalle)) {
@@ -99,6 +136,12 @@ const Cartography3D = {
     },
 
     // chargement des dalles autout d'une position
+    /**
+     * load tile around a position
+     * @function loadDallesAroundPosition
+     * @param {Object} p tile position ({x: 651000, y: 6861000})
+     * @param {boolean} islast if it is tha last tile to load
+     */
     loadDallesAroundPosition: function loadDallesAroundPosition(p, islast) {
         var lon = Math.floor(p.x / this.scale);
         var lat = Math.floor(p.z / this.scale);
@@ -122,6 +165,12 @@ const Cartography3D = {
     },
 
     // donne si le point p est dans la zone de travail
+    /**
+     * Check if the point if on the limitZone
+     * @function isDataAvailable
+     * @param {object} p point to test
+     * @returns {boolean} if the point is on the limitZone
+     */
     isDataAvailable: function isDataAvailable(p) {
         return (p.x > this.limitZone.xmin) && (p.x < this.limitZone.xmax) && (p.z > this.limitZone.ymin) && (p.z < this.limitZone.ymax);
     },

@@ -8,8 +8,9 @@ import MTLFile from 'mtl-file-parser';
 
 
 var _this;
+var saveData;
 
-function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, loader, symbolizer) {
+function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, loader, symbolizer, saveDataInit) {
     // Constructor
     this.view = view;
     this.document = doc;
@@ -24,8 +25,6 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.listControllers = [];
     this.nbSymbolizer = 0;
     this.guiInitialized = false;
-    this.layerFolder = this.menu.gui.addFolder('Layers');
-    this.layerFolder.open();
     this.loader = loader;
     this.symbolizer = symbolizer;
     this.stylizeObjectBtn = null;
@@ -37,19 +36,26 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.symbolizerInit = null;
     this.light = null;
     this.plane = null;
+    saveData = saveDataInit();
     _this = this;
 }
 
-var showBDTopo = (parent) => { parent.visible = true; };
 var hideBDTopo = (parent) => { parent.visible = false; };
+
+var buttons = {};
+var folders = {};
 
 // ********** GUI INITIALIZATION **********
 
-LayerManager.prototype.initListener = function initListener() {
+LayerManager.prototype.initGUI = function initGUI() {
     // Gui initialization
+    folders.layerFolder = this.menu.gui.addFolder('Layers');
+    folders.layerFolder.open();
+    folders.positionFolder = this.menu.gui.addFolder('Positions');
+    folders.positionFolder.open();
+    manageCamera();
     createBati3dBtn();
     createBdTopoBtn();
-    manageCamera();
     // Check key press listeners
     this.document.addEventListener('keypress', _this.checkKeyPress, false);
     this.document.addEventListener('keypress', _this.checkKeyPress, false);
@@ -120,9 +126,9 @@ LayerManager.prototype._readFile = function readFile(file) {
                 var coordX = json.coordX;
                 var coordY = json.coordY;
                 var coordZ = json.coordZ;
-                _this.rotateX = json.rotateX + this.rotateX;
-                _this.rotateY = json.rotateY + this.rotateY;
-                _this.rotateZ = json.rotateZ + this.rotateZ;
+                _this.rotateX = json.rotateX;
+                _this.rotateY = json.rotateY;
+                _this.rotateZ = json.rotateZ;
                 _this.scale = json.scale;
                 // Moving object
                 var vectCoord = new THREE.Vector3().set(coordX, coordY, coordZ);
@@ -133,10 +139,15 @@ LayerManager.prototype._readFile = function readFile(file) {
                 this.light.position.copy(coordLight.as(this.view.referenceCrs).xyz());
                 this.light.position.y += 50;
                 this.plane.position.copy(newCRS.as(this.view.referenceCrs).xyz());
+                this.plane.visible = false;
                 this.plane.updateMatrixWorld();
                 this.light.updateMatrixWorld();
-                _this.loader._loadModel(layer[0], layer[1], newCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
+                _this.loader._placeModel(layer[0], newCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
+                _this.loader._placeModel(layer[1], newCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);
                 _this.view.controls.setCameraTargetGeoPositionAdvanced({ longitude: newCRS.longitude(), latitude: newCRS.latitude(), zoom: 15, tilt: 30, heading: 30 }, true);
+                layer[0].updateMatrixWorld();
+                layer[1].updateMatrixWorld();
+                _this.view.notifyChange(true);
             });
         });
         reader.readAsText(file);
@@ -168,7 +179,7 @@ LayerManager.prototype._readFile = function readFile(file) {
 LayerManager.prototype.handleLayer = function handleLayer(model) {
     // Add a checkbox to the GUI, named after the layer
     var name = model[0].name.split('_')[0];
-    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name(name.split('-').join(' ')).onChange((checked) => {
+    var controller = folders.layerFolder.add({ Layer: false, Name: name }, 'Layer').name(name.split('-').join(' ')).onChange((checked) => {
         if (checked) {
             // Add layer and controller to the list
             _this.listLayers.push(model);
@@ -177,7 +188,8 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
                  
             // Creates buttons to start symbolizers
             if (!_this.guiInitialized) {
-                _this.guiInitialize();
+                _this.initControllers();
+                _this.initPositions();
             }
         }
         else {
@@ -195,14 +207,14 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
 LayerManager.prototype.handleBdTopo = function handleBdTopo() {
     // Add a checkbox to the GUI, named after the layer
     var name = 'BDTopo';
-    var controller = _this.layerFolder.add({ Layer: false, Name: name }, 'Layer').name('BDTopo').onChange((checked) => {
+    var controller = folders.layerFolder.add({ Layer: false, Name: name }, 'Layer').name('BDTopo').onChange((checked) => {
         if (checked) {
             // Add layer and controller to the list
             _this.listLayers.push('BDTopo');
             _this.listControllers.push(controller);
             // Creates buttons to start symbolizers
             if (!_this.guiInitialized) {
-                _this.guiInitialize();
+                _this.initControllers();
             }
         }
         else {
@@ -219,16 +231,16 @@ LayerManager.prototype.handleBdTopo = function handleBdTopo() {
 
 // ********** FUNCTIONS TO MANAGE CONTROLLERS **********
 
-LayerManager.prototype.guiInitialize = function guiInitialize() {
-    _this.stylizeObjectBtn = _this.layerFolder.add({ symbolizer: () => {
+LayerManager.prototype.initControllers = function initControllers() {
+    buttons.stylizeObjectBtn = folders.layerFolder.add({ symbolizer: () => {
         _this.initSymbolizer(false);
     },
     }, 'symbolizer').name('Stylize object...');
-    _this.stylizePartsBtn = _this.layerFolder.add({ symbolizer: () => {
+    buttons.stylizePartsBtn = folders.layerFolder.add({ symbolizer: () => {
         _this.initSymbolizer(true);
     },
     }, 'symbolizer').name('Stylize parts...');
-    _this.deleteBtn = _this.layerFolder.add({ delete: () => {
+    buttons.deleteBtn = folders.layerFolder.add({ delete: () => {
         // Removes the controllers
         if (_this.menu.gui.__folders.Layers != undefined) {
             _this.listControllers.forEach((controller) => {
@@ -238,40 +250,49 @@ LayerManager.prototype.guiInitialize = function guiInitialize() {
         _this.listControllers = [];
         // Actually remove the model from the scene
         _this.listLayers.forEach((layer) => {
+            var quads;
+            // Case BDTopo
             if (layer == 'BDTopo') {
                 this.loader.ForBuildings(hideBDTopo);
+                var b = _this.view._layers[0]._attachedLayers.filter(b => b.id == 'WFS Buildings');
+                b[0].visible = false;
                 _this.loader.bdTopoVisibility = false;
-                _this.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
+                buttons.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
                     if (_this.loader.bDTopoLoaded) {
+                        var b = _this.view._layers[0]._attachedLayers.filter(b => b.id == 'WFS Buildings');
                         if (_this.loader.bdTopoVisibility) {
-                            _this.loader.ForBuildings(hideBDTopo);
+                            b[0].visible = false;
                             _this.loader.bdTopoVisibility = false;
                         } else {
-                            _this.loader.ForBuildings(showBDTopo);
+                            b[0].visible = true;
                             _this.loader.bdTopoVisibility = true;
-                            _this.menu.gui.remove(_this.bdTopoBtn);
+                            _this.menu.gui.remove(buttons.bdTopoBtn);
                             _this.handleBdTopo();
                         }
                     }
                 },
-                }, 'bdTopo').name('bdTopo');
-                _this.view.scene.remove(_this.view.scene.getObjectByName('quads_bdTopo'));
+                }, 'bdTopo').name('Load BDTopo');
             }
+            // Case BATI3D
             else if (layer[0].name === 'bati3D_faces' || layer[0].name === 'bati3D_lines') {
                 createBati3dBtn();
                 _this.loader._setVisibility(_this.view, false);
                 _this.loader.checked = false;
                 // Remove quads if they exist
-                _this.view.scene.getObjectByName('quads').children.getObjectByName('quads_'.concat(layer[0].name.split('_')[0]));
-                // _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
+                quads = getQuadsByName(layer[0].name.split('_')[0]);
+                if (quads != null) {
+                    _this.view.scene.getObjectByName('quads').remove(quads);
+                }
             }
+            // Case OBJ
             else {
-                // Simple object
                 _this.view.scene.remove(layer[0]);
                 _this.view.scene.remove(layer[1]);
                 // Remove quads if they exist
-                _this.view.scene.getObjectByName('quads').children.getObjectByName('quads_'.concat(layer[0].name.split('_')[0]));
-                // _this.view.scene.remove(_this.view.scene.getObjectByName('quads_'.concat(layer[0].name.split('_')[0])));
+                quads = getQuadsByName(layer[0].name.split('_')[0]);
+                if (quads != null) {
+                    _this.view.scene.getObjectByName('quads').remove(quads);
+                }
             }
             _this.view.notifyChange(true);
         });
@@ -294,6 +315,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         // Merge elements of the list as one group
         var listObj = [];
         var listEdge = [];
+        var quads = _this.view.scene.getObjectByName('quads');
         var bdTopo = null;
         _this.listLayers.forEach((layer) => {
             if (layer != 'BDTopo' && layer.length >= 2) {
@@ -301,12 +323,11 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
                 listEdge.push(layer[1]);
 
                 // add mtl loader
-                _this.mtlBtn = _this.layerFolder.add({ symbolizer: () => {
+                buttons.mtlBtn = folders.layerFolder.add({ symbolizer: () => {
                     var button = document.createElement('input');
                     button.setAttribute('type', 'file');
                     button.addEventListener('change', () => {
                         var mtlLoader = new MTLLoader();
-                        console.log('1');
                         mtlLoader.load('models/'.concat(button.files[0].name.split('.')[0]).concat('/').concat(button.files[0].name), (materials) => {
                             materials.preload();
                             _this.loader.laodObj3d.setMaterials(materials);
@@ -333,7 +354,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         });
         // Call Symbolizer
         _this.nbSymbolizer++;
-        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer, _this.light, _this.plane);
+        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer, _this.light, _this.plane, quads);
         _this.symbolizerInit = symbolizer;
 
         
@@ -390,13 +411,281 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
 
 LayerManager.prototype._cleanGUI = function cleanGUI() {
     // Remove the layer management buttons
-    _this.menu.gui.__folders.Layers.remove(_this.stylizeObjectBtn);
-    _this.menu.gui.__folders.Layers.remove(_this.stylizePartsBtn);
-    _this.menu.gui.__folders.Layers.remove(_this.deleteBtn);
-    _this.menu.gui.__folders.Layers.remove(_this.mtlBtn);
+    _this.menu.gui.__folders.Layers.remove(buttons.mtlBtn);
+    _this.menu.gui.__folders.Layers.remove(buttons.stylizeObjectBtn);
+    _this.menu.gui.__folders.Layers.remove(buttons.stylizePartsBtn);
+    _this.menu.gui.__folders.Layers.remove(buttons.deleteBtn);
+    if (buttons.translateXBtn != undefined) {
+        _this.menu.gui.__folders.Positions.remove(buttons.saveGibesBtn);
+        _this.menu.gui.__folders.Positions.remove(buttons.translateXBtn);
+        _this.menu.gui.__folders.Positions.remove(buttons.translateYBtn);
+        _this.menu.gui.__folders.Positions.remove(buttons.translateZBtn);
+        _this.menu.gui.__folders.Positions.remove(buttons.rotateXBtn);
+        _this.menu.gui.__folders.Positions.remove(buttons.rotateYBtn);
+        _this.menu.gui.__folders.Positions.remove(buttons.rotateZBtn);
+        _this.menu.gui.__folders.Positions.remove(buttons.scaleBtn);
+        _this.menu.gui.__folders.Positions.remove(buttons.positionXBtn);
+        _this.menu.gui.__folders.Positions.remove(buttons.positionYBtn);
+        _this.menu.gui.__folders.Positions.remove(buttons.positionZBtn);
+    }
     _this.guiInitialized = false;
 };
 
+// ******************** GEOLOCATION ********************
+
+LayerManager.prototype._saveGibes = function saveGibes() {
+    if (_this.listLayers.length > 0) {
+        var nameFile = _this.listLayers[0][0].name.split('_')[0];
+        var gibes = {
+            name: nameFile,
+            coordX: _this.listLayers[0][0].position.x,
+            coordY: _this.listLayers[0][0].position.y,
+            coordZ: _this.listLayers[0][0].position.z,
+            rotateX: _this.listLayers[0][0].rotation.x,
+            rotateY: _this.listLayers[0][0].rotation.y,
+            rotateZ: _this.listLayers[0][0].rotation.z,
+            scale: _this.listLayers[0][0].scale.x,
+        };
+        saveData(gibes, nameFile.concat('.gibes'));
+    }
+};
+
+LayerManager.prototype._addScale = function addScale() {
+    // Add controller for scaling objects
+    buttons.scaleBtn = folders.positionFolder.add({ scale: 1 }, 'scale', 0.1, 1000, 0.01).name('Scale').onChange((value) => {
+        for (var i = 0; i < _this.listLayers.length; i++) {
+            // Check the layer so we do not move BD Topo and Bati3D (already georeferenced)
+            if (_this.listLayers[i] != 'BDTopo' && _this.listLayers[i][0].name != 'bati3D_faces') {
+                // Scale objects and edges
+                _this.listLayers[i][0].scale.set(value, value, value);
+                _this.listLayers[i][1].scale.set(value, value, value);
+                _this.plane.updateMatrixWorld();
+                _this.listLayers[i][0].updateMatrixWorld();
+                _this.listLayers[i][1].updateMatrixWorld();
+                _this.light.updateMatrixWorld();
+                // Scale quads if they exist
+                var quads = getQuadsByName(_this.listLayers[i][0].name.split('_')[0]);
+                if (quads != null) {
+                    quads.scale.copy(_this.listLayers[i][0].scale);
+                    quads.updateMatrixWorld();
+                }
+            }
+        }
+        _this.view.notifyChange(true);
+    });
+};
+
+LayerManager.prototype._addTranslate = function addTranslate() {
+    var prevValueX = 0;
+    var prevValueY = 0;
+    var prevValueZ = 0;
+    // Add controller for X translation
+    buttons.translateXBtn = folders.positionFolder.add({ MovecoordX: 0 }, 'MovecoordX', -500, 500, 0.1).name('Translation X').onChange((value) => {
+        for (var i = 0; i < _this.listLayers.length; i++) {
+            // Check the layer so we do not move BD Topo and Bati3D (already georeferenced)
+            if (_this.listLayers[i] != 'BDTopo' && _this.listLayers[i][0].name != 'bati3D_faces') {
+                // Translate object and edges
+                _this.listLayers[i][0].translateX(value - prevValueX);
+                _this.listLayers[i][1].translateX(value - prevValueX);
+                // Save previous value
+                prevValueX = value;
+                _this.listLayers[i][0].updateMatrixWorld();
+                _this.listLayers[i][1].updateMatrixWorld();
+                // Translate quads if they exist
+                var quads = getQuadsByName(_this.listLayers[i][0].name.split('_')[0]);
+                if (quads != null) {
+                    quads.position.copy(_this.listLayers[i][0].position);
+                    quads.updateMatrixWorld();
+                }
+            }
+        }
+        _this.view.notifyChange(true);
+    });
+    // Add controller for Y translation
+    buttons.translateYBtn = folders.positionFolder.add({ MovecoordY: 0 }, 'MovecoordY', -500, 500, 0.1).name('Translation Y').onChange((value) => {
+        for (var i = 0; i < _this.listLayers.length; i++) {
+            // Check the layer so we do not move BD Topo and Bati3D (already georeferenced)
+            if (_this.listLayers[i] != 'BDTopo' && _this.listLayers[i][0].name != 'bati3D_faces') {
+                // Translate object and edges
+                _this.listLayers[i][0].translateZ(value - prevValueY);
+                _this.listLayers[i][1].translateZ(value - prevValueY);
+                // Save previous value
+                prevValueY = value;
+                _this.listLayers[i][0].updateMatrixWorld();
+                _this.listLayers[i][1].updateMatrixWorld();
+                // Translate quads if they exist
+                var quads = getQuadsByName(_this.listLayers[i][0].name.split('_')[0]);
+                if (quads != null) {
+                    quads.position.copy(_this.listLayers[i][0].position);
+                    quads.updateMatrixWorld();
+                }
+            }
+        }
+        _this.view.notifyChange(true);
+    });
+    // Add controller for Z translation
+    buttons.translateZBtn = folders.positionFolder.add({ MovecoordZ: 0 }, 'MovecoordZ', -500, 500, 0.1).name('Translation Z').onChange((value) => {
+        for (var i = 0; i < _this.listLayers.length; i++) {
+            // Check the layer so we do not move BD Topo and Bati3D (already georeferenced)
+            if (_this.listLayers[i] != 'BDTopo' && _this.listLayers[i][0].name != 'bati3D_faces') {
+                // Translate object and edges
+                _this.listLayers[i][0].translateY(value - prevValueZ);
+                _this.listLayers[i][1].translateY(value - prevValueZ);
+                // Save previous value
+                prevValueZ = value;
+                _this.listLayers[i][0].updateMatrixWorld();
+                _this.listLayers[i][1].updateMatrixWorld();
+                // Translate quads if they exist
+                var quads = getQuadsByName(_this.listLayers[i][0].name.split('_')[0]);
+                if (quads != null) {
+                    quads.position.copy(_this.listLayers[i][0].position);
+                    quads.updateMatrixWorld();
+                }
+            }
+        }
+        _this.view.notifyChange(true);
+    });
+};
+
+
+LayerManager.prototype._addRotate = function addRotate() {
+    var prevValueX = 0;
+    var prevValueY = 0;
+    var prevValueZ = 0;
+    // Add controller for X rotation
+    buttons.rotateXBtn = folders.positionFolder.add({ rotationX: 0 }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('Rotation X').onChange((value) => {
+        for (var i = 0; i < _this.listLayers.length; i++) {
+            // Check the layer so we do not move BD Topo and Bati3D (already georeferenced)
+            if (_this.listLayers[i] != 'BDTopo' && _this.listLayers[i][0].name != 'bati3D_faces') {
+                // Rotate object and edges
+                _this.listLayers[i][0].rotateX(value - prevValueX);
+                _this.listLayers[i][1].rotateX(value - prevValueX);
+                // Save previous value
+                prevValueX = value;
+                _this.listLayers[i][0].updateMatrixWorld();
+                _this.listLayers[i][1].updateMatrixWorld();
+                // Rotate quads if they exist
+                var quads = getQuadsByName(_this.listLayers[i][0].name.split('_')[0]);
+                if (quads != null) {
+                    quads.rotation.copy(_this.listLayers[i][0].rotation);
+                    quads.updateMatrixWorld();
+                }
+            }
+        }
+        _this.view.notifyChange(true);
+    });
+    // Add controller for Y rotation
+    buttons.rotateYBtn = folders.positionFolder.add({ rotationY: 0 }, 'rotationY', -Math.PI, Math.PI, Math.PI / 100).name('Rotation Y').onChange((value) => {
+        for (var i = 0; i < _this.listLayers.length; i++) {
+            // Check the layer so we do not move BD Topo and Bati3D (already georeferenced)
+            if (_this.listLayers[i] != 'BDTopo' && _this.listLayers[i][0].name != 'bati3D_faces') {
+                // Rotate object and edges
+                _this.listLayers[i][0].rotateY(value - prevValueY);
+                _this.listLayers[i][1].rotateY(value - prevValueY);
+                // Save previous value
+                prevValueY = value;
+                _this.listLayers[i][0].updateMatrixWorld();
+                _this.listLayers[i][1].updateMatrixWorld();
+                // Rotate quads if they exist
+                var quads = getQuadsByName(_this.listLayers[i][0].name.split('_')[0]);
+                if (quads != null) {
+                    quads.rotation.copy(_this.listLayers[i][0].rotation);
+                    quads.updateMatrixWorld();
+                }
+            }
+        }
+        _this.view.notifyChange(true);
+    });
+    // Add controller for Z rotation
+    buttons.rotateZBtn = folders.positionFolder.add({ rotationZ: 0 }, 'rotationZ', -Math.PI, Math.PI, Math.PI / 100).name('Rotation Z').onChange((value) => {
+        for (var i = 0; i < _this.listLayers.length; i++) {
+            // Check the layer so we do not move BD Topo and Bati3D (already georeferenced)
+            if (_this.listLayers[i] != 'BDTopo' && _this.listLayers[i][0].name != 'bati3D_faces') {
+                // Rotate object and edges
+                _this.listLayers[i][0].rotateZ(value - prevValueZ);
+                _this.listLayers[i][1].rotateZ(value - prevValueZ);
+                // Save previous value
+                prevValueZ = value;
+                _this.listLayers[i][0].updateMatrixWorld();
+                _this.listLayers[i][1].updateMatrixWorld();
+                // Rotate quads if they exist
+                var quads = getQuadsByName(_this.listLayers[i][0].name.split('_')[0]);
+                if (quads != null) {
+                    quads.rotation.copy(_this.listLayers[i][0].rotation);
+                    quads.updateMatrixWorld();
+                }
+            }
+        }
+        _this.view.notifyChange(true);
+    });
+};
+
+LayerManager.prototype._addPosition = function addPosition() {
+    // Initial GUI value
+    var initialX = _this.listLayers[0][0].position.x;
+    var initialY = _this.listLayers[0][0].position.y;
+    var initialZ = _this.listLayers[0][0].position.z;
+    let X = initialX;
+    let Y = initialY;
+    let Z = initialZ;
+    // vector to store the new coordinates
+    var vectCoord = new THREE.Vector3();
+    // Controller for position on X
+    buttons.positionXBtn = folders.positionFolder.add({ longitude: initialX }, 'longitude').name('Position X').onChange((value) => {
+        X = value;
+        vectCoord.set(X, Y, Z);
+        _this._changeCoordinates(vectCoord);
+    });
+    // Controller for position on Y
+    buttons.positionYBtn = folders.positionFolder.add({ latitude: initialY }, 'latitude').name('Position Y').onChange((value) => {
+        Y = value;
+        vectCoord.set(X, Y, Z);
+        _this._changeCoordinates(vectCoord);
+    });
+    // Controller for position on Z
+    buttons.positionZBtn = folders.positionFolder.add({ altitude: initialZ }, 'altitude').name('Position Z').onChange((value) => {
+        Z = value;
+        vectCoord.set(X, Y, Z);
+        _this._changeCoordinates(vectCoord);
+    });
+};
+
+LayerManager.prototype._changeCoordinates = function changeCoordinates(vectCoord) {
+    // Check if only one layer is selected
+    if (_this.listLayers.length == 1) {
+        // Check the layer so we do not move BD Topo and Bati3D (already georeferenced)
+        if (_this.listLayers[0] != 'BDTopo' && _this.listLayers[0][0].name != 'bati3D_faces') {
+            // Modification of object and edges position
+            _this.listLayers[0][0].position.copy(vectCoord);
+            _this.listLayers[0][1].position.copy(vectCoord);
+            _this.listLayers[0][0].updateMatrixWorld();
+            _this.listLayers[0][1].updateMatrixWorld();
+            // Modification of quads position if they exist
+            var quads = getQuadsByName(_this.listLayers[0][0].name.split('_')[0]);
+            if (quads != null) {
+                quads.position.copy(_this.listLayers[0][0].position);
+                quads.updateMatrixWorld();
+            }
+            _this.view.controls.setCameraTargetPosition(_this.listLayers[0][0].position, false);
+            _this.view.notifyChange(true);
+        }
+        else {
+            throw new layerException('Cannot move a georeferenced layer');
+        }
+    }
+    else {
+        throw new layerException('Coordinates must be applied to exactly 1 layer');
+    }
+};
+
+
+LayerManager.prototype.initPositions = function initPositions() {
+    buttons.saveGibesBtn = folders.positionFolder.add({ saveGibe: () => _this._saveGibes() }, 'saveGibe').name('Save position');
+    _this._addPosition();
+    _this._addTranslate();
+    _this._addRotate();
+    _this._addScale();
+};
 
 // ********** OBJECT MOVEMENTS **********
 
@@ -404,39 +693,27 @@ LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
     // moving the object after clicked on it using the keys (4,6,2,8,7,3 or a,z,q,s,w,x)
     if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         if ((key.key == 'a') || (key.key == '4')) {
-            _this._xmoins(-10);
+            _this._moveX(-10);
         }
         if ((key.key == 'z') || (key.key == '6')) {
-            _this._xplus(10);
+            _this._moveX(10);
         }
         if ((key.key == 'w') || (key.key == '7')) {
-            _this._yplus(10);
+            _this._moveY(10);
         }
         if ((key.key == 'x') || (key.key == '3')) {
-            _this._ymoins(-10);
+            _this._moveY(-10);
         }
         if ((key.key == 'q') || (key.key == '8')) {
-            _this._zmoins(-10);
+            _this._moveZ(-10);
         }
         if ((key.key == 's') || (key.key == '2')) {
-            _this._zplus(10);
+            _this._moveZ(10);
         }
     }
 };
 
-LayerManager.prototype._xplus = function xplus(a) {
-    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
-        var obj = _this.listLayers[0][0];
-        var edges = _this.listLayers[0][1];
-        obj.translateX(a);
-        edges.translateX(a);
-        obj.updateMatrixWorld();
-        edges.updateMatrixWorld();
-        this.view.notifyChange(true);
-    }
-};
-
-LayerManager.prototype._xmoins = function _xmoins(a) {
+LayerManager.prototype._moveX = function _moveX(a) {
     if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
@@ -449,7 +726,7 @@ LayerManager.prototype._xmoins = function _xmoins(a) {
     this.view.notifyChange(true);
 };
 
-LayerManager.prototype._yplus = function yplus(a) {
+LayerManager.prototype._moveY = function _moveY(a) {
     if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
@@ -462,20 +739,7 @@ LayerManager.prototype._yplus = function yplus(a) {
     this.view.notifyChange(true);
 };
 
-LayerManager.prototype._ymoins = function _ymoins(a) {
-    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
-        var obj = _this.listLayers[0][0];
-        var edges = _this.listLayers[0][1];
-        obj.translateY(a);
-        edges.translateY(a);
-        obj.updateMatrixWorld();
-        edges.updateMatrixWorld();
-        this.view.notifyChange(true);
-    }
-    this.view.notifyChange(true);
-};
-
-LayerManager.prototype._zplus = function zplus(a) {
+LayerManager.prototype._moveZ = function _moveZ(a) {
     if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
         var edges = _this.listLayers[0][1];
@@ -488,18 +752,6 @@ LayerManager.prototype._zplus = function zplus(a) {
     this.view.notifyChange(true);
 };
 
-LayerManager.prototype._zmoins = function _zmoins(a) {
-    if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
-        var obj = _this.listLayers[0][0];
-        var edges = _this.listLayers[0][1];
-        obj.translateZ(a);
-        edges.translateZ(a);
-        obj.updateMatrixWorld();
-        edges.updateMatrixWorld();
-        this.view.notifyChange(true);
-    }
-    this.view.notifyChange(true);
-};
 LayerManager.prototype.picking = function picking(event) {
     // Pick an object with batch id
     var mouse = _this.view.eventToNormalizedCoords(event);
@@ -510,7 +762,7 @@ LayerManager.prototype.picking = function picking(event) {
     if (intersects.length > 0) {
         var source = getParent(intersects[0].object);
         if (source.name != 'globe' && source.name != '') {
-            _this.layerFolder.__controllers.forEach((element) => {
+            folders.layerFolder.__controllers.forEach((element) => {
                 if (element.__checkbox && element.object.Name == source.name.split('_')[0]) element.setValue(!element.__prev);
                 return element;
             });
@@ -522,7 +774,7 @@ LayerManager.prototype.picking = function picking(event) {
 
 function createBati3dBtn() {
     _this.loader.loadBati3D();
-    _this.bati3dBtn = _this.menu.gui.add({ bati3D: () => {
+    buttons.bati3dBtn = _this.menu.gui.add({ bati3D: () => {
         var bati3D_faces = _this.view.scene.getObjectByName('bati3D_faces');
         var bati3D_lines = _this.view.scene.getObjectByName('bati3D_lines');
         if (bati3D_faces != undefined && bati3D_lines != undefined) {
@@ -530,14 +782,14 @@ function createBati3dBtn() {
             _this.loader.checked = true;
             var model = [bati3D_faces, bati3D_lines];
             _this.handleLayer(model);
-            _this.menu.gui.remove(_this.bati3dBtn);
+            _this.menu.gui.remove(buttons.bati3dBtn);
         }
     },
     }, 'bati3D').name('Load Bati3D');
 }
 
 function createBdTopoBtn() {
-    _this.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
+    buttons.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
         if (!_this.loader.bDTopoLoaded) {
             _this.loader.loadBDTopo();
         }
@@ -549,7 +801,7 @@ function createBdTopoBtn() {
         } else {
             b[0].visible = true;
             _this.loader.bdTopoVisibility = true;
-            _this.menu.gui.remove(_this.bdTopoBtn);
+            _this.menu.gui.remove(buttons.bdTopoBtn);
             _this.handleBdTopo();
         }
         // }
@@ -600,6 +852,19 @@ function manageCamera() {
     });
 }
 
+function getQuadsByName(layerName) {
+    var quadGroup = _this.view.scene.getObjectByName('quads');
+    var quad = null;
+    if (quadGroup != null) {
+        quadGroup.children.forEach((child) => {
+            if (child.name === 'quads_'.concat(layerName)) {
+                quad = child;
+            }
+        });
+    }
+    return quad;
+}
+
 function getParent(obj) {
     if (obj.parent.parent != null) return getParent(obj.parent);
     return obj;
@@ -614,8 +879,12 @@ function removeFromList(list, elmt) {
 
 function loadFileException(message) {
     this.message = message;
-    this.name = 'loadFileException';
+    this.name = 'LoadFileException';
 }
 
+function layerException(message) {
+    this.message = message;
+    this.name = 'LayerException';
+}
 
 export default LayerManager;

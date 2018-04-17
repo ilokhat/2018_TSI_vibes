@@ -7,6 +7,12 @@ var parts;
 var manager = itowns.LayerManager.prototype;
 var symbolizer = itowns.Symbolizer.prototype;
 
+var positionOnGlobe = { longitude: 2.396387, latitude: 48.848701, altitude: 2000 };
+var viewerDiv = document.createElement('viewerDiv');
+var globeView = new itowns.GlobeView(viewerDiv, positionOnGlobe);
+manager.coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 50);
+manager.view = globeView;
+
 var f = new File([''], 'filename.text', { type: 'text/plain' });
 
 describe('LayerManager._readFile()', function () {

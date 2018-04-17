@@ -1,3 +1,11 @@
+/**
+ * Edit On: april 2018
+ * Class: clipMap
+ * Description:  Part extracted from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
+ */
+
 import * as THREE from 'three';
 import dalleClasse from './dalleClasse';
 
