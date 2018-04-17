@@ -130,6 +130,7 @@ LayerManager.prototype._readFile = function readFile(file) {
                 this.light.position.copy(coordLight.as(this.view.referenceCrs).xyz());
                 this.light.position.y += 50;
                 this.plane.position.copy(newCRS.as(this.view.referenceCrs).xyz());
+                this.plane.visible = false;
                 this.plane.updateMatrixWorld();
                 this.light.updateMatrixWorld();
                 _this.loader._loadModel(layer[0], layer[1], newCRS, _this.rotateX, _this.rotateY, _this.rotateZ, _this.scale);

@@ -1,3 +1,11 @@
+/**
+ * Edit On: april 2018
+ * Class: dalleClasse
+ * Description:  Part extracted from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
+ */
+
 import * as THREE from 'three';
 import B3DLoader from './lib/B3DLoader';
 import Shader from './Shader';
@@ -69,8 +77,9 @@ dalleClasse.prototype.getLoDLevel = function getLoDLevel() {
     return this.LOBLevel.level;
 };
 
+// changed
 dalleClasse.prototype.showDalleInScene = function showDalleInScene() {
-    // Create mesh for each n material with BufferGeomtry and specific shader material
+    // Create mesh for all materials with BufferGeomtry
     var faces = this.geometry.faces;
     var faceVertexUvs = this.geometry.faceVertexUvs;
     var geom2 = new THREE.Geometry();
@@ -83,13 +92,17 @@ dalleClasse.prototype.showDalleInScene = function showDalleInScene() {
         geom2.faces.push(face);
         geom2.faceVertexUvs[0].push(faceUV);
     }
+    // create the final Geometry
     var bufferGeometry = BufferGeometryUtils.fromGeometry(geom2);
+    // new material for the mesh
     var mat = new THREE.MeshPhongMaterial({ color: 0x2194ce, emissive: 0xbb2727, specular: 0x111111, side: THREE.DoubleSide });
     mat.needsUpdate = true;
+    // creat the mesh and add it on the Group
     var mesh = new THREE.Mesh(bufferGeometry, mat);
     mesh.name = this.name;
     this.globalObject.add(mesh);
     this.globalObject.updateMatrixWorld();
+    // apply the callback function
     this.doAfter(this.globalObject, this.isLast, this.modelLoader);
 };
 

@@ -1,7 +1,13 @@
 /* eslint no-eval: 0 */
+
 /**
- * Tool to apply 3D stylization on a mesh
+ * Generated On: april 2018
+ * Class: Feature2MeshStyle
+ * Description: Tool to apply 3D stylization on a mesh
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
  */
+
 
 import * as THREE from 'three';
 // import savery from 'savery';
@@ -1799,6 +1805,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
         }
         if (this.light != null) {
             var lightFolder = parentFolder.addFolder('Light');
+            if (this.plane != null) { this._addShades(lightFolder); }
             this._addColorLight(lightFolder);
             this._addMoveLight(lightFolder);
         }
@@ -1815,7 +1822,6 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this.folder.open();
     this._addSaveAll(folder);
     this._addLoad(folder);
-    if (this.plane != null) this._addShades(folder);
     /*
     var positionFolder = folder.addFolder('Position');
     this._addResetPosition(positionFolder);
@@ -1838,6 +1844,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addShininessAll(facesFolder);
     if (this.light != null) {
         var lightFolder = folder.addFolder('Light');
+        if (this.plane != null) { this._addShades(lightFolder); }
         this._addColorLight(lightFolder);
         this._addMoveLight(lightFolder);
     }

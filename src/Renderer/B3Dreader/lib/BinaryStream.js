@@ -1,4 +1,10 @@
-
+/**
+ * Edit On: april 2018
+ * Class: BinaryStream
+ * Description:  Part extracted from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
+ */
 
 function BinaryStream(data, isBigEndian) {
     if (isBigEndian) throw new Error('BinaryStream constructor failed: Big endian is not supported yet!');
