@@ -1,3 +1,10 @@
+/**
+ * part extract from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
+ * no change
+ * project VIBES
+ * @class BinaryStream
+ */
+
 const Shader = {
     shaderBati3DVS: [
         '#ifdef GL_ES',

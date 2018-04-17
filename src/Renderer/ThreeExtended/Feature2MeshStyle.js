@@ -1,9 +1,11 @@
 /**
- * Feature2Mesh adapted for the BDTopo
- * modification avril 2018
- * projet VIBES
- * @class Feature2MeshStyle
+ * Generated On: april 2018
+ * Class: Feature2MeshStyle
+ * Description: Feature2Mesh adapted for the BDTopo
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
  */
+
 import * as THREE from 'three';
 import Earcut from 'earcut';
 
@@ -323,8 +325,49 @@ function featureCollectionToThree(featureCollection, options) {
 }
 
 export default {
-
+    /** @module Feature2MeshStyle */
+    /**
+     * Return a function to convert BDTopo features to THREE.Group
+     * @function convert
+     * @param {Object} options options for the conversion
+     * @example
+     * var options = {
+     *      altitude: ((properties) => return properties.z_min - properties.hauteur),
+     *      extrude: ((properties) => return properties.hauteur),
+     *      style: {
+     *          wall_faces: {
+     *              texture: null,
+     *              opacity: 1,
+     *              color: '#ffffff',
+     *              emissive: '#ffffff',
+     *              specular: '#ffffff',
+     *              shininess: 30,
+     *              textureRepetition: 1,
+     *          },
+     *          roof_faces: {
+     *              texture: null,
+     *              opacity: 1,
+     *              color: '#ffffff',
+     *              emissive: '#ffffff',
+     *              specular: '#ffffff',
+     *              shininess: 30,
+     *              textureRepetition: 1,
+     *          },
+     *          edges: {
+     *              color: '#ffffff',
+     *              opacity: 1,
+     *              width: 1,
+     *              style: 'Continuous',
+     *              gapSize: null,
+     *              dashSize: null,
+     *          },
+     *      },
+     * };
+     * var functionConvert = Feature2MeshStyle.convert(options);
+     * @returns {function} function to convert BDTopo features to THREE.Group
+     */
     convert(options = {}) {
+        if (!options.style) return;
         return function _convert(feature) {
             if (!feature) return;
             if (feature.geometries) {

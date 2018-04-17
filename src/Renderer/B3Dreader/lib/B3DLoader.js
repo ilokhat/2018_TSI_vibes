@@ -1,3 +1,10 @@
+/**
+ * Edit On: april 2018
+ * Class: B3DLoader
+ * Description:  Part extracted from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
+ */
 import * as THREE from 'three';
 import BinaryStream from './BinaryStream';
 import PlatformInfo from './PlatformInfo';

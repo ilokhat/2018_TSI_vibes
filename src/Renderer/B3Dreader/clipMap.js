@@ -1,3 +1,10 @@
+/**
+ * part extract from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
+ * no change
+ * project VIBES
+ * @class clipMap
+ */
+
 import * as THREE from 'three';
 import dalleClasse from './dalleClasse';
 

@@ -1,3 +1,10 @@
+/**
+ * Edit On: april 2018
+ * Class: BufferGeometryUtils
+ * Description:  Part extracted from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
+ */
 import * as THREE from 'three';
 import Coordinates from '../../../../Core/Geographic/Coordinates';
 
@@ -32,6 +39,8 @@ const BufferGeometryUtils = {
             var a = vertices[face.a];
             var b = vertices[face.b];
             var c = vertices[face.c];
+            // change: 'EPSG:2154' coordinates to 'EPSG:4978'
+            // and no change the coordinates order ((x, z, y) => (x, y, z))
             var coordA = new Coordinates('EPSG:2154', a.x, a.y, a.z).as('EPSG:4978');
             var coordB = new Coordinates('EPSG:2154', b.x, b.y, b.z).as('EPSG:4978');
             var coordC = new Coordinates('EPSG:2154', c.x, c.y, c.z).as('EPSG:4978');
@@ -44,7 +53,7 @@ const BufferGeometryUtils = {
             positions[i3 + 6] = coordC.x();
             positions[i3 + 7] = coordC.y();
             positions[i3 + 8] = coordC.z();
-            // normals
+            // change: normals
             normal[i3 + 0] = 0;
             normal[i3 + 1] = 0;
             normal[i3 + 2] = 1;

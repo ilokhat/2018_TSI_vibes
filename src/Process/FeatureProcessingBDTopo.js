@@ -1,7 +1,7 @@
 /**
  * FeatureProcessing adapted for a individual mesh style
- * modification avril 2018
- * projet VIBES
+ * edit on avril 2018
+ * project VIBES
  * @class FeatureProcessingBDTopo
  */
 import * as THREE from 'three';

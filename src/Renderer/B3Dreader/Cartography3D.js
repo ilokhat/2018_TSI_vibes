@@ -1,3 +1,10 @@
+/**
+ * part extract from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
+ * edit on april 2018
+ * project VIBES
+ * @class Cartography3D
+ */
+
 import * as THREE from 'three';
 import clipMap from './clipMap';
 
@@ -67,9 +74,11 @@ const Cartography3D = {
         this.modelLoader = modelLoader;
         _textureType = this.textureType;
         this.generateGrid();
+        // on parcour chaque case de la grille
         for (var i = 0; i < this.grid.length; i++) {
             for (var j = 0; j < this.grid[i].length; j++) {
                 var pos = new THREE.Vector3((i + bbox.xmin) * 500 + 250, 0, (j + bbox.ymin) * 500 + 250);
+                // si la donnée dans la zone de travail on charge la dalle
                 if (this.isDataAvailable(pos)) {
                     this.loadDallesAroundPosition(pos, (i == this.grid.length - 1 && j == this.grid[i].length - 1));
                     this.setInitStatus(true);

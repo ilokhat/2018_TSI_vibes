@@ -1,17 +1,10 @@
 /**
- * A loader for 3D model of diverse formats (obj, bati3D, flux WFS BDTopo)
- * modification avril 2018
- * projet VIBES
- * @author Adouni
- * @author Bouchaour
- * @author Grégoire
- * @author Mathelier
- * @author Nino
- * @author Ouhabi
- * @author Schlegel
- * @class ModelLoader
+ * Generated On: april 2018
+ * Class: ModelLoader
+ * Description: A loader for 3D model of diverse formats (obj, bati3D, flux WFS BDTopo)
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
  */
-
 import * as THREE from 'three';
 import Cartography3D from '../B3Dreader/Cartography3D';
 import Feature2MeshStyle from './Feature2MeshStyle';
@@ -19,9 +12,10 @@ import FeatureProcessingBDTopo from '../../Process/FeatureProcessingBDTopo';
 
 var _this;
 /**
- * Constructor
+ * A loader for 3D model of diverse formats (obj, bati3D, flux WFS BDTopo)
  *
- * @param {itowns.GlobeView} view where the loaded webject will be added
+ * @constructor
+ * @param {GlobeView} view where the loaded webject will be added
  */
 function ModelLoader(view) {
     // Constructor
@@ -67,7 +61,7 @@ function ModelLoader(view) {
  * loader for a '.obj' file
  *
  * @param {url} url url of the file
- * @param {itowns.Coordinates} coord place of the object on the scene
+ * @param {Coordinates} coord place of the object on the scene
  * @param {number} rotateX rotation of the object around the x-axis
  * @param {number} rotateY rotation of the object around the y-axis
  * @param {number} rotateZ rotation of the object around the z-axis
@@ -90,9 +84,10 @@ ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, r
 /**
  * check if the name single and make it single if needed
  *
- * @param {string} name to test
- * @param {itowns.GlobeView} view view where the name should be single
+ * @param {string} name name to test
+ * @param {GlobeView} view view where the name should be single
  * @return {string} name single name
+ * @memberOf ModelLoader
  */
 function controlName(name, view) {
     var i = 1;
@@ -116,7 +111,7 @@ function controlName(name, view) {
  *
  * @param {THREE.Group} obj THREE.Group of THREE.Mesh contains the object faces
  * @param {THREE.Group} lines THREE.Group where the object lines will be stored
- * @param {itowns.Coordinates} coord place of the object on the scene
+ * @param {Coordinates} coord place of the object on the scene
  * @param {number} rotateX rotation of the object around the x-axis
  * @param {number} rotateY rotation of the object around the y-axis
  * @param {number} rotateZ rotation of the object around the z-axis
@@ -168,7 +163,7 @@ ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX
  * apply rotations and scaling on a group and geolocalize it
  *
  * @param {THREE.Group} obj THREE.Group to which we want to apply the parameters
- * @param {itowns.Coordinates} coord place of the object on the scene
+ * @param {Coordinates} coord place of the object on the scene
  * @param {number} rotateX rotation of the object around the x-axis
  * @param {number} rotateY rotation of the object around the y-axis
  * @param {number} rotateZ rotation of the object around the z-axis
@@ -268,6 +263,7 @@ ModelLoader.prototype._setVisibility = function _setVisibility(self, v) {
  *
  * @param {Object} properties building properties
  * @returns {number} building's altitude
+ * @memberOf ModelLoader
  */
 function altitudeBuildings(properties) {
     return properties.z_min - properties.hauteur;
@@ -278,6 +274,7 @@ function altitudeBuildings(properties) {
  *
  * @param {Object} properties building properties
  * @returns {number} building's height
+ * @memberOf ModelLoader
  */
 function extrudeBuildings(properties) {
     return properties.hauteur;
@@ -288,6 +285,7 @@ function extrudeBuildings(properties) {
  *
  * @param {Object} properties
  * @returns {boolean} if the feature is accepted or not
+ * @memberOf ModelLoader
  */
 function acceptFeature(properties) {
     return !!properties.hauteur;
