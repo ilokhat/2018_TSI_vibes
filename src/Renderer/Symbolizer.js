@@ -17,7 +17,19 @@ import Fetcher from '../Core/Scheduler/Providers/Fetcher';
 var saveData;
 
 // Classe Symbolizer
-
+/**
+ * @constructor
+ * @param {GlobeView} view GlobeView where the element are
+ * @param {THREE.Group[]} obj list of faces
+ * @param {THREE.Group[]} edges list of edges (same order than obj)
+ * @param {ModelLoader} bdTopo if stilize BDTopo
+ * @param {GuiTools} menu menu use for the simbolization
+ * @param {number} nb symbolizer id number
+ * @param {THREE.PointLight} light light for the scene
+ * @param {THREE.Mesh} plane plan for the shadow
+ * @param {THREE.Group} quads quads use for the skechy edges
+ * @param {function} saveDataInit function to initialise the save function
+ */
 function Symbolizer(view, obj, edges, bdTopo, menu, nb, light, plane, quads, saveDataInit) {
     // Constructor
     this.obj = obj;
@@ -38,11 +50,17 @@ function Symbolizer(view, obj, edges, bdTopo, menu, nb, light, plane, quads, sav
 
 // ******************** SAVING AND LOADING FUNCTIONALITIES ********************
 
+/**
+ * Apply one style to the object
+ * @param {Object} [style] style to apply (format .vibes)
+ * @param {Dat.gui.Folder} [folder] folder of the symbolyzer
+ */
 Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = null) {
     var i;
     var j;
     var k;
     var h;
+    /* for part style */
     if (style && style.faces[0].name) {
         // Update GUI
         var count = 0;
@@ -58,6 +76,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
                 folder.__folders.Faces.__folders[k].__controllers[4].setValue(style.faces[count].emissive);
                 folder.__folders.Faces.__folders[k].__controllers[5].setValue(style.faces[count].specular);
                 folder.__folders.Faces.__folders[k].__controllers[6].setValue(style.faces[count].shininess);
+                /* TODO: uptate for the Texture */
                 /*
                 if (style.faces[count].texture != null) {
                     this._addTextureRepetition(count, folder.__folders.Faces.__folders[k]);
@@ -68,9 +87,12 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
             count++;
         }
         // Apply given style to each child
+        this._changeOpacityEdge(style.edges.opacity);
+        this._changeColorEdge(style.edges.color);
+        this._changeWidthEdge(style.edges.width);
+        this._changeStyleEdge(style.edges.style, folder.__folders.Edges);
         if (this.edges.length > 0) {
             // Edges
-            this._changeStyleEdge(style.edges.style, folder.__folders.Edges);
             // Speficic sketchy parameters
             if (style.edges.style === 'Sketchy') {
                 this._createSketchyMaterial(style.edges.stroke, style.edges.color, style.edges.sketchyWidth, style.edges.threshold);
@@ -79,13 +101,6 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
             if (style.edges.style === 'Dashed') {
                 this._changeDashSize(style.edges.dashSize);
                 this._changeGapSize(style.edges.gapSize);
-            }
-            for (i = 0; i < this.edges.length; i++) {
-                for (j = 0; j < this.edges[i].children.length; j++) {
-                    this._changeOpacityEdge(style.edges.opacity, i, j);
-                    this._changeColorEdge(style.edges.color, i, j);
-                    this._changeWidthEdge(style.edges.width, i, j);
-                }
             }
             // Faces
             for (j = 0; j < this.obj[0].children.length; j++) {
@@ -116,11 +131,6 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
         if (this.bdTopo) {
             h = 0;
             while (h < style.faces.length) {
-                // BDTopo Edges
-                this._changeOpacityEdge(style.edges.opacity, -10, 0);
-                this._changeColorEdge(style.edges.color, -10, 0);
-                this._changeWidthEdge(style.edges.width, -10, 0);
-                this._changeStyleEdge(style.edges.style, folder.__folders.Edges);
                 // BDTopo Faces
                 if (style.faces[h].name == 'wall_faces') {
                     this._changeOpacity(style.faces[h].opacity, -10, 0);
@@ -141,6 +151,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
             }
         }
     }
+    /* for the global style */
     else if (style && style.faces.length == 1) {
         // Update GUI
         folder.__folders.Edges.__controllers[0].setValue(style.edges.color);
@@ -153,31 +164,28 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
         folder.__folders.Faces.__controllers[2].setValue(style.faces[0].emissive);
         folder.__folders.Faces.__controllers[3].setValue(style.faces[0].specular);
         folder.__folders.Faces.__controllers[4].setValue(style.faces[0].shininess);
+        /* TODO: uptate for the Texture */
         /*
         if (style.faces[0].texture != null) {
             this._addTextureRepetitionAll(folder.__folders.Faces);
             folder.__folders.Faces.__controllers[6].setValue(style.faces[0].textureRepeat);
         }
         */
+        this._changeOpacityEdge(style.edges.opacity);
+        this._changeColorEdge(style.edges.color);
+        this._changeWidthEdge(style.edges.width);
+        this._changeStyleEdge(style.edges.style, folder.__folders.Edges);
+        // Specific dashed parameters
+        if (style.edges.style === 'Dashed') {
+            this._changeGapSize(style.edges.gapSize);
+            this._changeDashSize(style.edges.dashSize);
+        }
         // Apply given style to all children
         if (this.edges.length > 0) {
             // Edges
-            this._changeStyleEdge(style.edges.style, folder.__folders.Edges);
             // Speficic sketchy parameters
             if (style.edges.style === 'Sketchy') {
                 this._createSketchyMaterial(style.edges.stroke, style.edges.color, style.edges.sketchyWidth, style.edges.threshold);
-            }
-            // Specific dashed parameters
-            if (style.edges.style === 'Dashed') {
-                this._changeDashSize(style.edges.dashSize);
-                this._changeGapSize(style.edges.gapSize);
-            }
-            for (i = 0; i < this.edges.length; i++) {
-                for (j = 0; j < this.edges[i].children.length; j++) {
-                    this._changeOpacityEdge(style.edges.opacity, i, j);
-                    this._changeColorEdge(style.edges.color, i, j);
-                    this._changeWidthEdge(style.edges.width, i, j);
-                }
             }
             // Faces
             for (i = 0; i < this.obj.length; i++) {
@@ -199,15 +207,6 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
             }
         }
         if (this.bdTopo) {
-            // BDTopo Edges
-            this._changeOpacityEdge(style.edges.opacity, -10, 0);
-            this._changeColorEdge(style.edges.color, -10, 0);
-            this._changeWidthEdge(style.edges.width, -10, 0);
-            this._changeStyleEdge(style.edges.style, folder.__folders.Edges);
-            if (style.edges.style === 'Dashed') {
-                this._changeGapSize(style.edges.gapSize);
-                this._changeDashSize(style.edges.dashSize);
-            }
             // BDTopo Faces
             this._changeOpacity(style.faces[0].opacity, -10, 0);
             this._changeColor(style.faces[0].color, -10, 0);
@@ -224,7 +223,15 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
         }
     }
 };
+
+/**
+ * Apply a style on a particular part
+ * @param {Object} style style to apply (type .vibe)
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for the part 'j'
+ * @param {number} j part position
+ */
 Symbolizer.prototype.applyStylePart = function applyStylePart(style, folder, j) {
+    // update controllers
     folder.__controllers[2].setValue(style.faces[0].opacity);
     folder.__controllers[3].setValue(style.faces[0].color);
     folder.__controllers[4].setValue(style.faces[0].emissive);
@@ -239,7 +246,7 @@ Symbolizer.prototype.applyStylePart = function applyStylePart(style, folder, j) 
             this._changeSpecular(style.faces[0].specular, i, j);
             this._changeShininess(style.faces[0].shininess, i, j);
         }
-        if (style.faces[0].texture != null) {
+        if (style.faces[0].texture != './textures/') {
             this._changeTexture(style.faces[0].texture, j, folder);
             this._changeTextureRepetition(style.faces[0].textureRepeat, j);
         }
@@ -259,12 +266,21 @@ Symbolizer.prototype.applyStylePart = function applyStylePart(style, folder, j) 
     }
 };
 
+/**
+ * reader for the '.vibes'
+ * @param {File} file
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * @param {number} [j] optional part number to apply the style file
+ * @returns {number} return 0 is the the read no fail
+ */
 Symbolizer.prototype._readVibes = function readVibes(file, folder, j = -100) {
     var reader = new FileReader();
     if (file.name.endsWith('.vibes')) {
         if (j == -100) {
+            // apply for all object
             reader.addEventListener('load', () => this.applyStyle(JSON.parse(reader.result), folder), false);
         } else {
+            // apply to one part of an object
             reader.addEventListener('load', () => this.applyStylePart(JSON.parse(reader.result), folder, j), false);
         }
         reader.readAsText(file);
@@ -274,6 +290,9 @@ Symbolizer.prototype._readVibes = function readVibes(file, folder, j = -100) {
     }
 };
 
+/**
+ * save the style apply for each part
+ */
 Symbolizer.prototype._saveVibes = function saveVibes() {
     // Initiate stylesheet with edge style and an empty list for face style
     var vibes;
@@ -398,6 +417,10 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
     saveData(vibes, name.concat('_partie.vibes'));
 };
 
+/**
+ * save the style apply overall
+ * @param {number} [target=0] part position for the reference style
+ */
 Symbolizer.prototype._saveVibesAll = function saveVibesAll(target = 0) {
     var vibes;
     var name;
@@ -480,17 +503,21 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll(target = 0) {
             ],
         };
     }
-    // var blob = new Blob([JSON.stringify(vibes)], { type: 'text/plain;charset=utf-8' });
-    // FILE_SAVER.saveAs(blob, name.concat('_globale.vibes'));
     saveData(vibes, name.concat('_globale.vibes'));
 };
 
-
+/**
+ * Add the save button for each part'.vibes' and '.gibes'
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ */
 Symbolizer.prototype._addSave = function addSave(folder) {
     folder.add({ save: () => this._saveVibes() }, 'save').name('Save style');
     folder.add({ saveGibe: () => this._saveGibesAll() }, 'saveGibe').name('Save position');
 };
-
+/**
+ * Add the load button for the '.vibes'
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ */
 Symbolizer.prototype._addLoad = function addLoad(folder) {
     folder.add({ load: () => {
         var button = document.createElement('input');
@@ -500,10 +527,20 @@ Symbolizer.prototype._addLoad = function addLoad(folder) {
     } }, 'load').name('Load style');
 };
 
+/**
+ * Add the save button for the '.gibes' and  the global style '.vibes'
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ */
 Symbolizer.prototype._addSaveAll = function addSave(folder) {
     folder.add({ save: () => this._saveVibesAll() }, 'save').name('Save style');
     folder.add({ saveGibe: () => this._saveGibesAll() }, 'saveGibe').name('Save position');
 };
+
+/**
+ * Add the save and load '.vibes' button for one part style
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * @param {number} j part position
+ */
 Symbolizer.prototype._addSaveLoadPart = function addSaveLoadPart(folder, j) {
     folder.add({ save: () => this._saveVibesAll(j) }, 'save').name('Save part style');
     folder.add({ load: () => {
@@ -518,13 +555,19 @@ Symbolizer.prototype._addSaveLoadPart = function addSaveLoadPart(folder, j) {
 
 // *** EDGE OPACITY ***
 
-Symbolizer.prototype._changeOpacityEdge = function changeOpacityEdge(value, i, j) {
+/**
+ * change the edges opacity
+ * @param {number} value opacity value
+ */
+Symbolizer.prototype._changeOpacityEdge = function changeOpacityEdge(value) {
     // Update edge opacity with selected value
-    if (i >= 0) {
-        this.edges[i].children[j].material.opacity = value;
-        this.edges[i].children[j].material.needsUpdate = true;
-        this.view.notifyChange(true);
+    for (var i = 0; i < this.edges.length; i++) {
+        for (var j = 0; j < this.edges[i].children.length; j++) {
+            this.edges[i].children[j].material.opacity = value;
+            this.edges[i].children[j].material.needsUpdate = true;
+        }
     }
+    this.view.notifyChange(true);
     if (this.bdTopo) {
         var f = (parent) => {
             for (var i = 0; i < parent.children.length; i++) {
@@ -540,40 +583,37 @@ Symbolizer.prototype._changeOpacityEdge = function changeOpacityEdge(value, i, j
     }
 };
 
+/**
+ * add the edges opacity menu controller
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ */
 Symbolizer.prototype._addOpacityEdgeAll = function addOpacityEdgeAll(folder) {
     var initialOpacity;
     if (this.edges.length > 0) {
         initialOpacity = this.edges[0].children[0].material.opacity;
-        folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Edge opacity').onChange((value) => {
-            for (var i = 0; i < this.edges.length; i++) {
-                for (var j = 0; j < this.edges[i].children.length; j++) {
-                    this._changeOpacityEdge(value, i, j);
-                }
-            }
-            if (this.bdTopo) {
-                this._changeOpacityEdge(value, -10, 0);
-                this._changeOpacityEdge(value, -10, 1);
-            }
-        });
-    }
-    else if (this.bdTopo) {
+    } else if (this.bdTopo) {
         initialOpacity = this.bdTopoStyle.edges.opacity;
-        folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Edge opacity').onChange((value) => {
-            this._changeOpacityEdge(value, -10, 0);
-            this._changeOpacityEdge(value, -10, 1);
-        });
     }
+    folder.add({ opacity: initialOpacity }, 'opacity', 0, 1).name('Edge opacity').onChange((value) => {
+        this._changeOpacityEdge(value);
+    });
 };
 
 // *** EDGE COLOR ***
 
-Symbolizer.prototype._changeColorEdge = function changeColorEdge(value, i, j) {
+/**
+ * change the edges color
+ * @param {HexColor} value color value
+ */
+Symbolizer.prototype._changeColorEdge = function changeColorEdge(value) {
     // Update edge color with selected value
-    if (i >= 0) {
-        this.edges[i].children[j].material.color = new THREE.Color(value);
-        this.edges[i].children[j].material.needsUpdate = true;
-        this.view.notifyChange(true);
+    for (var i = 0; i < this.edges.length; i++) {
+        for (var j = 0; j < this.edges[i].children.length; j++) {
+            this.edges[i].children[j].material.color = new THREE.Color(value);
+            this.edges[i].children[j].material.needsUpdate = true;
+        }
     }
+    this.view.notifyChange(true);
     if (this.bdTopo) {
         var f = (parent) => {
             for (var i = 0; i < parent.children.length; i++) {
@@ -587,41 +627,37 @@ Symbolizer.prototype._changeColorEdge = function changeColorEdge(value, i, j) {
         this.bdTopo(f);
     }
 };
-
+/**
+ * add the edges color menu controller
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ */
 Symbolizer.prototype._addColorEdgeAll = function addColorEdgeAll(folder) {
     var initialColor;
     if (this.edges.length > 0) {
         initialColor = '#'.concat(this.edges[0].children[0].material.color.getHexString());
-        folder.addColor({ color: initialColor }, 'color').name('Edge color').onChange((value) => {
-            for (var i = 0; i < this.edges.length; i++) {
-                for (var j = 0; j < this.edges[i].children.length; j++) {
-                    this._changeColorEdge(value, i, j);
-                }
-            }
-            if (this.bdTopo) {
-                this._changeColorEdge(value, -10, 0);
-                this._changeColorEdge(value, -10, 1);
-            }
-        });
-    }
-    else if (this.bdTopo) {
+    } else if (this.bdTopo) {
         initialColor = this.bdTopoStyle.edges.color;
-        folder.addColor({ color: initialColor }, 'color').name('Edge color').onChange((value) => {
-            this._changeColorEdge(value, -10, 0);
-            this._changeColorEdge(value, -10, 1);
-        });
     }
+    folder.addColor({ color: initialColor }, 'color').name('Edge color').onChange((value) => {
+        this._changeColorEdge(value);
+    });
 };
 
 // *** EDGE WIDTH ***
 
-Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, i, j) {
+/**
+ * change the edges width
+ * @param {number} value width value
+ */
+Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value) {
     // Update edge width with selected value
-    if (i >= 0) {
-        this.edges[i].children[j].material.linewidth = value;
-        this.edges[i].children[j].material.needsUpdate = true;
-        this.view.notifyChange(true);
+    for (var i = 0; i < this.edges.length; i++) {
+        for (var j = 0; j < this.edges[i].children.length; j++) {
+            this.edges[i].children[j].material.linewidth = value;
+            this.edges[i].children[j].material.needsUpdate = true;
+        }
     }
+    this.view.notifyChange(true);
     if (this.bdTopo) {
         var f2 = (parent) => {
             for (var j = 0; j < parent.children.length; j++) {
@@ -636,33 +672,29 @@ Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value, i, j) {
     }
 };
 
+/**
+ * add the edges width menu controller
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ */
 Symbolizer.prototype._addWidthEdgeAll = function addWidthEdgeAll(folder) {
     var initialWidth;
     if (this.edges.length > 0) {
         initialWidth = this.edges[0].children[0].material.linewidth;
-        folder.add({ width: initialWidth }, 'width', 0, 5).name('Edge width').onChange((value) => {
-            for (var i = 0; i < this.edges.length; i++) {
-                for (var j = 0; j < this.edges[i].children.length; j++) {
-                    this._changeWidthEdge(value, i, j);
-                }
-            }
-            if (this.bdTopo) {
-                this._changeWidthEdge(value, -10, 0);
-                this._changeWidthEdge(value, -10, 1);
-            }
-        });
     }
     else if (this.bdTopo) {
         initialWidth = this.bdTopoStyle.edges.width;
-        folder.add({ width: initialWidth }, 'width', 0, 5).name('Edge width').onChange((value) => {
-            this._changeWidthEdge(value, -10, 0);
-            this._changeWidthEdge(value, -10, 1);
-        });
     }
+    folder.add({ width: initialWidth }, 'width', 0, 5).name('Edge width').onChange((value) => {
+        this._changeWidthEdge(value);
+    });
 };
 
 // *** EDGE STYLE (continuous, dashed, sketchy) ***
 
+/**
+ * change the edges dash size
+ * @param {number} value dash size value
+ */
 Symbolizer.prototype._changeDashSize = function changeDashSize(value) {
     var i;
     var j;
@@ -689,6 +721,10 @@ Symbolizer.prototype._changeDashSize = function changeDashSize(value) {
     }
 };
 
+/**
+ * change the edges dash gap size
+ * @param {number} value dash gap size value
+ */
 Symbolizer.prototype._changeGapSize = function changeGapSize(value) {
     var i;
     var j;
@@ -715,9 +751,12 @@ Symbolizer.prototype._changeGapSize = function changeGapSize(value) {
     }
 };
 
+/**
+ * add the edges line style menu controllers
+ * @param {string} value line type ['Sketchy'|'Dashed'|'Continuous']
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ */
 Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, folder) {
-    var i;
-    var j;
     var k;
     // Create or remove specific controllers according to the style chosen (sketchy, dashed, continuous)
     if (value === 'Sketchy') {
@@ -762,8 +801,7 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
                 this._createSketchyMaterial(stroke, color, width, threshold);
                 // Keeps the normal behavior with BD Topo
                 if (this.bdTopo) {
-                    this._changeColorEdge(color, -10, 0);
-                    this._changeColorEdge(color, -10, 1);
+                    this._changeColorEdge(color);
                 }
             });
             // Adapt width controller to sketchy edge
@@ -800,28 +838,12 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
         }
         // Readapt color and width controller to classic edge (continuous or dashed)
         folder.__controllers[0].onChange((value) => {
-            for (i = 0; i < this.edges.length; i++) {
-                for (j = 0; j < this.edges[i].children.length; j++) {
-                    this._changeColorEdge(value, i, j);
-                }
-            }
-            if (this.bdTopo) {
-                this._changeColorEdge(value, -10, 0);
-                this._changeColorEdge(value, -10, 1);
-            }
+            this._changeColorEdge(value);
         });
         folder.__controllers[2].__min = 0.0;
         folder.__controllers[2].__max = 5.0;
         folder.__controllers[2].onChange((value) => {
-            for (i = 0; i < this.edges.length; i++) {
-                for (j = 0; j < this.edges[i].children.length; j++) {
-                    this._changeWidthEdge(value, i, j);
-                }
-            }
-            if (this.bdTopo) {
-                this._changeWidthEdge(value, -10, 0);
-                this._changeWidthEdge(value, -10, 1);
-            }
+            this._changeWidthEdge(value);
         });
         if (value === 'Dashed') {
             // Checks if dash size and gap size controllers already exist
@@ -855,6 +877,11 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
     }
 };
 
+/**
+ * change the edges line style
+ * @param {string} value line type ['Sketchy'|'Dashed'|'Continuous']
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ */
 Symbolizer.prototype._changeStyleEdge = function changeStyleEdge(value, folder) {
     var oldOpacity;
     var oldColor;
@@ -967,6 +994,13 @@ Symbolizer.prototype._changeStyleEdge = function changeStyleEdge(value, folder) 
     this._addStyleEdgeParams(value, folder);
 };
 
+/**
+ * create the sketchy material
+ * @param {string} stroke sketchy image name
+ * @param {HexColor} color edge color
+ * @param {number} width ???
+ * @param {number} threshold limit width between the small and normal image apply
+ */
 Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(stroke, color, width, threshold) {
     // Initializations
     var texture1;
@@ -1138,6 +1172,10 @@ Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(str
     this.view.notifyChange(true);
 };
 
+/**
+ * add the edges line style menu controller
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ */
 Symbolizer.prototype._addStyleEdgeAll = function addStyleEdgeAll(folder) {
     folder.add({ style: 'Continuous' }, 'style', ['Continous', 'Dashed', 'Sketchy']).name('Edge style').onChange((value) => {
         this._changeStyleEdge(value, folder);
@@ -1148,6 +1186,12 @@ Symbolizer.prototype._addStyleEdgeAll = function addStyleEdgeAll(folder) {
 
 // *** OPACITY ***
 
+/**
+ * change the face opacity
+ * @param {number} value face opacity value
+ * @param {number} i object place
+ * @param {number} j sub-object place
+ */
 Symbolizer.prototype._changeOpacity = function changeOpacity(value, i, j) {
     // Update opacity with selected value
     if (i >= 0) {
@@ -1168,7 +1212,11 @@ Symbolizer.prototype._changeOpacity = function changeOpacity(value, i, j) {
         this.bdTopo(f);
     }
 };
-
+/**
+ * add the face opacity menu controller for one part
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ * @param {number} j sub-object place
+ */
 Symbolizer.prototype._addOpacity = function addOpacity(folder, j) {
     var initialOpacity;
     if (this.obj.length > 0 && j >= 0) {
@@ -1189,7 +1237,10 @@ Symbolizer.prototype._addOpacity = function addOpacity(folder, j) {
         });
     }
 };
-
+/**
+ * add the face opacity menu controller for overall
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ */
 Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
     var initialOpacity;
     if (this.obj.length > 0) {
@@ -1217,6 +1268,12 @@ Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
 
 // *** COLOR (color, emissive, specular) ***
 
+/**
+ * change the face color
+ * @param {HexColor} value face color value
+ * @param {number} i object place
+ * @param {number} j sub-object place
+ */
 Symbolizer.prototype._changeColor = function changeColor(value, i, j) {
     // Update color with selected value
     if (i >= 0) {
@@ -1238,6 +1295,11 @@ Symbolizer.prototype._changeColor = function changeColor(value, i, j) {
     }
 };
 
+/**
+ * add the face color menu controller for one part
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ * @param {number} j sub-object place
+ */
 Symbolizer.prototype._addColor = function addColor(folder, j) {
     var initialColor;
     if (this.obj.length > 0 && j >= 0) {
@@ -1257,6 +1319,10 @@ Symbolizer.prototype._addColor = function addColor(folder, j) {
     }
 };
 
+/**
+ * add the face color menu controller for overall
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ */
 Symbolizer.prototype._addColorAll = function addColorAll(folder) {
     var initialColor;
     if (this.obj.length > 0) {
@@ -1279,6 +1345,12 @@ Symbolizer.prototype._addColorAll = function addColorAll(folder) {
     }
 };
 
+/**
+ * change the face emissive color
+ * @param {HexColor} value face emissive color value
+ * @param {number} i object place
+ * @param {number} j sub-object place
+ */
 Symbolizer.prototype._changeEmissive = function changeEmissive(value, i, j) {
     // Update edge width with selected value
     if (i >= 0) {
@@ -1300,6 +1372,11 @@ Symbolizer.prototype._changeEmissive = function changeEmissive(value, i, j) {
     }
 };
 
+/**
+ * add the face emissive color menu controller for one part
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ * @param {number} j sub-object place
+ */
 Symbolizer.prototype._addEmissive = function addEmissive(folder, j) {
     var initialEmissive;
     if (this.obj.length > 0 && j >= 0) {
@@ -1319,6 +1396,10 @@ Symbolizer.prototype._addEmissive = function addEmissive(folder, j) {
     }
 };
 
+/**
+ * add the face emissive color menu controller for overall
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ */
 Symbolizer.prototype._addEmissiveAll = function addEmissiveAll(folder) {
     var initialEmissive;
     if (this.obj.length > 0) {
@@ -1341,6 +1422,12 @@ Symbolizer.prototype._addEmissiveAll = function addEmissiveAll(folder) {
     }
 };
 
+/**
+ * change the face specular color
+ * @param {HexColor} value face specular color value
+ * @param {number} i object place
+ * @param {number} j sub-object place
+ */
 Symbolizer.prototype._changeSpecular = function changeSpecular(value, i, j) {
     // Update specular with selected value
     if (i >= 0) {
@@ -1362,6 +1449,11 @@ Symbolizer.prototype._changeSpecular = function changeSpecular(value, i, j) {
     }
 };
 
+/**
+ * add the face specular color menu controller for one part
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ * @param {number} j sub-object place
+ */
 Symbolizer.prototype._addSpecular = function addSpecular(folder, j) {
     var initialSpecular;
     if (this.obj.length > 0 && j >= 0) {
@@ -1382,6 +1474,10 @@ Symbolizer.prototype._addSpecular = function addSpecular(folder, j) {
     }
 };
 
+/**
+ * add the face specular color menu controller for overall
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ */
 Symbolizer.prototype._addSpecularAll = function addSpecularAll(folder) {
     var initialSpecular;
     if (this.obj.length > 0) {
@@ -1406,6 +1502,12 @@ Symbolizer.prototype._addSpecularAll = function addSpecularAll(folder) {
 
 // *** SHININESS ***
 
+/**
+ * change the face shininess
+ * @param {number} value face shininess value
+ * @param {number} i object place
+ * @param {number} j sub-object place
+ */
 Symbolizer.prototype._changeShininess = function changeShininess(value, i, j) {
     // Update shininess with selected value
     if (i >= 0) {
@@ -1427,6 +1529,11 @@ Symbolizer.prototype._changeShininess = function changeShininess(value, i, j) {
     }
 };
 
+/**
+ * add the face shininess menu controller for one part
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ * @param {number} j sub-object place
+ */
 Symbolizer.prototype._addShininess = function addShininess(folder, j) {
     var initialShininess;
     if (this.obj.length > 0 && j >= 0) {
@@ -1446,7 +1553,10 @@ Symbolizer.prototype._addShininess = function addShininess(folder, j) {
         });
     }
 };
-
+/**
+ * add the face shininess menu controller for overall
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ */
 Symbolizer.prototype._addShininessAll = function addShininessAll(folder) {
     var initialShininess;
     if (this.obj.length > 0) {
@@ -1471,6 +1581,11 @@ Symbolizer.prototype._addShininessAll = function addShininessAll(folder) {
 
 // *** FACE TEXTURATION ***
 
+/**
+ * change the face texture reapeatition
+ * @param {number} value face texture reapeatition value
+ * @param {number} m sub-object place or -1 for all
+ */
 Symbolizer.prototype._changeTextureRepetition = function _changeTextureRepetition(value, m) {
     var i;
     var j;
@@ -1503,6 +1618,11 @@ Symbolizer.prototype._changeTextureRepetition = function _changeTextureRepetitio
     }
 };
 
+/**
+ * add the face texture reapeatition menu controller for one part
+ * @param {number} j sub-object place
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ */
 Symbolizer.prototype._addTextureRepetition = function addTextureRepetition(j, folder) {
     // Checks if a texture repetition controller already exists
     var isTextured = false;
@@ -1525,6 +1645,12 @@ Symbolizer.prototype._addTextureRepetition = function addTextureRepetition(j, fo
     }
 };
 
+/**
+ * change the face texture for one part
+ * @param {string} chemin face texture value
+ * @param {number} j sub-object place
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ */
 Symbolizer.prototype._changeTexture = function changeTexture(chemin, j, folder) {
     var i;
     var k;
@@ -1603,6 +1729,10 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, j, folder) 
     }
 };
 
+/**
+ * add the face texture repetition menu controller for overall
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ */
 Symbolizer.prototype._addTextureRepetitionAll = function addTextureRepetitionAll(folder) {
     // Checks if a texture repetition controller already exists
     var isTextured = false;
@@ -1625,6 +1755,11 @@ Symbolizer.prototype._addTextureRepetitionAll = function addTextureRepetitionAll
     }
 };
 
+/**
+ * change the face texture for overall
+ * @param {string} chemin face texture value
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ */
 Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, folder) {
     var i;
     var j;
@@ -1709,22 +1844,26 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, folde
     }
 };
 
+/**
+ * add the face texture menu controller for one part
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ * @param {number} j sub-object place
+ */
 Symbolizer.prototype._addTexture = function addTexture(folder, j) {
     Fetcher.json('./textures/listeTexture.json').then((listTextures) => {
         if (listTextures) {
             listTextures[''] = '';
             folder.add({ texture: '' }, 'texture', listTextures).onChange((value) => {
-                if (this.obj.length > 0) {
-                    this._changeTexture('./textures/'.concat(value), j, folder);
-                }
-                if (this.bdTopo) {
-                    this._changeTexture('./textures/'.concat(value), 0, folder);
-                }
+                this._changeTexture('./textures/'.concat(value), j, folder);
             }).name('Texture');
         }
     });
 };
 
+/**
+ * add the face texture menu controller for overall
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for all parts
+ */
 Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
     Fetcher.json('./textures/listeTexture.json').then((listTextures) => {
         if (listTextures) {
@@ -1905,8 +2044,6 @@ Symbolizer.prototype._saveGibesAll = function saveGibesAll() {
             rotateZ: this.obj[0].rotation.z,
             scale: this.obj[0].scale.x,
         };
-        // var blob = new Blob([JSON.stringify(gibes)], { type: 'text/plain; charset=utf-8' });
-        // FILE_SAVER.saveAs(blob, this.obj[0].materialLibraries[0].substring(0, this.obj[0].materialLibraries[0].length - 4).concat('.gibes'));
         saveData(gibes, nameFile.concat('_globale.gibes'));
     }
 };
