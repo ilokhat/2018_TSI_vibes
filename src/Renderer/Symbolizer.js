@@ -482,7 +482,6 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll(target = 0) {
 
 Symbolizer.prototype._addSave = function addSave(folder) {
     folder.add({ save: () => this._saveVibes() }, 'save').name('Save style');
-    folder.add({ saveGibe: () => this._saveGibesAll() }, 'saveGibe').name('Save position');
 };
 
 Symbolizer.prototype._addLoad = function addLoad(folder) {
@@ -1754,12 +1753,14 @@ Symbolizer.prototype.initGui = function addToGUI() {
         this.folder.open();
         this._addSave(parentFolder);
         this._addLoad(parentFolder);
+        /*
         var positionFolder = parentFolder.addFolder('Position');
         this._addResetPosition(positionFolder);
         this._addRotationsAll(positionFolder);
         this._addScaleAll(positionFolder);
         this._addMoveobjcoordAll(positionFolder);
         this._addPositionAll(positionFolder);
+        */
         var edgesFolder = parentFolder.addFolder('Edges');
         this._addColorEdgeAll(edgesFolder);
         this._addOpacityEdgeAll(edgesFolder);
@@ -1815,12 +1816,14 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addSaveAll(folder);
     this._addLoad(folder);
     if (this.plane != null) this._addShades(folder);
+    /*
     var positionFolder = folder.addFolder('Position');
     this._addResetPosition(positionFolder);
     this._addRotationsAll(positionFolder);
     this._addScaleAll(positionFolder);
     this._addMoveobjcoordAll(positionFolder);
     this._addPositionAll(positionFolder);
+    */
     var edgesFolder = folder.addFolder('Edges');
     this._addColorEdgeAll(edgesFolder);
     this._addOpacityEdgeAll(edgesFolder);
@@ -1885,7 +1888,7 @@ Symbolizer.prototype._addShades = function addShades(folder) {
 };
 
 // ******************** GEOLOCATION ********************
-
+/*
 Symbolizer.prototype._saveGibesAll = function saveGibesAll() {
     if (this.obj.length > 0) {
         var nameFile = this.obj[0].name.split('_')[0];
@@ -1904,7 +1907,9 @@ Symbolizer.prototype._saveGibesAll = function saveGibesAll() {
         saveData(gibes, nameFile.concat('_globale.gibes'));
     }
 };
+*/
 
+/*
 Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
     if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
         // Get initial values
@@ -1959,7 +1964,9 @@ Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
         }, 'resetPosition').name('Reset position');
     }
 };
+*/
 
+/*
 Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
     if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
         // Initial GUI value
@@ -1986,7 +1993,9 @@ Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
         });
     }
 };
+*/
 
+/*
 Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
     if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
         var prevValueX = 0;
@@ -2054,7 +2063,9 @@ Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
         });
     }
 };
+*/
 
+/*
 Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
     if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
         // Initial GUI value
@@ -2126,7 +2137,9 @@ Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
         });
     }
 };
+*/
 
+/*
 Symbolizer.prototype._addPositionAll = function addPositionAll(folder) {
     if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
         // Initial GUI value
@@ -2158,7 +2171,9 @@ Symbolizer.prototype._addPositionAll = function addPositionAll(folder) {
         });
     }
 };
+*/
 
+/*
 Symbolizer.prototype._changeCoordinates = function changeCoordinates(vectCoord) {
     if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
         for (var i = 0; i < this.obj.length; i++) {
@@ -2179,6 +2194,8 @@ Symbolizer.prototype._changeCoordinates = function changeCoordinates(vectCoord) 
         this.view.notifyChange(true);
     }
 };
+*/
+
 
 /*
 function getRandomColor() {
