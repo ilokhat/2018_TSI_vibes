@@ -414,8 +414,6 @@ LayerManager.prototype._saveGibes = function saveGibes() {
             rotateZ: _this.listLayers[0][0].rotation.z,
             scale: _this.listLayers[0][0].scale.x,
         };
-        console.log(gibes);
-        console.log(saveData);
         saveData(gibes, nameFile.concat('.gibes'));
     }
 };
