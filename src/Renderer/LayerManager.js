@@ -354,7 +354,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
                 }, false);
                 button.click();
             },
-            }, 'symbolizer').name('MTL file');
+            }, 'symbolizer').name('Load MTL file');
 
             // Create controller to close the symbolizer
             deleteSymbolizerBtn = _this.menu.gui.add({ deleteSymbolizer: () => {
