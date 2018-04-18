@@ -103,6 +103,7 @@ LayerManager.prototype.documentDrop = function documentDrop(e) {
 /**
  * file reader for the droped file
  * @param {File} file droped file
+ * @returns {nomber} return 0
  */
 LayerManager.prototype._readFile = function readFile(file) {
     // Read the file dropped and actually load the object
@@ -351,6 +352,7 @@ LayerManager.prototype.initControllers = function initControllers() {
  * creat the symbolizer menu
  *
  * @param {boolean} complex if the symbolyzer is by part
+ * @returns {string} return the Symbolizer name
  */
 LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
     var i;
@@ -388,16 +390,16 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
                         materials.preload();
                         _this.loader.laodObj3d.setMaterials(materials);
                         listObj.forEach((layer) => {
-                        if (layer.name.split('_')[0] == button.files[0].name.split('.')[0]) {
-                            layer.children.forEach((child) => {
-                                if (materials.materials[child.name] != undefined) {
-                                    child.material = _this.loader.laodObj3d.materials.materials[child.name];
-                                   _this.symbolizerInit.applyStyle(child.material, _this.symbolizerInit.menu.gui.__folders['Symbolizer '.concat(_this.nbSymbolizer)]);                                      
-                                }
-                            });
-                            _this.view.notifyChange(true);
-                        }
-                    });
+                            if (layer.name.split('_')[0] == button.files[0].name.split('.')[0]) {
+                                layer.children.forEach((child) => {
+                                    if (materials.materials[child.name] != undefined) {
+                                        child.material = _this.loader.laodObj3d.materials.materials[child.name];
+                                        _this.symbolizerInit.applyStyle(child.material, _this.symbolizerInit.menu.gui.__folders['Symbolizer '.concat(_this.nbSymbolizer)]);
+                                    }
+                                });
+                                _this.view.notifyChange(true);
+                            }
+                        });
                     });
                 }, false);
                 button.click();
@@ -479,7 +481,7 @@ LayerManager.prototype._cleanGUI = function cleanGUI() {
 
 // ******************** GEOLOCATION ********************
 
-/** 
+/**
  * saving the geolocation
  */
 LayerManager.prototype._saveGibes = function saveGibes() {
@@ -946,10 +948,11 @@ function manageCamera() {
 }
 
 /**
- * extract the named quad from the scene
+ * extract the named quads group from the scene
  *
  * @param {string} layerName name of the quad
  * @memberOf LayerManager
+ * @returns {THREE.Group} named quads group
  */
 function getQuadsByName(layerName) {
     var quadGroup = _this.view.scene.getObjectByName('quads');
@@ -966,7 +969,7 @@ function getQuadsByName(layerName) {
 
 /**
  * get the parent's object if the parent is not the scene.
- * @param {THREE.Group} obj 
+ * @param {THREE.Group} obj
  * @memberOf LayerManager
  * @returns {THREE.Group} the object or this parent
  */
