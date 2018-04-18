@@ -1874,11 +1874,15 @@ Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
 
 // ******************** GUI INITIALIZATION ********************
 
+/**
+ * Use for controle if we can symbolyze objects by part
+ * @returns {boolean} if we can symbolyze objects by part
+ */
 Symbolizer.prototype._checkStructure = function checkStructure() {
     var i;
     if (this.bdTopo && this.obj.length > 0 && this.obj[0].children.length != 2) return false;
     // We check if the objects have the same number of children
-    for (i = 0; i < this.obj.length; i++) {
+    for (i = 1; i < this.obj.length; i++) {
         if (this.obj[i].children.length != this.obj[0].children.length) {
             // If one object has a different number of children, the function returns false
             return false;
@@ -1887,6 +1891,7 @@ Symbolizer.prototype._checkStructure = function checkStructure() {
     return true;
 };
 
+/** creat a symbolyzer menu for symbolyze each part */
 Symbolizer.prototype.initGui = function addToGUI() {
     // We check if the objects of the list have the same structure
     if (this._checkStructure()) {
@@ -1896,14 +1901,6 @@ Symbolizer.prototype.initGui = function addToGUI() {
         this.folder.open();
         this._addSave(parentFolder);
         this._addLoad(parentFolder);
-        /*
-        var positionFolder = parentFolder.addFolder('Position');
-        this._addResetPosition(positionFolder);
-        this._addRotationsAll(positionFolder);
-        this._addScaleAll(positionFolder);
-        this._addMoveobjcoordAll(positionFolder);
-        this._addPositionAll(positionFolder);
-        */
         var edgesFolder = parentFolder.addFolder('Edges');
         this._addColorEdgeAll(edgesFolder);
         this._addOpacityEdgeAll(edgesFolder);
@@ -1952,6 +1949,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
     }
 };
 
+/** creat a symbolyzer menu for symbolyze overall object(s) */
 Symbolizer.prototype.initGuiAll = function addToGUI() {
     // var folder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     var folder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
@@ -1959,14 +1957,6 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this.folder.open();
     this._addSaveAll(folder);
     this._addLoad(folder);
-    /*
-    var positionFolder = folder.addFolder('Position');
-    this._addResetPosition(positionFolder);
-    this._addRotationsAll(positionFolder);
-    this._addScaleAll(positionFolder);
-    this._addMoveobjcoordAll(positionFolder);
-    this._addPositionAll(positionFolder);
-    */
     var edgesFolder = folder.addFolder('Edges');
     this._addColorEdgeAll(edgesFolder);
     this._addOpacityEdgeAll(edgesFolder);
@@ -1990,6 +1980,10 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
 
 // ******************** ENVIRONMENT ********************
 
+/**
+ * add a light move menu controller
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for all parts
+ */
 Symbolizer.prototype._addMoveLight = function addMoveLight(folder) {
     var prevValueX = 0;
     var prevValueY = 0;
@@ -2017,6 +2011,10 @@ Symbolizer.prototype._addMoveLight = function addMoveLight(folder) {
     });
 };
 
+/**
+ * add a light color menu controller
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for all parts
+ */
 Symbolizer.prototype._addColorLight = function addColorLight(folder) {
     folder.addColor({ color: 0xffffff }, 'color').name('Color').onChange((value) => {
         this.light.color = new THREE.Color(value);
@@ -2024,6 +2022,10 @@ Symbolizer.prototype._addColorLight = function addColorLight(folder) {
     });
 };
 
+/**
+ * add a shadow menu controller
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer for all parts
+ */
 Symbolizer.prototype._addShades = function addShades(folder) {
     folder.add({ shades: this.plane.visible }, 'shades').name('Display shades').onChange((checked) => {
         this.plane.visible = checked;
@@ -2042,6 +2044,11 @@ function getRandomColor() {
 }
 */
 
+/**
+ * function for the file exception
+ * @param {string} message message
+ * @memberOf Symbolizer
+ */
 function loadFileException(message) {
     this.message = message;
     this.name = 'loadFileException';
@@ -2056,6 +2063,13 @@ function getSourceSynch(url) {
 }
 */
 
+/**
+ * initialize the edges between tow point for the quad
+ * @param {THREE.Vector3} pt1 first point
+ * @param {THREE.Vector3} pt2 second point
+ * @returns {THREE.BufferGeometry} edges between tow point for the quad
+ * @memberOf Symbolizer
+ */
 function createQuad(pt1, pt2) {
     // Définition propre a chaque géométrie
     var geometry = new THREE.BufferGeometry();
