@@ -22,29 +22,28 @@ var saveData;
  * @param {GlobeView} view GlobeView where the element are
  * @param {THREE.Group[]} obj list of faces
  * @param {THREE.Group[]} edges list of edges (same order than obj)
- * @param {ModelLoader} bdTopo if stilize BDTopo
  * @param {GuiTools} menu menu use for the simbolization
  * @param {number} nb symbolizer id number
  * @param {THREE.PointLight} light light for the scene
  * @param {THREE.Mesh} plane plan for the shadow
- * @param {THREE.Group} quads quads use for the skechy edges
  * @param {function} saveDataInit function to initialise the save function
+ * @param {ModelLoader} [bdTopo] if stilize BDTopo
  */
-function Symbolizer(view, obj, edges, bdTopo, menu, nb, light, plane, quads, saveDataInit) {
+function Symbolizer(view, obj, edges, menu, nb, light, plane, saveDataInit, bdTopo) {
     // Constructor
     this.obj = obj;
     this.edges = edges;
-    this.quads = quads;
-    if (bdTopo != null) this.bdTopo = bdTopo.ForBuildings;
+    this.bdTopo = bdTopo;
+    // if (bdTopo != null) this.bdTopo = bdTopo.ForBuildings;
     this.view = view;
     this.menu = menu;
     this.menu.view = this.view;
     this.nb = nb;
-    this.folder = null;
     this.light = light;
     this.plane = plane;
-    if (bdTopo != null) this.bdTopoStyle = bdTopo.bdTopoStyle;
-    this.applyStyle();
+    this.quads = this.view.scene.getObjectByName('quads');
+    if (bdTopo) this.bdTopoStyle = bdTopo.bdTopoStyle;
+    this.folder = null;
     saveData = saveDataInit();
 }
 
@@ -52,16 +51,16 @@ function Symbolizer(view, obj, edges, bdTopo, menu, nb, light, plane, quads, sav
 
 /**
  * Apply one style to the object
- * @param {Object} [style] style to apply (format .vibes)
+ * @param {Object} style style to apply (format .vibes)
  * @param {Dat.gui.Folder} [folder] folder of the symbolyzer
  */
-Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = null) {
+Symbolizer.prototype.applyStyle = function applyStyle(style, folder = null) {
     var i;
     var j;
     var k;
     var h;
     /* for part style */
-    if (style && style.faces[0].name) {
+    if (style.faces[0].name) {
         // Update GUI
         var count = 0;
         folder.__folders.Edges.__controllers[0].setValue(style.edges.color);
@@ -152,7 +151,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
         }
     }
     /* for the global style */
-    else if (style && style.faces.length == 1) {
+    else if (style.faces.length == 1) {
         // Update GUI
         folder.__folders.Edges.__controllers[0].setValue(style.edges.color);
         folder.__folders.Edges.__controllers[1].setValue(style.edges.opacity);
@@ -577,7 +576,7 @@ Symbolizer.prototype._changeOpacityEdge = function changeOpacityEdge(value) {
             }
         };
         this.bdTopoStyle.edges.opacity = value;
-        this.bdTopo(f);
+        this.bdTopo.ForBuildings(f);
     }
 };
 
@@ -622,7 +621,7 @@ Symbolizer.prototype._changeColorEdge = function changeColorEdge(value) {
             }
         };
         this.bdTopoStyle.edges.color = value;
-        this.bdTopo(f);
+        this.bdTopo.ForBuildings(f);
     }
 };
 /**
@@ -666,7 +665,7 @@ Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value) {
             }
         };
         this.bdTopoStyle.edges.width = value;
-        this.bdTopo(f2);
+        this.bdTopo.ForBuildings(f2);
     }
 };
 
@@ -715,7 +714,7 @@ Symbolizer.prototype._changeDashSize = function changeDashSize(value) {
             }
         };
         this.bdTopoStyle.edges.dashSize = value;
-        this.bdTopo(f2);
+        this.bdTopo.ForBuildings(f2);
     }
 };
 
@@ -745,7 +744,7 @@ Symbolizer.prototype._changeGapSize = function changeGapSize(value) {
             }
         };
         this.bdTopoStyle.edges.gapSize = value;
-        this.bdTopo(f2);
+        this.bdTopo.ForBuildings(f2);
     }
 };
 
@@ -936,7 +935,7 @@ Symbolizer.prototype._changeStyleEdge = function changeStyleEdge(value, folder) 
                 }
             };
             this.bdTopoStyle.edges.style = value;
-            this.bdTopo(f1);
+            this.bdTopo.ForBuildings(f1);
         }
     }
     else if (value === 'Sketchy') {
@@ -985,7 +984,7 @@ Symbolizer.prototype._changeStyleEdge = function changeStyleEdge(value, folder) 
                 }
             };
             this.bdTopoStyle.edges.style = value;
-            this.bdTopo(f3);
+            this.bdTopo.ForBuildings(f3);
         }
     }
     // Adapt the GUI
@@ -1207,7 +1206,7 @@ Symbolizer.prototype._changeOpacity = function changeOpacity(value, i, j) {
             }
         };
         this.bdTopoStyle[name].opacity = value;
-        this.bdTopo(f);
+        this.bdTopo.ForBuildings(f);
     }
 };
 /**
@@ -1289,7 +1288,7 @@ Symbolizer.prototype._changeColor = function changeColor(value, i, j) {
             }
         };
         this.bdTopoStyle[name].color = value;
-        this.bdTopo(f);
+        this.bdTopo.ForBuildings(f);
     }
 };
 
@@ -1366,7 +1365,7 @@ Symbolizer.prototype._changeEmissive = function changeEmissive(value, i, j) {
             }
         };
         this.bdTopoStyle[name].emissive = value;
-        this.bdTopo(f);
+        this.bdTopo.ForBuildings(f);
     }
 };
 
@@ -1443,7 +1442,7 @@ Symbolizer.prototype._changeSpecular = function changeSpecular(value, i, j) {
             }
         };
         this.bdTopoStyle[name].specular = value;
-        this.bdTopo(f);
+        this.bdTopo.ForBuildings(f);
     }
 };
 
@@ -1523,7 +1522,7 @@ Symbolizer.prototype._changeShininess = function changeShininess(value, i, j) {
             }
         };
         this.bdTopoStyle[name].shininess = value;
-        this.bdTopo(f);
+        this.bdTopo.ForBuildings(f);
     }
 };
 
@@ -1612,7 +1611,7 @@ Symbolizer.prototype._changeTextureRepetition = function _changeTextureRepetitio
             }
         };
         this.bdTopoStyle.edges.textureRepetition = value;
-        this.bdTopo(f2);
+        this.bdTopo.ForBuildings(f2);
     }
 };
 
@@ -1692,7 +1691,7 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, j, folder) 
                 }
             };
             this.bdTopoStyle[name].texture = chemin;
-            this.bdTopo(f);
+            this.bdTopo.ForBuildings(f);
         }
     }
     // Remove texture
@@ -1722,7 +1721,7 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, j, folder) 
                 }
             };
             this.bdTopoStyle[name].texture = chemin;
-            this.bdTopo(f2);
+            this.bdTopo.ForBuildings(f2);
         }
     }
 };
@@ -1806,7 +1805,7 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, folde
             };
             this.bdTopoStyle.wall_faces.texture = chemin;
             this.bdTopoStyle.roof_faces.texture = chemin;
-            this.bdTopo(f);
+            this.bdTopo.ForBuildings(f);
         }
     }
     // Remove texture
@@ -1837,7 +1836,7 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, folde
             };
             this.bdTopoStyle.wall_faces.texture = chemin;
             this.bdTopoStyle.roof_faces.texture = chemin;
-            this.bdTopo(f2);
+            this.bdTopo.ForBuildings(f2);
         }
     }
 };
@@ -2031,314 +2030,6 @@ Symbolizer.prototype._addShades = function addShades(folder) {
         this.view.notifyChange(true);
     });
 };
-
-// ******************** GEOLOCATION ********************
-/*
-Symbolizer.prototype._saveGibesAll = function saveGibesAll() {
-    if (this.obj.length > 0) {
-        var nameFile = this.obj[0].name.split('_')[0];
-        var gibes = {
-            name: nameFile,
-            coordX: this.obj[0].position.x,
-            coordY: this.obj[0].position.y,
-            coordZ: this.obj[0].position.z,
-            rotateX: this.obj[0].rotation.x,
-            rotateY: this.obj[0].rotation.y,
-            rotateZ: this.obj[0].rotation.z,
-            scale: this.obj[0].scale.x,
-        };
-        saveData(gibes, nameFile.concat('_globale.gibes'));
-    }
-};
-*/
-
-/*
-Symbolizer.prototype._addResetPosition = function addResetPosition(folder) {
-    if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
-        // Get initial values
-        var initialRotateX = this.obj[0].rotation.x;
-        var initialRotateY = this.obj[0].rotation.y;
-        var initialRotateZ = this.obj[0].rotation.z;
-        var initialScale = this.obj[0].scale.x;
-        var initialPositionX = this.obj[0].position.x;
-        var initialPositionY = this.obj[0].position.y;
-        var initialPositionZ = this.obj[0].position.z;
-        // Add a button to reset all initial parameters
-        folder.add({ resetPosition: () => {
-            // Reset GUI
-            folder.__controllers[1].setValue(initialRotateX);
-            folder.__controllers[2].setValue(initialRotateY);
-            folder.__controllers[3].setValue(initialRotateZ);
-            folder.__controllers[4].setValue(initialScale);
-            folder.__controllers[5].setValue(initialPositionX);
-            folder.__controllers[6].setValue(initialPositionY);
-            folder.__controllers[7].setValue(initialPositionZ);
-            folder.__controllers[8].setValue(initialPositionX);
-            folder.__controllers[9].setValue(initialPositionY);
-            folder.__controllers[10].setValue(initialPositionZ);
-            // Reset parameters
-            for (var i = 0; i < this.obj.length; i++) {
-                this.obj[i].rotation.x = initialRotateX;
-                this.edges[i].rotation.x = initialRotateX;
-                this.obj[i].rotation.y = initialRotateY;
-                this.edges[i].rotation.y = initialRotateY;
-                this.obj[i].rotation.z = initialRotateZ;
-                this.edges[i].rotation.z = initialRotateZ;
-                this.obj[i].scale.set(initialScale, initialScale, initialScale);
-                this.edges[i].scale.set(initialScale, initialScale, initialScale);
-                this.obj[i].position.x = initialPositionX;
-                this.edges[i].position.x = initialPositionX;
-                this.obj[i].position.y = initialPositionY;
-                this.edges[i].position.y = initialPositionY;
-                this.obj[i].position.z = initialPositionZ;
-                this.edges[i].position.z = initialPositionZ;
-                this.obj[i].updateMatrixWorld();
-                this.edges[i].updateMatrixWorld();
-                // Reset quads position if they exist
-                if (this.quads != null) {
-                    this.quads.children[i].position.copy(this.obj[i].position);
-                    this.quads.children[i].rotation.copy(this.obj[i].rotation);
-                    this.quads.children[i].scale.copy(this.obj[i].scale);
-                    this.quads.children[i].updateMatrixWorld();
-                }
-            }
-            this.view.notifyChange(true);
-        },
-        }, 'resetPosition').name('Reset position');
-    }
-};
-*/
-
-/*
-Symbolizer.prototype._addScaleAll = function addScaleAll(folder) {
-    if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
-        // Initial GUI value
-        var initialScale = this.obj[0].scale.x;
-        // Add controller for scaling objects
-        folder.add({ scale: initialScale }, 'scale', 0.1, 1000, 0.01).name('Scale').onChange((value) => {
-            for (var i = 0; i < this.obj.length; i++) {
-                if (this.obj[i].name != 'bati3D_faces') {
-                    // Scale objects and edges
-                    this.obj[i].scale.set(value, value, value);
-                    this.edges[i].scale.set(value, value, value);
-                    this.plane.updateMatrixWorld();
-                    this.obj[i].updateMatrixWorld();
-                    this.edges[i].updateMatrixWorld();
-                    this.light.updateMatrixWorld();
-                    // Scale quads if they exist
-                    if (this.quads != null) {
-                        this.quads.children[i].scale.copy(this.obj[i].scale);
-                        this.quads.children[i].updateMatrixWorld();
-                    }
-                }
-            }
-            this.view.notifyChange(true);
-        });
-    }
-};
-*/
-
-/*
-Symbolizer.prototype._addMoveobjcoordAll = function addMoveobjcoordAll(folder) {
-    if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
-        var prevValueX = 0;
-        var prevValueY = 0;
-        var prevValueZ = 0;
-        // Add controller for X translation
-        folder.add({ MovecoordX: 0 }, 'MovecoordX', -500, 500, 0.1).name('Translation X').onChange((value) => {
-            for (var i = 0; i < this.obj.length; i++) {
-                if (this.obj[i].name != 'bati3D_faces') {
-                    // Translate object and edges
-                    this.obj[i].translateX(value - prevValueX);
-                    this.edges[i].translateX(value - prevValueX);
-                    // Save previous value
-                    prevValueX = value;
-                    this.obj[i].updateMatrixWorld();
-                    this.edges[i].updateMatrixWorld();
-                    // Translate quads if they exist
-                    if (this.quads != null) {
-                        this.quads.children[i].position.copy(this.obj[i].position);
-                        this.quads.children[i].updateMatrixWorld();
-                    }
-                }
-            }
-            this.view.notifyChange(true);
-        });
-        // Add controller for Y translation
-        folder.add({ MovecoordY: 0 }, 'MovecoordY', -500, 500, 0.1).name('Translation Y').onChange((value) => {
-            for (var i = 0; i < this.obj.length; i++) {
-                if (this.obj[i].name != 'bati3D_faces') {
-                    // Translate object and edges
-                    this.obj[i].translateZ(value - prevValueY);
-                    this.edges[i].translateZ(value - prevValueY);
-                    // Save previous value
-                    prevValueY = value;
-                    this.obj[i].updateMatrixWorld();
-                    this.edges[i].updateMatrixWorld();
-                    // Translate quads if they exist
-                    if (this.quads != null) {
-                        this.quads.children[i].position.copy(this.obj[i].position);
-                        this.quads.children[i].updateMatrixWorld();
-                    }
-                }
-            }
-            this.view.notifyChange(true);
-        });
-        // Add controller for Z translation
-        folder.add({ MovecoordZ: 0 }, 'MovecoordZ', -500, 500, 0.1).name('Translation Z').onChange((value) => {
-            for (var i = 0; i < this.obj.length; i++) {
-                if (this.obj[i].name != 'bati3D_faces') {
-                    // Translate object and edges
-                    this.obj[i].translateY(value - prevValueZ);
-                    this.edges[i].translateY(value - prevValueZ);
-                    // Save previous value
-                    prevValueZ = value;
-                    this.obj[i].updateMatrixWorld();
-                    this.edges[i].updateMatrixWorld();
-                    // Translate quads if they exist
-                    if (this.quads != null) {
-                        this.quads.children[i].position.copy(this.obj[i].position);
-                        this.quads.children[i].updateMatrixWorld();
-                    }
-                }
-            }
-            this.view.notifyChange(true);
-        });
-    }
-};
-*/
-
-/*
-Symbolizer.prototype._addRotationsAll = function addRotationsAll(folder) {
-    if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
-        // Initial GUI value
-        var initialRotateX = this.obj[0].rotation.x;
-        var initialRotateY = this.obj[0].rotation.y;
-        var initialRotateZ = this.obj[0].rotation.z;
-        var prevValueX = 0;
-        var prevValueY = 0;
-        var prevValueZ = 0;
-        // Add controller for X rotation
-        folder.add({ rotationX: initialRotateX }, 'rotationX', -Math.PI, Math.PI, Math.PI / 100).name('Rotation X').onChange((value) => {
-            for (var i = 0; i < this.obj.length; i++) {
-                if (this.obj[i].name != 'bati3D_faces') {
-                    // Rotate object and edges
-                    this.obj[i].rotateX(value - prevValueX);
-                    this.edges[i].rotateX(value - prevValueX);
-                    // Save previous value
-                    prevValueX = value;
-                    this.obj[i].updateMatrixWorld();
-                    this.edges[i].updateMatrixWorld();
-                    // Rotate quads if they exist
-                    if (this.quads != null) {
-                        this.quads.children[i].rotation.copy(this.obj[i].rotation);
-                        this.quads.children[i].updateMatrixWorld();
-                    }
-                }
-            }
-            this.view.notifyChange(true);
-        });
-        // Add controller for Y rotation
-        folder.add({ rotationY: initialRotateY }, 'rotationY', -Math.PI, Math.PI, Math.PI / 100).name('Rotation Y').onChange((value) => {
-            for (var i = 0; i < this.obj.length; i++) {
-                if (this.obj[i].name != 'bati3D_faces') {
-                    // Rotate object and edges
-                    this.obj[i].rotateY(value - prevValueY);
-                    this.edges[i].rotateY(value - prevValueY);
-                    // Save previous value
-                    prevValueY = value;
-                    this.obj[i].updateMatrixWorld();
-                    this.edges[i].updateMatrixWorld();
-                    // Rotate quads if they exist
-                    if (this.quads != null) {
-                        this.quads.children[i].rotation.copy(this.obj[i].rotation);
-                        this.quads.children[i].updateMatrixWorld();
-                    }
-                }
-            }
-            this.view.notifyChange(true);
-        });
-        // Add controller for Z rotation
-        folder.add({ rotationZ: initialRotateZ }, 'rotationZ', -Math.PI, Math.PI, Math.PI / 100).name('Rotation Z').onChange((value) => {
-            for (var i = 0; i < this.obj.length; i++) {
-                if (this.obj[i].name != 'bati3D_faces') {
-                    // Rotate object and edges
-                    this.obj[i].rotateZ(value - prevValueZ);
-                    this.edges[i].rotateZ(value - prevValueZ);
-                    // Save previous value
-                    prevValueZ = value;
-                    this.obj[i].updateMatrixWorld();
-                    this.edges[i].updateMatrixWorld();
-                    // Rotate quads if they exist
-                    if (this.quads != null) {
-                        this.quads.children[i].rotation.copy(this.obj[i].rotation);
-                        this.quads.children[i].updateMatrixWorld();
-                    }
-                }
-            }
-            this.view.notifyChange(true);
-        });
-    }
-};
-*/
-
-/*
-Symbolizer.prototype._addPositionAll = function addPositionAll(folder) {
-    if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
-        // Initial GUI value
-        var initialX = this.obj[0].position.x;
-        var initialY = this.obj[0].position.y;
-        var initialZ = this.obj[0].position.z;
-        let X = initialX;
-        let Y = initialY;
-        let Z = initialZ;
-        // vector to store the new coordinates
-        var vectCoord = new THREE.Vector3();
-        // Controller for position on X
-        folder.add({ longitude: initialX }, 'longitude').name('Position X').onChange((value) => {
-            X = value;
-            vectCoord.set(X, Y, Z);
-            this._changeCoordinates(vectCoord);
-        });
-        // Controller for position on Y
-        folder.add({ latitude: initialY }, 'latitude').name('Position Y').onChange((value) => {
-            Y = value;
-            vectCoord.set(X, Y, Z);
-            this._changeCoordinates(vectCoord);
-        });
-        // Controller for position on Z
-        folder.add({ altitude: initialZ }, 'altitude').name('Position Z').onChange((value) => {
-            Z = value;
-            vectCoord.set(X, Y, Z);
-            this._changeCoordinates(vectCoord);
-        });
-    }
-};
-*/
-
-/*
-Symbolizer.prototype._changeCoordinates = function changeCoordinates(vectCoord) {
-    if (this.obj.length > 0 && (this.obj[0].name != 'bati3D_faces' || this.obj.length > 1)) {
-        for (var i = 0; i < this.obj.length; i++) {
-            if (this.obj[0].name != 'bati3D_faces') {
-                // Modification of object and edges position
-                this.obj[i].position.copy(vectCoord);
-                this.edges[i].position.copy(vectCoord);
-                this.obj[i].updateMatrixWorld();
-                this.edges[i].updateMatrixWorld();
-                // Modification of quads position if they exist
-                if (this.quads != null) {
-                    this.quads.children[i].position.copy(this.obj[i].position);
-                    this.quads.children[i].updateMatrixWorld();
-                }
-            }
-        }
-        this.view.controls.setCameraTargetPosition(this.obj[0].position, false);
-        this.view.notifyChange(true);
-    }
-};
-*/
-
 
 /*
 function getRandomColor() {

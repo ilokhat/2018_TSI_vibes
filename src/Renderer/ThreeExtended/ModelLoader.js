@@ -71,7 +71,7 @@ function ModelLoader(view) {
  * @param {Function} callback function run after the model creation callback([groupFaces, groupEdges], menu)
  * @param {GuiTools} menu menu use for the callback
  */
-ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale, callback, menu) {
+ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale, callback, menu = null) {
     // OBJ loader
     _this.laodObj3d = new THREE.OBJLoader();
     var promise = new Promise((resolve) => {
@@ -335,11 +335,11 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
  */
 ModelLoader.prototype.ForBuildings = function ForBuildings(callback) {
     // For all globe tile meshes we look for tile at level 14 on which building meshes are attached.
-    var a = element => _this.traverseElement(element, callback);
-    for (var i = 0; i < _this.view.wgs84TileLayer.level0Nodes.length; ++i) {
-        _this.view.wgs84TileLayer.level0Nodes[i].traverse(a);
+    var a = element => traverseElement(element, callback);
+    for (var i = 0; i < this.view.wgs84TileLayer.level0Nodes.length; ++i) {
+        this.view.wgs84TileLayer.level0Nodes[i].traverse(a);
     }
-    _this.view.notifyChange(true);
+    this.view.notifyChange(true);
 };
 
 /**
@@ -347,7 +347,46 @@ ModelLoader.prototype.ForBuildings = function ForBuildings(callback) {
  *
  * @param {Object} element element traversed
  * @param {function} callback callback function
+ * @memberOf Symbolizer
  */
+function traverseElement(element, callback) {
+    if (element.level != undefined && element.level <= 14) {
+        // console.log(element);
+        for (var c = 0; c < element.children.length; ++c) {
+            if (element.children[c].type == 'Group') {
+                var parent = element.children[c];
+                callback(parent);
+            }
+        }
+    }
+}
+
+/**
+ * apply the callback for each tile
+ *
+ * @param {Function} callback callback function
+ * @example
+ *  callback = (parentGroup) => console.log(parentGroup);
+ *  with the parentGroup compose of meshes wall_faces, roof_faces, wall_edges, roof_edges
+ */
+ /*
+ModelLoader.prototype.ForBuildings = function ForBuildings(callback) {
+    // For all globe tile meshes we look for tile at level 14 on which building meshes are attached.
+    var a = element => _this.traverseElement(element, callback);
+    for (var i = 0; i < _this.view.wgs84TileLayer.level0Nodes.length; ++i) {
+        _this.view.wgs84TileLayer.level0Nodes[i].traverse(a);
+    }
+    _this.view.notifyChange(true);
+};
+*/
+
+/**
+ * internal function for ForBuildings
+ *
+ * @param {Object} element element traversed
+ * @param {function} callback callback function
+ */
+ /*
 ModelLoader.prototype.traverseElement = function traverseElement(element, callback) {
     if (element.level != undefined && element.level <= 14) {
         // console.log(element);
@@ -359,23 +398,6 @@ ModelLoader.prototype.traverseElement = function traverseElement(element, callba
         }
     }
 };
-
-/*
-function calleback(group) {
-    var mesh;
-    var i;
-    for (i = 0; i < group.children.length; i++) {
-        mesh = group.children[i];
-        // change couleur toit
-        if (mesh.name == 'roof_faces') {
-            mesh.material = new THREE.MeshPhongMaterial({ color: 0x2240d1, emissive: 0x2240d1, specular: 0x2240d1, shininess: 30 });
-            mesh.material.transparent = true;
-            mesh.castShadow = true;
-            mesh.material.side = THREE.DoubleSide;
-            mesh.material.needsUpdate = true;
-        }
-    }
-}
 */
 
 export default ModelLoader;

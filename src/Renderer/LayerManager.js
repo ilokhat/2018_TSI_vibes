@@ -27,12 +27,6 @@ function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, 
     this.guiInitialized = false;
     this.loader = loader;
     this.symbolizer = symbolizer;
-    this.stylizeObjectBtn = null;
-    this.stylizePartsBtn = null;
-    this.mtlBtn = null;
-    this.deleteBtn = null;
-    this.bati3dBtn = null;
-    this.bdTopoBtn = null;
     this.symbolizerInit = null;
     this.light = null;
     this.plane = null;
@@ -251,7 +245,7 @@ LayerManager.prototype.initControllers = function initControllers() {
             var quads;
             // Case BDTopo
             if (layer == 'BDTopo') {
-                this.loader.ForBuildings(hideBDTopo);
+                _this.loader.ForBuildings(hideBDTopo);
                 var b = _this.view._layers[0]._attachedLayers.filter(b => b.id == 'WFS Buildings');
                 b[0].visible = false;
                 _this.loader.bdTopoVisibility = false;
@@ -313,7 +307,6 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         // Merge elements of the list as one group
         var listObj = [];
         var listEdge = [];
-        var quads = _this.view.scene.getObjectByName('quads');
         var bdTopo = null;
         _this.listLayers.forEach((layer) => {
             if (layer != 'BDTopo' && layer.length >= 2) {
@@ -347,7 +340,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         });
         // Call Symbolizer
         _this.nbSymbolizer++;
-        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer, _this.light, _this.plane, quads);
+        var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, _this.menu, _this.nbSymbolizer, _this.light, _this.plane, bdTopo);
         _this.symbolizerInit = symbolizer;
         // Open symbolizer with 'stylize parts'
         if (complex) {
@@ -814,12 +807,12 @@ function manageCamera() {
     },
     }, 'resetCam').name('Reset camera');
     // Different point of view choises
-    camFolder.add({ plan: ' ' }, 'plan', ['Horizon', 'Plongeante', 'Globe']).name('Vue').onChange((value) => {
+    camFolder.add({ plan: ' ' }, 'plan', ['Horizon', 'Bird\'s-eye', 'Globe']).name('Vue').onChange((value) => {
         if (value === 'Horizon') {
             _this.view.controls.setTilt(100, false);
             _this.view.controls.setZoom(12, false);
         }
-        else if (value === 'Plongeante') {
+        else if (value === 'Bird\'s-eye') {
             _this.view.controls.setTilt(10, false);
             _this.view.controls.setZoom(17, false);
         }

@@ -49,7 +49,6 @@ var rotateY = 0;
 var rotateZ = 0;
 var scale = 1;
 
-
 function saveDataInit() {
     var a = document.createElement('a');
     document.body.appendChild(a);
@@ -69,9 +68,8 @@ function saveDataInit() {
 var loader = new itowns.ModelLoader(globeView);
 
 // Symbolizer
-var symbolizer = function(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane, quads) {
-    // console.log(saveDataInit);
-    return new itowns.Symbolizer(view, listObj, listEdge, bdTopo, menu, nbSymbolizer, light, plane, quads, saveDataInit);
+var symbolizer = function(view, listObj, listEdge, menu, nbSymbolizer, light, plane, bdTopo) {
+    return new itowns.Symbolizer(view, listObj, listEdge, menu, nbSymbolizer, light, plane, saveDataInit, bdTopo);
 }
 
 // Layer management

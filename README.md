@@ -248,27 +248,7 @@ Therefore, there will also be two types of style formats :
       "shininess": 30,
       "texture": "./textures/glass.png",
       "textureRepeat": 1.5901250000000002
-    },
-    {
-      "name": "Tower1_Tower_Fence_posts_Tube_1",
-      "opacity": 1,
-      "color": "#ffffff",
-      "emissive": "#000000",
-      "specular": "#111111",
-      "shininess": 30,
-      "texture": null,
-      "textureRepeat": null
-    },
-    {
-      "name": "Tower1_Tower_Fence_posts_Tube_2",
-      "opacity": 1,
-      "color": "#ffffff",
-      "emissive": "#000000",
-      "specular": "#111111",
-      "shininess": 30,
-      "texture": null,
-      "textureRepeat": null
-    } 
+    }
   ]
 }
 ```
