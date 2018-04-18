@@ -350,7 +350,6 @@ ModelLoader.prototype.ForBuildings = function ForBuildings(callback) {
  */
 ModelLoader.prototype.traverseElement = function traverseElement(element, callback) {
     if (element.level != undefined && element.level <= 14) {
-        // console.log(element);
         for (var c = 0; c < element.children.length; ++c) {
             if (element.children[c].type == 'Group') {
                 var parent = element.children[c];

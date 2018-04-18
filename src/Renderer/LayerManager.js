@@ -320,27 +320,6 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
                 listObj.push(layer[0]);
                 listEdge.push(layer[1]);
                 // add mtl loader
-                buttons.mtlBtn = folders.layerFolder.add({ symbolizer: () => {
-                    var button = document.createElement('input');
-                    button.setAttribute('type', 'file');
-                    button.addEventListener('change', () => {
-                        var mtlLoader = new MTLLoader();
-                        mtlLoader.load('models/'.concat(button.files[0].name.split('.')[0]).concat('/').concat(button.files[0].name), (materials) => {
-                            materials.preload();
-                            _this.loader.laodObj3d.setMaterials(materials);
-                            if (layer[0].name.split('_')[0] == button.files[0].name.split('.')[0]) {
-                                layer[0].children.forEach((child) => {
-                                    if (materials.materials[child.name] != undefined) {
-                                        child.material = _this.loader.laodObj3d.materials.materials[child.name];
-                                    }
-                                });
-                                _this.view.notifyChange(true);
-                            }
-                        });
-                    }, false);
-                    button.click();
-                },
-                }, 'symbolizer').name('MTL file');
             } else if (layer == 'BDTopo') {
                 bdTopo = _this.loader;
             }
@@ -352,6 +331,31 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         // Open symbolizer with 'stylize parts'
         if (complex) {
             symbolizer.initGui();
+            buttons.mtlBtn = _this.menu.gui.__folders['Symbolizer '.concat(this.nbSymbolizer)].add({ symbolizer: () => {
+                var button = document.createElement('input');
+                button.setAttribute('type', 'file');
+                button.addEventListener('change', () => {
+                    var mtlLoader = new MTLLoader();
+                    mtlLoader.load('models/'.concat(button.files[0].name.split('.')[0]).concat('/').concat(button.files[0].name), (materials) => {
+                        materials.preload();
+                        _this.loader.laodObj3d.setMaterials(materials);
+                        listObj.forEach((layer) => {
+                        if (layer.name.split('_')[0] == button.files[0].name.split('.')[0]) {
+                            layer.children.forEach((child) => {
+                                if (materials.materials[child.name] != undefined) {
+                                    child.material = _this.loader.laodObj3d.materials.materials[child.name];
+                                   _this.symbolizerInit.applyStyle(child.material, _this.symbolizerInit.menu.gui.__folders['Symbolizer '.concat(_this.nbSymbolizer)]);                                      
+                                }
+                            });
+                            _this.view.notifyChange(true);
+                        }
+                    });
+                    });
+                }, false);
+                button.click();
+            },
+            }, 'symbolizer').name('MTL file');
+
             // Create controller to close the symbolizer
             deleteSymbolizerBtn = _this.menu.gui.add({ deleteSymbolizer: () => {
                 // Delete symbolizer folder

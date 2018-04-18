@@ -60,8 +60,25 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
     var j;
     var k;
     var h;
+    var l;
     /* for part style */
-    if (style && style.faces[0].name) {
+    var myProp = 'type';
+    if (style && !('edges' in style) && !('faces' in style) && style.type == 'MeshPhongMaterial') {
+        for (l in folder.__folders.Faces.__folders) {
+            if (Object.prototype.hasOwnProperty.call(folder.__folders.Faces.__folders, l)) {
+               if (l == style.name) {
+                folder.__folders.Faces.__folders[l].__controllers[2].setValue(style.opacity);
+                folder.__folders.Faces.__folders[l].__controllers[3].setValue(rgb2hex(style.color.r * 255, style.color.g * 255, style.color.b * 255));
+                folder.__folders.Faces.__folders[l].__controllers[4].setValue(rgb2hex(style.emissive.r * 255, style.emissive.g * 255, style.emissive.b * 255));
+                folder.__folders.Faces.__folders[l].__controllers[5].setValue(rgb2hex(style.specular.r * 255, style.specular.g * 255, style.specular.b * 255));                
+                folder.__folders.Faces.__folders[l].__controllers[6].setValue(style.shininess);
+
+               } 
+            }
+        }             
+    }
+    else if (style && style.faces[0].name) {
+        console.log('1');
         // Update GUI
         var count = 0;
         folder.__folders.Edges.__controllers[0].setValue(style.edges.color);
@@ -153,6 +170,7 @@ Symbolizer.prototype.applyStyle = function applyStyle(style = null, folder = nul
     }
     /* for the global style */
     else if (style && style.faces.length == 1) {
+        console.log('2');
         // Update GUI
         folder.__folders.Edges.__controllers[0].setValue(style.edges.color);
         folder.__folders.Edges.__controllers[1].setValue(style.edges.opacity);
@@ -2354,6 +2372,10 @@ function getRandomColor() {
 function loadFileException(message) {
     this.message = message;
     this.name = 'loadFileException';
+}
+
+function rgb2hex(r, g, b) {    
+    return '#'.concat(('0'.concat(r.toString(16))).slice(-2)).concat(('0'.concat(g.toString(16))).slice(-2)).concat(('0'.concat(b.toString(16))).slice(-2));
 }
 
 /*
