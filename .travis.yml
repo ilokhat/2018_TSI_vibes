@@ -10,3 +10,9 @@ before_install:
     - sudo apt-get update
     - sudo apt-get install google-chrome-stable
     - export CHROME_BIN=chromium-browser
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: ls ./dist
+  on:
+    branch: master
