@@ -4,7 +4,7 @@
 
 import * as THREE from 'three';
 import MTLLoader from 'three-mtl-loader';
-import MTLFile from 'mtl-file-parser';
+// import MTLFile from 'mtl-file-parser';
 
 
 var _this;
@@ -184,8 +184,6 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
             // Add layer and controller to the list
             _this.listLayers.push(model);
             _this.listControllers.push(controller);
-
-                 
             // Creates buttons to start symbolizers
             if (!_this.guiInitialized) {
                 _this.initControllers();
@@ -321,7 +319,6 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
             if (layer != 'BDTopo' && layer.length >= 2) {
                 listObj.push(layer[0]);
                 listEdge.push(layer[1]);
-
                 // add mtl loader
                 buttons.mtlBtn = folders.layerFolder.add({ symbolizer: () => {
                     var button = document.createElement('input');
@@ -331,23 +328,19 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
                         mtlLoader.load('models/'.concat(button.files[0].name.split('.')[0]).concat('/').concat(button.files[0].name), (materials) => {
                             materials.preload();
                             _this.loader.laodObj3d.setMaterials(materials);
-                           if (layer[0].name.split('_')[0] == button.files[0].name.split('.')[0]) { 
-                              layer[0].children.forEach((child) => {
-                                if (materials.materials[child.name] != undefined) {
-                                     child.material = _this.loader.laodObj3d.materials.materials[child.name];
-                                    }  
-                              });
-                          _this.view.notifyChange(true);  
-                           }                   
-                          
-                            });
+                            if (layer[0].name.split('_')[0] == button.files[0].name.split('.')[0]) {
+                                layer[0].children.forEach((child) => {
+                                    if (materials.materials[child.name] != undefined) {
+                                        child.material = _this.loader.laodObj3d.materials.materials[child.name];
+                                    }
+                                });
+                                _this.view.notifyChange(true);
+                            }
+                        });
                     }, false);
                     button.click();
-                    
                 },
                 }, 'symbolizer').name('MTL file');
-
-
             } else if (layer == 'BDTopo') {
                 bdTopo = _this.loader;
             }
@@ -356,8 +349,6 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         _this.nbSymbolizer++;
         var symbolizer = _this.symbolizer(_this.view, listObj, listEdge, bdTopo, _this.menu, _this.nbSymbolizer, _this.light, _this.plane, quads);
         _this.symbolizerInit = symbolizer;
-
-        
         // Open symbolizer with 'stylize parts'
         if (complex) {
             symbolizer.initGui();
