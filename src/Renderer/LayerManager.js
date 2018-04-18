@@ -402,7 +402,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
 
 LayerManager.prototype._cleanGUI = function cleanGUI() {
     // Remove the layer management buttons
-    _this.menu.gui.__folders.Layers.remove(buttons.mtlBtn);
+    if (buttons.mtlBtn) _this.menu.gui.__folders.Layers.remove(buttons.mtlBtn);
     _this.menu.gui.__folders.Layers.remove(buttons.stylizeObjectBtn);
     _this.menu.gui.__folders.Layers.remove(buttons.stylizePartsBtn);
     _this.menu.gui.__folders.Layers.remove(buttons.deleteBtn);
