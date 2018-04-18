@@ -13,7 +13,7 @@ var globeView = new itowns.GlobeView(viewerDiv, positionOnGlobe);
 manager.coord = new itowns.Coordinates('EPSG:4326', 2.396159, 48.848264, 50);
 manager.view = globeView;
 
-var f = new File([''], 'filename.obj', { type: 'text/plain' });
+var f = new File([''], 'filename.text', { type: 'text/plain' });
 
 describe('LayerManager._readFile()', function () {
     it('Expected .obj or .gibes file', function () {
