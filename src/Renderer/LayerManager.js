@@ -1,15 +1,34 @@
 /**
- * Tool to manage layers in Vibes project
+ * Generated On: april 2018
+ * Class: ModelLoader
+ * Description: Tool to manage layers in Vibes project
+ * project VIBES
+ * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
  */
 
 import * as THREE from 'three';
 import MTLLoader from 'three-mtl-loader';
-// import MTLFile from 'mtl-file-parser';
 
 
 var _this;
 var saveData;
 
+/**
+ * Tool to manage layers in Vibes project
+ *
+ * @constructor
+ * @param {GlobeView} view view where the loaded object are
+ * @param {Document} doc DOM Document
+ * @param {GuiTools} menu menu for inteacted with the layers
+ * @param {Coordinates} coord place of the object on the scene
+ * @param {number} rotateX rotation of the object around the x-axis
+ * @param {number} rotateY rotation of the object around the y-axis
+ * @param {number} rotateZ rotation of the object around the z-axis
+ * @param {number} scale scale apply to the object
+ * @param {ModelLoader} loader ModelLoader use
+ * @param {function} symbolizer function for initialize the Symbolizers
+ * @param {function} saveDataInit function for initialize the save file function
+ */
 function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, loader, symbolizer, saveDataInit) {
     // Constructor
     this.view = view;
@@ -41,6 +60,9 @@ var folders = {};
 
 // ********** GUI INITIALIZATION **********
 
+/**
+ * initialize the menu for the layer managment and add the listners
+ */
 LayerManager.prototype.initGUI = function initGUI() {
     // Gui initialization
     folders.layerFolder = this.menu.gui.addFolder('Layers');
@@ -62,12 +84,21 @@ LayerManager.prototype.initGUI = function initGUI() {
     this.document.addEventListener('dragleave', prevDefault, false);
 };
 
+/**
+ * function for the drop event
+ * @param {Event} e file droped
+ */
 LayerManager.prototype.documentDrop = function documentDrop(e) {
     e.preventDefault();
     var file = e.dataTransfer.files[0];
     _this._readFile(file);
 };
 
+/**
+ * file reader for the droped file
+ * @param {File} file droped file
+ * @returns {nomber} return 0
+ */
 LayerManager.prototype._readFile = function readFile(file) {
     // Read the file dropped and actually load the object
     var reader = new FileReader();
@@ -170,6 +201,12 @@ LayerManager.prototype._readFile = function readFile(file) {
 
 // ********** LAYER HANDLERS **********
 
+/**
+ * Function run after add an object on the scene.
+ * Make the layer managable
+ *
+ * @param {THREE.Groupe[]} model object faces and edges [faces, edges]
+ */
 LayerManager.prototype.handleLayer = function handleLayer(model) {
     // Add a checkbox to the GUI, named after the layer
     var name = model[0].name.split('_')[0];
@@ -196,6 +233,10 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
     });
 };
 
+/**
+ * Function run after add the BDTopo.
+ * Make the layer managable
+ */
 LayerManager.prototype.handleBdTopo = function handleBdTopo() {
     // Add a checkbox to the GUI, named after the layer
     var name = 'BDTopo';
@@ -223,6 +264,9 @@ LayerManager.prototype.handleBdTopo = function handleBdTopo() {
 
 // ********** FUNCTIONS TO MANAGE CONTROLLERS **********
 
+/**
+ * initialize the controleurs for the managment and the stylization
+ */
 LayerManager.prototype.initControllers = function initControllers() {
     buttons.stylizeObjectBtn = folders.layerFolder.add({ symbolizer: () => {
         _this.initSymbolizer(false);
@@ -298,10 +342,16 @@ LayerManager.prototype.initControllers = function initControllers() {
     _this.guiInitialized = true;
 };
 
+/**
+ * creat the symbolizer menu
+ *
+ * @param {boolean} complex if the symbolyzer is by part
+ * @returns {string} return the Symbolizer name
+ */
 LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
     var i;
     var deleteSymbolizerBtn;
-    // _this._cleanGUI();
+    _this._cleanGUI();
     // Checks if a layer is selected (if not, nothing happens)
     if (_this.listLayers.length != 0) {
         // Merge elements of the list as one group
@@ -313,27 +363,6 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
                 listObj.push(layer[0]);
                 listEdge.push(layer[1]);
                 // add mtl loader
-                buttons.mtlBtn = folders.layerFolder.add({ symbolizer: () => {
-                    var button = document.createElement('input');
-                    button.setAttribute('type', 'file');
-                    button.addEventListener('change', () => {
-                        var mtlLoader = new MTLLoader();
-                        mtlLoader.load('models/'.concat(button.files[0].name.split('.')[0]).concat('/').concat(button.files[0].name), (materials) => {
-                            materials.preload();
-                            _this.loader.laodObj3d.setMaterials(materials);
-                            if (layer[0].name.split('_')[0] == button.files[0].name.split('.')[0]) {
-                                layer[0].children.forEach((child) => {
-                                    if (materials.materials[child.name] != undefined) {
-                                        child.material = _this.loader.laodObj3d.materials.materials[child.name];
-                                    }
-                                });
-                                _this.view.notifyChange(true);
-                            }
-                        });
-                    }, false);
-                    button.click();
-                },
-                }, 'symbolizer').name('MTL file');
             } else if (layer == 'BDTopo') {
                 bdTopo = _this.loader;
             }
@@ -345,6 +374,31 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
         // Open symbolizer with 'stylize parts'
         if (complex) {
             symbolizer.initGui();
+            buttons.mtlBtn = _this.menu.gui.__folders['Symbolizer '.concat(this.nbSymbolizer)].add({ symbolizer: () => {
+                var button = document.createElement('input');
+                button.setAttribute('type', 'file');
+                button.addEventListener('change', () => {
+                    var mtlLoader = new MTLLoader();
+                    mtlLoader.load('models/'.concat(button.files[0].name.split('.')[0]).concat('/').concat(button.files[0].name), (materials) => {
+                        materials.preload();
+                        _this.loader.laodObj3d.setMaterials(materials);
+                        listObj.forEach((layer) => {
+                            if (layer.name.split('_')[0] == button.files[0].name.split('.')[0]) {
+                                layer.children.forEach((child) => {
+                                    if (materials.materials[child.name] != undefined) {
+                                        child.material = _this.loader.laodObj3d.materials.materials[child.name];
+                                        _this.symbolizerInit.applyStyle(child.material, _this.symbolizerInit.menu.gui.__folders['Symbolizer '.concat(_this.nbSymbolizer)]);
+                                    }
+                                });
+                                _this.view.notifyChange(true);
+                            }
+                        });
+                    });
+                }, false);
+                button.click();
+            },
+            }, 'symbolizer').name('Load MTL file');
+
             // Create controller to close the symbolizer
             deleteSymbolizerBtn = _this.menu.gui.add({ deleteSymbolizer: () => {
                 // Delete symbolizer folder
@@ -393,30 +447,49 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
     return 'Symbolizer '.concat(_this.nbSymbolizer);
 };
 
+/**
+ * clean the layer management menu
+ */
 LayerManager.prototype._cleanGUI = function cleanGUI() {
     // Remove the layer management buttons
-    if (buttons.mtlBtn) _this.menu.gui.__folders.Layers.remove(buttons.mtlBtn);
     _this.menu.gui.__folders.Layers.remove(buttons.stylizeObjectBtn);
+    buttons.stylizeObjectBtn = undefined;
     _this.menu.gui.__folders.Layers.remove(buttons.stylizePartsBtn);
+    buttons.stylizePartsBtn = undefined;
     _this.menu.gui.__folders.Layers.remove(buttons.deleteBtn);
+    buttons.deleteBtn = undefined;
     if (buttons.translateXBtn != undefined) {
         _this.menu.gui.__folders.Positions.remove(buttons.saveGibesBtn);
+        buttons.saveGibesBtn = undefined;
         _this.menu.gui.__folders.Positions.remove(buttons.translateXBtn);
+        buttons.translateXBtn = undefined;
         _this.menu.gui.__folders.Positions.remove(buttons.translateYBtn);
+        buttons.translateYBtn = undefined;
         _this.menu.gui.__folders.Positions.remove(buttons.translateZBtn);
+        buttons.translateZBtn = undefined;
         _this.menu.gui.__folders.Positions.remove(buttons.rotateXBtn);
+        buttons.rotateXBtn = undefined;
         _this.menu.gui.__folders.Positions.remove(buttons.rotateYBtn);
+        buttons.rotateYBtn = undefined;
         _this.menu.gui.__folders.Positions.remove(buttons.rotateZBtn);
+        buttons.rotateZBtn = undefined;
         _this.menu.gui.__folders.Positions.remove(buttons.scaleBtn);
+        buttons.scaleBtn = undefined;
         _this.menu.gui.__folders.Positions.remove(buttons.positionXBtn);
+        buttons.positionXBtn = undefined;
         _this.menu.gui.__folders.Positions.remove(buttons.positionYBtn);
+        buttons.positionYBtn = undefined;
         _this.menu.gui.__folders.Positions.remove(buttons.positionZBtn);
+        buttons.positionZBtn = undefined;
     }
     _this.guiInitialized = false;
 };
 
 // ******************** GEOLOCATION ********************
 
+/**
+ * saving the geolocation
+ */
 LayerManager.prototype._saveGibes = function saveGibes() {
     if (_this.listLayers.length > 0) {
         var nameFile = _this.listLayers[0][0].name.split('_')[0];
@@ -434,6 +507,9 @@ LayerManager.prototype._saveGibes = function saveGibes() {
     }
 };
 
+/**
+ * add a scale controler on the menu
+ */
 LayerManager.prototype._addScale = function addScale() {
     // Add controller for scaling objects
     buttons.scaleBtn = folders.positionFolder.add({ scale: 1 }, 'scale', 0.1, 1000, 0.01).name('Scale').onChange((value) => {
@@ -459,6 +535,9 @@ LayerManager.prototype._addScale = function addScale() {
     });
 };
 
+/**
+ * add a translate controler on the menu
+ */
 LayerManager.prototype._addTranslate = function addTranslate() {
     var prevValueX = 0;
     var prevValueY = 0;
@@ -531,7 +610,9 @@ LayerManager.prototype._addTranslate = function addTranslate() {
     });
 };
 
-
+/**
+ * add a rotate controler on the menu
+ */
 LayerManager.prototype._addRotate = function addRotate() {
     var prevValueX = 0;
     var prevValueY = 0;
@@ -604,6 +685,9 @@ LayerManager.prototype._addRotate = function addRotate() {
     });
 };
 
+/**
+ * add a absolute position controler on the menu
+ */
 LayerManager.prototype._addPosition = function addPosition() {
     // Initial GUI value
     var initialX = _this.listLayers[0][0].position.x;
@@ -634,6 +718,10 @@ LayerManager.prototype._addPosition = function addPosition() {
     });
 };
 
+/**
+ * change the coordinates
+ * @param {THREE.Vector3} vectCoord coordinat vector
+ */
 LayerManager.prototype._changeCoordinates = function changeCoordinates(vectCoord) {
     // Check if only one layer is selected
     if (_this.listLayers.length == 1) {
@@ -662,7 +750,9 @@ LayerManager.prototype._changeCoordinates = function changeCoordinates(vectCoord
     }
 };
 
-
+/**
+ * add the position contoler and this menu
+ */
 LayerManager.prototype.initPositions = function initPositions() {
     buttons.saveGibesBtn = folders.positionFolder.add({ saveGibe: () => _this._saveGibes() }, 'saveGibe').name('Save position');
     _this._addPosition();
@@ -673,6 +763,10 @@ LayerManager.prototype.initPositions = function initPositions() {
 
 // ********** OBJECT MOVEMENTS **********
 
+/**
+ * function for move one object on the scene with keybord
+ * @param {Key} key key pressed
+ */
 LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
     // moving the object after clicked on it using the keys (4,6,2,8,7,3 or a,z,q,s,w,x)
     if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
@@ -697,6 +791,10 @@ LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
     }
 };
 
+/**
+ * translat the object on its X-axis
+ * @param {number} a translation value
+ */
 LayerManager.prototype._moveX = function _moveX(a) {
     if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
@@ -710,6 +808,10 @@ LayerManager.prototype._moveX = function _moveX(a) {
     this.view.notifyChange(true);
 };
 
+/**
+ * translat the object on its Y-axis
+ * @param {number} a translation value
+ */
 LayerManager.prototype._moveY = function _moveY(a) {
     if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
@@ -723,6 +825,10 @@ LayerManager.prototype._moveY = function _moveY(a) {
     this.view.notifyChange(true);
 };
 
+/**
+ * translat the object on its Z-axis
+ * @param {number} a translation value
+ */
 LayerManager.prototype._moveZ = function _moveZ(a) {
     if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
         var obj = _this.listLayers[0][0];
@@ -736,6 +842,10 @@ LayerManager.prototype._moveZ = function _moveZ(a) {
     this.view.notifyChange(true);
 };
 
+/**
+ * function use on click
+ * @param {Event} event click event
+ */
 LayerManager.prototype.picking = function picking(event) {
     // Pick an object with batch id
     var mouse = _this.view.eventToNormalizedCoords(event);
@@ -756,6 +866,9 @@ LayerManager.prototype.picking = function picking(event) {
 
 // ********** UTILS FUNCTIONS **********
 
+/**
+ * make a button for add the BATI3D
+ */
 function createBati3dBtn() {
     _this.loader.loadBati3D();
     buttons.bati3dBtn = _this.menu.gui.add({ bati3D: () => {
@@ -772,12 +885,14 @@ function createBati3dBtn() {
     }, 'bati3D').name('Load Bati3D');
 }
 
+/**
+ * make a button for add the BDTopo
+ */
 function createBdTopoBtn() {
     buttons.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
         if (!_this.loader.bDTopoLoaded) {
             _this.loader.loadBDTopo();
         }
-        // if (_this.loader.bDTopoLoaded) {
         var b = _this.view._layers[0]._attachedLayers.filter(b => b.id == 'WFS Buildings');
         if (_this.loader.bdTopoVisibility) {
             b[0].visible = false;
@@ -788,11 +903,13 @@ function createBdTopoBtn() {
             _this.menu.gui.remove(buttons.bdTopoBtn);
             _this.handleBdTopo();
         }
-        // }
     },
     }, 'bdTopo').name('Load BDTopo');
 }
 
+/**
+ * add Camera folder and its controleurs on the menu
+ */
 function manageCamera() {
     // Create a folder on the menu to manage the camera
     var camFolder = _this.menu.gui.addFolder('Camera');
@@ -836,6 +953,13 @@ function manageCamera() {
     });
 }
 
+/**
+ * extract the named quads group from the scene
+ *
+ * @param {string} layerName name of the quad
+ * @memberOf LayerManager
+ * @returns {THREE.Group} named quads group
+ */
 function getQuadsByName(layerName) {
     var quadGroup = _this.view.scene.getObjectByName('quads');
     var quad = null;
@@ -849,11 +973,23 @@ function getQuadsByName(layerName) {
     return quad;
 }
 
+/**
+ * get the parent's object if the parent is not the scene.
+ * @param {THREE.Group} obj
+ * @memberOf LayerManager
+ * @returns {THREE.Group} the object or this parent
+ */
 function getParent(obj) {
     if (obj.parent.parent != null) return getParent(obj.parent);
     return obj;
 }
 
+/**
+ * remove en element from the given list
+ * @param {[]} list list where the element will be removed
+ * @param {all} elmt element will be removed
+ * @memberOf LayerManager
+ */
 function removeFromList(list, elmt) {
     var i = list.indexOf(elmt);
     if (i != -1) {
@@ -861,11 +997,23 @@ function removeFromList(list, elmt) {
     }
 }
 
+/**
+ * excepton for the file load
+ *
+ * @param {string} message exception message
+ * @memberOf LayerManager
+ */
 function loadFileException(message) {
     this.message = message;
     this.name = 'LoadFileException';
 }
 
+/**
+ * excepton for the layer
+ *
+ * @param {string} message exception message
+ * @memberOf LayerManager
+ */
 function layerException(message) {
     this.message = message;
     this.name = 'LayerException';
