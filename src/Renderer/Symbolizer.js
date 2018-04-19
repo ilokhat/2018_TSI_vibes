@@ -11,6 +11,7 @@
 
 import * as THREE from 'three';
 // import savery from 'savery';
+import MTLLoader from 'three-mtl-loader';
 import Fetcher from '../Core/Scheduler/Providers/Fetcher';
 // import { patchMaterialForLogDepthSupport } from '../Core/Scheduler/Providers/3dTiles_Provider';
 
@@ -27,14 +28,13 @@ var saveData;
  * @param {THREE.PointLight} light light for the scene
  * @param {THREE.Mesh} plane plan for the shadow
  * @param {function} saveDataInit function to initialise the save function
- * @param {ModelLoader} [bdTopo] if stilize BDTopo
+ * @param {ModelLoader} [bdTopo] the loader we
  */
 function Symbolizer(view, obj, edges, menu, nb, light, plane, saveDataInit, bdTopo) {
     // Constructor
     this.obj = obj;
     this.edges = edges;
     this.bdTopo = bdTopo;
-    // if (bdTopo != null) this.bdTopo = bdTopo.ForBuildings;
     this.view = view;
     this.menu = menu;
     this.menu.view = this.view;
@@ -536,6 +536,38 @@ Symbolizer.prototype._addLoad = function addLoad(folder) {
         button.addEventListener('change', () => this._readVibes(button.files[0], folder), false);
         button.click();
     } }, 'load').name('Load style');
+};
+
+/**
+ * Add the 'Load MTL' button
+ * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ */
+Symbolizer.prototype._addLoadMTL = function addLoadMTL(folder) {
+    // Create 'Load MTL' button
+    folder.add({ symbolizer: () => {
+        var button = document.createElement('input');
+        button.setAttribute('type', 'file');
+        button.addEventListener('change', () => {
+            var mtlLoader = new MTLLoader();
+            mtlLoader.load('models/'.concat(button.files[0].name.split('.')[0]).concat('/').concat(button.files[0].name), (materials) => {
+                materials.preload();
+               // this.loader.laodObj3d.setMaterials(materials);
+                this.obj.forEach((layer) => {
+                    if (layer.name.split('_')[0] == button.files[0].name.split('.')[0]) {
+                        layer.children.forEach((child) => {
+                            if (materials.materials[child.name] != undefined) {
+                                child.material = materials.materials[child.name];
+                                this.applyStyle(child.material, folder);
+                            }
+                        });
+                        this.view.notifyChange(true);
+                    }
+                });
+            });
+        }, false);
+        button.click();
+    },
+    }, 'symbolizer').name('Load MTL file');
 };
 
 /**
@@ -1915,6 +1947,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
         this.folder.open();
         this._addSave(parentFolder);
         this._addLoad(parentFolder);
+        this._addLoadMTL(parentFolder);
         var edgesFolder = parentFolder.addFolder('Edges');
         this._addColorEdgeAll(edgesFolder);
         this._addOpacityEdgeAll(edgesFolder);
