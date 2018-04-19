@@ -1630,7 +1630,7 @@ Symbolizer.prototype._addTextureRepetition = function addTextureRepetition(j, fo
     }
     // If not, a texture repetition controller is added to the GUI
     if (!isTextured) {
-        folder.add({ textureRepetition: 1 }, 'textureRepetition', 0.1, 5).name('Texture Repetition').onChange((value) => {
+        folder.add({ textureRepetition: 1 }, 'textureRepetition', 0.1, 10).name('Texture Repetition').onChange((value) => {
             if (this.obj.length > 0) {
                 this._changeTextureRepetition(value, j);
             }
@@ -1740,7 +1740,7 @@ Symbolizer.prototype._addTextureRepetitionAll = function addTextureRepetitionAll
     }
     // If not, a texture repetition controller is added to the GUI
     if (!isTextured) {
-        folder.add({ textureRepetition: 1 }, 'textureRepetition', 0.1, 5).name('Texture Repetition').onChange((value) => {
+        folder.add({ textureRepetition: 1 }, 'textureRepetition', 0.1, 10).name('Texture Repetition').onChange((value) => {
             if (this.obj.length > 0) {
                 this._changeTextureRepetition(value, -1);
             }
