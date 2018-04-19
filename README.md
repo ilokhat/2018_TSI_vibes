@@ -52,7 +52,7 @@ It was proposed by Sidonie Christophe, from the COGIT laboratory (IGN), with Ale
 
 * Go to example/VibesObj.html *(Vibes Style Visualisation)*
 
-* ​
+​
 
   ![croutitower](VIBES/EXAMPLES_ITOWNS.png)
 
@@ -100,7 +100,7 @@ To load data from BATI3D or BD Topo, you just need to click on the corresponding
 
   ![croutitower](VIBES/BATI3D.png)
 
-**/!\ ** To load your own BATI3D file, you must add it to the 'Buildings3D' folder. Therefore, you must run Vibes locally and put the whole BATI3D folder provided by IGN (without modifying the name).
+**/!\** To load your own BATI3D file, you must add it to the 'Buildings3D' folder. Therefore, you must run Vibes locally and put the whole BATI3D folder provided by IGN (without modifying the name).
 
 
 
@@ -397,7 +397,7 @@ When the data is loaded, it is accessible in **loader.model**, as a JavaScript a
 
 #### BD Topo
 
-```
+```javascript
 loader.loadBDTopo();
 ```
 
