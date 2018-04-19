@@ -11,7 +11,6 @@ import Cartography3D from '../B3Dreader/Cartography3D';
 import Feature2MeshStyle from './Feature2MeshStyle';
 import FeatureProcessingBDTopo from '../../Process/FeatureProcessingBDTopo';
 
-var _this;
 /**
  * A loader for 3D model of diverse formats (obj, bati3D, flux WFS BDTopo)
  *
@@ -53,7 +52,6 @@ function ModelLoader(view) {
             dashSize: null,
         },
     };
-    _this = this;
 }
 
 // ********** OBJ **********
