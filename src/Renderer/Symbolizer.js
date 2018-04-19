@@ -151,14 +151,16 @@ Symbolizer.prototype.applyStyle = function applyStyle(style, folder = null) {
                     this._changeEmissive(style.faces[h].emissive, -10, 0);
                     this._changeSpecular(style.faces[h].specular, -10, 0);
                     this._changeShininess(style.faces[h].shininess, -10, 0);
-                    if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, 0, folder.__folders.Faces.__folders[style.faces[h].name]);
+                    // TODO: add uv on BDTopo
+                    // if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, 0, folder.__folders.Faces.__folders[style.faces[h].name]);
                 } else if (style.faces[h].name == 'roof_faces') {
                     this._changeOpacity(style.faces[h].opacity, -10, 1);
                     this._changeColor(style.faces[h].color, -10, 1);
                     this._changeEmissive(style.faces[h].emissive, -10, 1);
                     this._changeSpecular(style.faces[h].specular, -10, 1);
                     this._changeShininess(style.faces[h].shininess, -10, 1);
-                    if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, 1, folder.__folders.Faces.__folders[style.faces[h].name]);
+                    // TODO: add uv on BDTopo
+                    // if (style.faces[h].texture != null) this._changeTexture(style.faces[h].texture, 1, folder.__folders.Faces.__folders[style.faces[h].name]);
                 }
                 h++;
             }
@@ -226,13 +228,15 @@ Symbolizer.prototype.applyStyle = function applyStyle(style, folder = null) {
             this._changeEmissive(style.faces[0].emissive, -10, 0);
             this._changeSpecular(style.faces[0].specular, -10, 0);
             this._changeShininess(style.faces[0].shininess, -10, 0);
-            if (style.faces[0].texture != null) this._changeTexture(style.faces[0].texture, 0, folder.__folders.Faces);
+            // TODO: add uv on BDTopo
+            // if (style.faces[0].texture != null) this._changeTexture(style.faces[0].texture, 0, folder.__folders.Faces);
             this._changeOpacity(style.faces[0].opacity, -10, 1);
             this._changeColor(style.faces[0].color, -10, 1);
             this._changeEmissive(style.faces[0].emissive, -10, 1);
             this._changeSpecular(style.faces[0].specular, -10, 1);
             this._changeShininess(style.faces[0].shininess, -10, 1);
-            if (style.faces[0].texture != null) this._changeTexture(style.faces[0].texture, 1, folder.__folders.Faces);
+            // TODO: add uv on BDTopo
+            // if (style.faces[0].texture != null) this._changeTexture(style.faces[0].texture, 1, folder.__folders.Faces);
         }
     }
 };
@@ -275,6 +279,7 @@ Symbolizer.prototype.applyStylePart = function applyStylePart(style, folder, j) 
         this._changeEmissive(style.faces[0].emissive, -10, j);
         this._changeSpecular(style.faces[0].specular, -10, j);
         this._changeShininess(style.faces[0].shininess, -10, j);
+        // TODO: add uv on BDTopo
         // if (style.faces[0].texture != null) this._changeTexture(style.faces[0].texture, j, folder);
     }
 };
@@ -1647,6 +1652,8 @@ Symbolizer.prototype._changeTextureRepetition = function _changeTextureRepetitio
         }
         this.view.notifyChange(true);
     }
+    /*
+    // TODO: add uv on BDTopo
     if (this.bdTopo) {
         var f2 = (parent) => {
             for (j = 0; j < parent.children.length; j++) {
@@ -1659,6 +1666,7 @@ Symbolizer.prototype._changeTextureRepetition = function _changeTextureRepetitio
         this.bdTopoStyle.edges.textureRepetition = value;
         this.bdTopo.ForBuildings(f2);
     }
+    */
 };
 
 /**
@@ -1680,10 +1688,13 @@ Symbolizer.prototype._addTextureRepetition = function addTextureRepetition(j, fo
             if (this.obj.length > 0) {
                 this._changeTextureRepetition(value, j);
             }
+            /*
+            // TODO: add uv on BDTopo
             if (this.bdTopo) {
                 this._changeTextureRepetition(value, 0);
                 this._changeTextureRepetition(value, 1);
             }
+            */
         });
     }
 };
@@ -1698,7 +1709,7 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, j, folder) 
     var i;
     var k;
     // Add texture
-    var name;
+    // var name;
     if (chemin != './textures/') {
         this._addTextureRepetition(j, folder);
         // Create new texture
@@ -1720,6 +1731,8 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, j, folder) 
             }
             this.view.notifyChange(true);
         }
+        /*
+        // TODO: add uv on BDTopo
         if (this.bdTopo) {
             name = j == 0 ? 'wall_faces' : 'roof_faces';
             var f = (parent) => {
@@ -1739,6 +1752,7 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, j, folder) 
             this.bdTopoStyle[name].texture = chemin;
             this.bdTopo.ForBuildings(f);
         }
+        */
     }
     // Remove texture
     else {
@@ -1756,6 +1770,8 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, j, folder) 
             }
             this.view.notifyChange(true);
         }
+        /*
+        // TODO: add uv on BDTopo
         if (this.bdTopo) {
             name = j == 0 ? 'wall_faces' : 'roof_faces';
             var f2 = (parent) => {
@@ -1769,6 +1785,7 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, j, folder) 
             this.bdTopoStyle[name].texture = chemin;
             this.bdTopo.ForBuildings(f2);
         }
+        */
     }
 };
 
@@ -1790,10 +1807,13 @@ Symbolizer.prototype._addTextureRepetitionAll = function addTextureRepetitionAll
             if (this.obj.length > 0) {
                 this._changeTextureRepetition(value, -1);
             }
+            /*
+            // TODO: add uv on BDTopo
             if (this.bdTopo) {
                 this._changeTextureRepetition(value, 0);
                 this._changeTextureRepetition(value, 1);
             }
+            */
         });
     }
 };
@@ -1830,7 +1850,10 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, folde
                     this.view.notifyChange(true);
                 }
             }
-        } else if (this.bdTopo) {
+        }
+        /*
+        // TODO: add uv on BDTopo
+        else if (this.bdTopo) {
             var f = (parent) => {
                 for (j = 0; j < parent.children.length; j++) {
                     if (parent.children[j].name == 'wall_faces' || parent.children[j].name == 'roof_faces') {
@@ -1853,6 +1876,7 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, folde
             this.bdTopoStyle.roof_faces.texture = chemin;
             this.bdTopo.ForBuildings(f);
         }
+        */
     }
     // Remove texture
     else {
@@ -1871,7 +1895,10 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, folde
                     this.view.notifyChange(true);
                 }
             }
-        } else if (this.bdTopo) {
+        }
+        /*
+        // TODO: add uv on BDTopo
+        else if (this.bdTopo) {
             var f2 = (parent) => {
                 for (j = 0; j < parent.children.length; j++) {
                     if (parent.children[j].name == 'wall_faces' || parent.children[j].name == 'roof_faces') {
@@ -1884,6 +1911,7 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, folde
             this.bdTopoStyle.roof_faces.texture = chemin;
             this.bdTopo.ForBuildings(f2);
         }
+        */
     }
 };
 
@@ -1981,7 +2009,8 @@ Symbolizer.prototype.initGui = function addToGUI() {
                 this._addEmissive(folder, j);
                 this._addSpecular(folder, j);
                 this._addShininess(folder, j);
-                this._addTexture(folder, j);
+                // TODO: add uv on BDTopo
+                // this._addTexture(folder, j);
             }
         }
         if (this.light != null) {
@@ -2010,7 +2039,7 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
     this._addWidthEdgeAll(edgesFolder);
     this._addStyleEdgeAll(edgesFolder);
     var facesFolder = folder.addFolder('Faces');
-    this._addTextureAll(facesFolder);
+    if (this.obj.length != 0) this._addTextureAll(facesFolder);
     this._addOpacityAll(facesFolder);
     this._addColorAll(facesFolder);
     this._addEmissiveAll(facesFolder);
