@@ -23,7 +23,6 @@ function ModelLoader(view) {
     this.view = view;
     this.model = [new THREE.Group(), new THREE.Group()];
     this.checked = false;// if the BATI3D is loaded
-    this.laodObj3d = null;
     this.bdTopoVisibility = false;// BDTopo visibility
      // style apply to the BDTopo
     this.bdTopoStyle = {
@@ -73,10 +72,10 @@ function ModelLoader(view) {
  */
 ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale, callback, menu = null) {
     // OBJ loader
-    _this.laodObj3d = new THREE.OBJLoader();
+    var objLoader = new THREE.OBJLoader();
     var promise = new Promise((resolve) => {
         var lines = new THREE.Group();
-        _this.laodObj3d.load(url, (obj) => {
+        objLoader.load(url, (obj) => {
             this._loadModel(obj, lines, coord, rotateX, rotateY, rotateZ, scale);
             resolve();
         });
