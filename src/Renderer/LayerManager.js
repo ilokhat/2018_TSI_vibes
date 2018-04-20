@@ -110,7 +110,7 @@ LayerManager.prototype._readFile = function readFile(file) {
         }, false);
             // Create a PointLight and turn on shadows for the light
         this.light = new THREE.PointLight(0xffffff, 1, 0, 1);
-        var coordLight = this.coord.clone();
+        var coordLight = (this.coord.clone()).as('EPSG:4326');
         coordLight.setAltitude(coordLight.altitude() + 350);
         this.light.position.copy(coordLight.as(this.view.referenceCrs).xyz());
         this.light.position.y += 70;
