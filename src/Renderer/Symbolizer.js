@@ -2131,7 +2131,7 @@ function loadFileException(message) {
 
 /**
  * Converts the RGB color into an hexadecimal color
- * @param {number} r The value for red 
+ * @param {number} r The value for red
  * @param {number} g The value for green
  * @param {number} b The value for blue
  * @return {string} The hexadecimal color
