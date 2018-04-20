@@ -2,8 +2,8 @@
  * Edit On: april 2018
  * Class: Cartography3D
  * Description:  Part extracted from 'itowns-legacy' {@link https://github.com/iTowns/itowns-legacy}
- * project VIBES
- * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
+ * Project VIBES
+ * Author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
  */
 
 import * as THREE from 'three';
@@ -55,7 +55,7 @@ const Cartography3D = {
 
     // création d'une grille pour toutes les dalles de la limiteZone
     /**
-     * Make the tile grid for the limitZone
+     * Makes the tile grid for the limitZone
      * @function generateGrid
      */
     generateGrid: function generateGrid() {
@@ -74,7 +74,7 @@ const Cartography3D = {
 
     // initialisation de la visualisation
     /**
-     * function for initialise the BATI3D loading
+     * Function for initialize the BATI3D loading
      * @function initCarto3D
      * @param {Object} options
      * @param {function} doAfter callback function run after the Bati3D tile creation (doAfter(objCreated, islast, ModelLoader))
@@ -105,7 +105,7 @@ const Cartography3D = {
     /**
      * Change the initialization status of the Cartography3D
      * @function setInitStatus
-     * @param {boolean} v initialization status
+     * @param {boolean} v Initialization status
      */
     setInitStatus: function setInitStatus(v) {
         this.intialized = v;
@@ -113,9 +113,9 @@ const Cartography3D = {
 
     // return variable test initialisation
     /**
-     * return if the the initialization status of the Cartography3D
+     * Returns true if the Cartography3D is initialized
      * @function isCartoInitialized
-     * @returns {boolean} the initialization status of the Cartography3D
+     * @returns {boolean} The initialization status of the Cartography3D
      */
     isCartoInitialized: function isCartoInitialized() {
         return this.intialized;
@@ -123,9 +123,9 @@ const Cartography3D = {
 
     // change visibilité des dalles
     /**
-     * Change the tile visibility
+     * Changes the tile visibility
      * @function setVisibility
-     * @param {boolean} v if it is visible
+     * @param {boolean} v True if it is visible
      */
     setVisibility: function setVisibility(v) {
         for (var dalle in this.listDalles) {
@@ -137,10 +137,10 @@ const Cartography3D = {
 
     // chargement des dalles autout d'une position
     /**
-     * load tile around a position
+     * Load tiles around a position
      * @function loadDallesAroundPosition
-     * @param {Object} p tile position ({x: 651000, y: 6861000})
-     * @param {boolean} islast if it is tha last tile to load
+     * @param {Object} p Tile position ({x: 651000, y: 6861000})
+     * @param {boolean} islast True if it is tha last tile to load
      */
     loadDallesAroundPosition: function loadDallesAroundPosition(p, islast) {
         var lon = Math.floor(p.x / this.scale);
@@ -168,8 +168,8 @@ const Cartography3D = {
     /**
      * Check if the point if on the limitZone
      * @function isDataAvailable
-     * @param {object} p point to test
-     * @returns {boolean} if the point is on the limitZone
+     * @param {object} p Point to test
+     * @returns {boolean} True if the point is on the limitZone
      */
     isDataAvailable: function isDataAvailable(p) {
         return (p.x > this.limitZone.xmin) && (p.x < this.limitZone.xmax) && (p.z > this.limitZone.ymin) && (p.z < this.limitZone.ymax);

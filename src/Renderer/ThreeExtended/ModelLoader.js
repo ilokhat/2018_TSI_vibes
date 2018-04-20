@@ -2,8 +2,8 @@
  * Generated On: april 2018
  * Class: ModelLoader
  * Description: A loader for 3D model of diverse formats (obj, bati3D, flux WFS BDTopo)
- * project VIBES
- * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
+ * Project VIBES
+ * Author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
  */
 
 import * as THREE from 'three';
@@ -12,7 +12,7 @@ import Feature2MeshStyle from './Feature2MeshStyle';
 import FeatureProcessingBDTopo from '../../Process/FeatureProcessingBDTopo';
 
 /**
- * A loader for 3D model of diverse formats (obj, bati3D, flux WFS BDTopo)
+ * A loader for 3D model of diverse formats (obj, bati3D, BDTopo WFS flux)
  *
  * @constructor
  * @param {GlobeView} view where the loaded webject will be added
@@ -23,7 +23,7 @@ function ModelLoader(view) {
     this.model = [new THREE.Group(), new THREE.Group()];
     this.checked = false;// if the BATI3D is loaded
     this.bdTopoVisibility = false;// BDTopo visibility
-     // style apply to the BDTopo
+     // style applied to the BDTopo
     this.bdTopoStyle = {
         wall_faces: {
             texture: null,
@@ -57,16 +57,16 @@ function ModelLoader(view) {
 // ********** OBJ **********
 
 /**
- * loader for a '.obj' file
+ * Loader for an '.obj' file
  *
- * @param {url} url url of the file
- * @param {Coordinates} coord place of the object on the scene
- * @param {number} rotateX rotation of the object around the x-axis
- * @param {number} rotateY rotation of the object around the y-axis
- * @param {number} rotateZ rotation of the object around the z-axis
- * @param {number} scale scale apply to the object
- * @param {Function} callback function run after the model creation callback([groupFaces, groupEdges], menu)
- * @param {GuiTools} menu menu use for the callback
+ * @param {url} url URL of the file
+ * @param {Coordinates} coord Place of the object on the scene
+ * @param {number} rotateX Rotation of the object around the x-axis
+ * @param {number} rotateY Rotation of the object around the y-axis
+ * @param {number} rotateZ Rotation of the object around the z-axis
+ * @param {number} scale Scale applied to the object
+ * @param {Function} callback Function run after the model creation callback([groupFaces, groupEdges], menu)
+ * @param {GuiTools} [menu] Menu used for the callback
  */
 ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, rotateZ, scale, callback, menu = null) {
     // OBJ loader
@@ -82,11 +82,11 @@ ModelLoader.prototype.loadOBJ = function loadOBJ(url, coord, rotateX, rotateY, r
 };
 
 /**
- * check if the name single and make it single if needed
+ * Checks if the name is single and makes it single if needed
  *
- * @param {string} name name to test
- * @param {GlobeView} view view where the name should be single
- * @return {string} name single name
+ * @param {string} name Name to test
+ * @param {GlobeView} view View where the name should be single
+ * @return {string} name Single name
  * @memberOf ModelLoader
  */
 function controlName(name, view) {
@@ -107,15 +107,15 @@ function controlName(name, view) {
 }
 
 /**
- * internal function, funtion use for load le '.obj' object on the scene
+ * Internal function uses to load the '.obj' object on the scene
  *
- * @param {THREE.Group} obj THREE.Group of THREE.Mesh contains the object faces
+ * @param {THREE.Group} obj THREE.Group of THREE.Mesh containing the object faces
  * @param {THREE.Group} lines THREE.Group where the object lines will be stored
- * @param {Coordinates} coord place of the object on the scene
- * @param {number} rotateX rotation of the object around the x-axis
- * @param {number} rotateY rotation of the object around the y-axis
- * @param {number} rotateZ rotation of the object around the z-axis
- * @param {number} scale scale apply to the object
+ * @param {Coordinates} coord Place of the object on the scene
+ * @param {number} rotateX Rotation of the object around the x-axis
+ * @param {number} rotateY Rotation of the object around the y-axis
+ * @param {number} rotateZ Rotation of the object around the z-axis
+ * @param {number} scale Scale applied to the object
  */
 ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX, rotateY, rotateZ, scale) {
     var objID = this.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
@@ -160,14 +160,14 @@ ModelLoader.prototype._loadModel = function loadModel(obj, lines, coord, rotateX
 };
 
 /**
- * apply rotations and scaling on a group and geolocalize it
+ * Applies rotations and scaling on a group and geolocalize it
  *
  * @param {THREE.Group} obj THREE.Group to which we want to apply the parameters
- * @param {Coordinates} coord place of the object on the scene
- * @param {number} rotateX rotation of the object around the x-axis
- * @param {number} rotateY rotation of the object around the y-axis
- * @param {number} rotateZ rotation of the object around the z-axis
- * @param {number} scale scale apply to the object
+ * @param {Coordinates} coord Place of the object on the scene
+ * @param {number} rotateX Rotation of the object around the x-axis
+ * @param {number} rotateY Rotation of the object around the y-axis
+ * @param {number} rotateZ Rotation of the object around the z-axis
+ * @param {number} scale Scale applied to the object
  * @returns {THREE.Group} obj object with the parameter apply
  */
 ModelLoader.prototype._placeModel = function placeModel(obj, coord, rotateX, rotateY, rotateZ, scale) {
@@ -188,9 +188,9 @@ ModelLoader.prototype._placeModel = function placeModel(obj, coord, rotateX, rot
 /**
  * callback for the Bati3D loader
  *
- * @param {THREE.Group} obj object faces
- * @param {boolean} islast if it is the last tile
- * @param {ModelLoader} self this ModelLoader instance (self = this)
+ * @param {THREE.Group} obj Object's faces
+ * @param {boolean} islast True if it is the last tile
+ * @param {ModelLoader} self Current ModelLoader instance (self = this)
  */
 ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
     if (obj != null) {
@@ -206,7 +206,7 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
             self.model[1].add(line);
         }
     }
-    // pour le dernier :
+    // for the last:
     if (islast) {
         var objID = self.view.mainLoop.gfxEngine.getUniqueThreejsLayer();
         self.model[0].traverse(obj => obj.layers.set(objID));
@@ -227,7 +227,7 @@ ModelLoader.prototype.doAfter = function doAfter(obj, islast, self) {
 };
 
 /**
- * loader for the Bati3D tiles
+ * Loader for the Bati3D tiles
 */
 ModelLoader.prototype.loadBati3D = function loadBati3D() {
     // options for the path and the visibility
@@ -241,10 +241,10 @@ ModelLoader.prototype.loadBati3D = function loadBati3D() {
 };
 
 /**
- * change the BATI3D visibility
+ * Changes the BATI3D visibility
  *
- * @param {ModelLoader} self this ModelLoader
- * @param {boolean} v the BATI3D visibility
+ * @param {ModelLoader} self Current ModelLoader
+ * @param {boolean} v BATI3D visibility
  */
 ModelLoader.prototype._setVisibility = function _setVisibility(self, v) {
     var bati3D_faces = self.scene.getObjectByName('bati3D_faces');
@@ -259,10 +259,10 @@ ModelLoader.prototype._setVisibility = function _setVisibility(self, v) {
 // ********** BDTOPO **********
 
 /**
- * extraction of the building's altitude
+ * Extraction of the building's altitude
  *
- * @param {Object} properties building properties
- * @returns {number} building's altitude
+ * @param {Object} properties Building properties
+ * @returns {number} Building's altitude
  * @memberOf ModelLoader
  */
 function altitudeBuildings(properties) {
@@ -270,10 +270,10 @@ function altitudeBuildings(properties) {
 }
 
 /**
- * extraction of the building's height
+ * Extraction of the building's height
  *
- * @param {Object} properties building properties
- * @returns {number} building's height
+ * @param {Object} properties Building properties
+ * @returns {number} Building's height
  * @memberOf ModelLoader
  */
 function extrudeBuildings(properties) {
@@ -283,8 +283,8 @@ function extrudeBuildings(properties) {
 /**
  * Acceptance criteria for the features
  *
- * @param {Object} properties
- * @returns {boolean} if the feature is accepted or not
+ * @param {Object} properties Building properties
+ * @returns {boolean} True if the feature is accepted
  * @memberOf ModelLoader
  */
 function acceptFeature(properties) {
@@ -323,12 +323,12 @@ ModelLoader.prototype.loadBDTopo = function loadBDTopo() {
 };
 
 /**
- * apply the callback for each tile
+ * Applies the callback for each tile
  *
- * @param {Function} callback callback function
+ * @param {Function} callback Callback function
  * @example
  *  callback = (parentGroup) => console.log(parentGroup);
- *  with the parentGroup compose of meshes wall_faces, roof_faces, wall_edges, roof_edges
+ *  with the parentGroup composed of meshes wall_faces, roof_faces, wall_edges, roof_edges
  */
 ModelLoader.prototype.ForBuildings = function ForBuildings(callback) {
     // For all globe tile meshes we look for tile at level 14 on which building meshes are attached.
@@ -340,10 +340,10 @@ ModelLoader.prototype.ForBuildings = function ForBuildings(callback) {
 };
 
 /**
- * internal function for ForBuildings
+ * Internal function for ForBuildings
  *
- * @param {Object} element element traversed
- * @param {function} callback callback function
+ * @param {Object} element Element traversed
+ * @param {function} callback Callback function
  * @memberOf Symbolizer
  */
 function traverseElement(element, callback) {
@@ -357,43 +357,5 @@ function traverseElement(element, callback) {
         }
     }
 }
-
-/**
- * apply the callback for each tile
- *
- * @param {Function} callback callback function
- * @example
- *  callback = (parentGroup) => console.log(parentGroup);
- *  with the parentGroup compose of meshes wall_faces, roof_faces, wall_edges, roof_edges
- */
- /*
-ModelLoader.prototype.ForBuildings = function ForBuildings(callback) {
-    // For all globe tile meshes we look for tile at level 14 on which building meshes are attached.
-    var a = element => _this.traverseElement(element, callback);
-    for (var i = 0; i < _this.view.wgs84TileLayer.level0Nodes.length; ++i) {
-        _this.view.wgs84TileLayer.level0Nodes[i].traverse(a);
-    }
-    _this.view.notifyChange(true);
-};
-*/
-
-/**
- * internal function for ForBuildings
- *
- * @param {Object} element element traversed
- * @param {function} callback callback function
- */
- /*
-ModelLoader.prototype.traverseElement = function traverseElement(element, callback) {
-    if (element.level != undefined && element.level <= 14) {
-        for (var c = 0; c < element.children.length; ++c) {
-            if (element.children[c].type == 'Group') {
-                var parent = element.children[c];
-                callback(parent);
-            }
-        }
-    }
-};
-*/
 
 export default ModelLoader;

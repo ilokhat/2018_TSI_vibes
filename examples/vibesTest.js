@@ -49,6 +49,7 @@ var rotateY = 0;
 var rotateZ = 0;
 var scale = 1;
 
+// Function to save data
 function saveDataInit() {
     var a = document.createElement('a');
     document.body.appendChild(a);
@@ -86,7 +87,4 @@ globeView.addEventListener(itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED, function 
         result.innerHTML += "<br> To move object click on it or select it from GUI and use:<br> keys A and Z or 4 and 6 to move it from West-East <br> keys Q and S or 8 and 2 to move it from North-South <br> keys W and X or 7 and 3 to move it from Top-Down ";
     })
     result.innerHTML += "<br> To move object click on it or select it from GUI <br> use keys A and Z or 4 and 6 to move it from West-East <br> use keys Q and S or 8 and 2 to move it from North-South <br> use keys W and X or 7 and 3 to move it from Top-Down ";
-    // globeView.controls.setOrbitalPosition({ heading: 180, tilt: 60 });
 });
-//var loader2 = new itowns.ModelLoader(globeView);
- // loader.loadBati3D();

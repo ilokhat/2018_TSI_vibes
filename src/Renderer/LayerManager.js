@@ -1,9 +1,9 @@
 /**
  * Generated On: april 2018
  * Class: ModelLoader
- * Description: Tool to manage layers in Vibes project
- * project VIBES
- * author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
+ * Description: Tool to manage layers in VIBES project
+ * Project VIBES
+ * Author: Adouni, Bouchaour, Grégoire, Mathelier, Nino, Ouhabi, Schlegel
  */
 
 import * as THREE from 'three';
@@ -13,20 +13,20 @@ var _this;
 var saveData;
 
 /**
- * Tool to manage layers in Vibes project
+ * Tool to manage layers in VIBES project
  *
  * @constructor
- * @param {GlobeView} view view where the loaded object are
+ * @param {GlobeView} view View where the loaded object are placed
  * @param {Document} doc DOM Document
- * @param {GuiTools} menu menu for inteacted with the layers
- * @param {Coordinates} coord place of the object on the scene
- * @param {number} rotateX rotation of the object around the x-axis
- * @param {number} rotateY rotation of the object around the y-axis
- * @param {number} rotateZ rotation of the object around the z-axis
- * @param {number} scale scale apply to the object
- * @param {ModelLoader} loader ModelLoader use
- * @param {function} symbolizer function for initialize the Symbolizers
- * @param {function} saveDataInit function for initialize the save file function
+ * @param {GuiTools} menu Menu to interact with the layers
+ * @param {Coordinates} coord Place of the object on the scene
+ * @param {number} rotateX Rotation of the object around the x-axis
+ * @param {number} rotateY Rotation of the object around the y-axis
+ * @param {number} rotateZ Rotation of the object around the z-axis
+ * @param {number} scale Scale applied to the object
+ * @param {ModelLoader} loader ModelLoader used
+ * @param {function} symbolizer Function to initialize the Symbolizers
+ * @param {function} saveDataInit Function to initialize the save file function
  */
 function LayerManager(view, doc, menu, coord, rotateX, rotateY, rotateZ, scale, loader, symbolizer, saveDataInit) {
     // Constructor
@@ -60,7 +60,7 @@ var folders = {};
 // ********** GUI INITIALIZATION **********
 
 /**
- * initialize the menu for the layer managment and add the listners
+ * Function to initialize the menu for the layer managment and add the listners
  */
 LayerManager.prototype.initGUI = function initGUI() {
     // Gui initialization
@@ -84,8 +84,8 @@ LayerManager.prototype.initGUI = function initGUI() {
 };
 
 /**
- * function for the drop event
- * @param {Event} e file droped
+ * Function for the drop event
+ * @param {Event} e File dropped
  */
 LayerManager.prototype.documentDrop = function documentDrop(e) {
     e.preventDefault();
@@ -94,9 +94,9 @@ LayerManager.prototype.documentDrop = function documentDrop(e) {
 };
 
 /**
- * file reader for the droped file
- * @param {File} file droped file
- * @returns {nomber} return 0
+ * File reader for the dropped file
+ * @param {File} file Dropped file
+ * @returns {number} Returns 0
  */
 LayerManager.prototype._readFile = function readFile(file) {
     // Read the file dropped and actually load the object
@@ -201,10 +201,10 @@ LayerManager.prototype._readFile = function readFile(file) {
 // ********** LAYER HANDLERS **********
 
 /**
- * Function run after add an object on the scene.
- * Make the layer managable
+ * Function run after adding an object to the scene.
+ * Makes the layer managable
  *
- * @param {THREE.Groupe[]} model object faces and edges [faces, edges]
+ * @param {THREE.Group[]} model Object's faces and edges [faces, edges]
  */
 LayerManager.prototype.handleLayer = function handleLayer(model) {
     // Add a checkbox to the GUI, named after the layer
@@ -233,7 +233,7 @@ LayerManager.prototype.handleLayer = function handleLayer(model) {
 };
 
 /**
- * Function run after add the BDTopo.
+ * Function run after adding the BDTopo.
  * Make the layer managable
  */
 LayerManager.prototype.handleBdTopo = function handleBdTopo() {
@@ -264,7 +264,7 @@ LayerManager.prototype.handleBdTopo = function handleBdTopo() {
 // ********** FUNCTIONS TO MANAGE CONTROLLERS **********
 
 /**
- * initialize the controleurs for the managment and the stylization
+ * Function to initialize the controllers for the managment and the stylization
  */
 LayerManager.prototype.initControllers = function initControllers() {
     buttons.stylizeObjectBtn = folders.layerFolder.add({ symbolizer: () => {
@@ -342,10 +342,10 @@ LayerManager.prototype.initControllers = function initControllers() {
 };
 
 /**
- * creat the symbolizer menu
+ * Creates the symbolizer menu
  *
- * @param {boolean} complex if the symbolyzer is by part
- * @returns {string} return the Symbolizer name
+ * @param {boolean} complex True if the symbolizer is by part
+ * @returns {string} Returns the Symbolizer name
  */
 LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
     var i;
@@ -422,7 +422,7 @@ LayerManager.prototype.initSymbolizer = function initSymbolizer(complex) {
 };
 
 /**
- * clean the layer management menu
+ * Cleans the layer management menu
  */
 LayerManager.prototype._cleanGUI = function cleanGUI() {
     // Remove the layer management buttons
@@ -462,7 +462,7 @@ LayerManager.prototype._cleanGUI = function cleanGUI() {
 // ******************** GEOLOCATION ********************
 
 /**
- * saving the geolocation
+ * Saves the geolocation in a .gibes file
  */
 LayerManager.prototype._saveGibes = function saveGibes() {
     if (_this.listLayers.length > 0) {
@@ -482,7 +482,7 @@ LayerManager.prototype._saveGibes = function saveGibes() {
 };
 
 /**
- * add a scale controler on the menu
+ * Adds a scale controller on the menu
  */
 LayerManager.prototype._addScale = function addScale() {
     // Add controller for scaling objects
@@ -510,7 +510,7 @@ LayerManager.prototype._addScale = function addScale() {
 };
 
 /**
- * add a translate controler on the menu
+ * Adds a translate controller on the menu
  */
 LayerManager.prototype._addTranslate = function addTranslate() {
     var prevValueX = 0;
@@ -585,7 +585,7 @@ LayerManager.prototype._addTranslate = function addTranslate() {
 };
 
 /**
- * add a rotate controler on the menu
+ * Adds a rotate controller on the menu
  */
 LayerManager.prototype._addRotate = function addRotate() {
     var prevValueX = 0;
@@ -660,7 +660,7 @@ LayerManager.prototype._addRotate = function addRotate() {
 };
 
 /**
- * add a absolute position controler on the menu
+ * Adds an absolute position controller on the menu
  */
 LayerManager.prototype._addPosition = function addPosition() {
     // Initial GUI value
@@ -693,8 +693,8 @@ LayerManager.prototype._addPosition = function addPosition() {
 };
 
 /**
- * change the coordinates
- * @param {THREE.Vector3} vectCoord coordinat vector
+ * Changes the coordinates
+ * @param {THREE.Vector3} vectCoord Vector containing the 3 coordinates (X, Y, Z)
  */
 LayerManager.prototype._changeCoordinates = function changeCoordinates(vectCoord) {
     // Check if only one layer is selected
@@ -725,7 +725,7 @@ LayerManager.prototype._changeCoordinates = function changeCoordinates(vectCoord
 };
 
 /**
- * add the position contoler and this menu
+ * Adds all the position contollers and this menu
  */
 LayerManager.prototype.initPositions = function initPositions() {
     buttons.saveGibesBtn = folders.positionFolder.add({ saveGibe: () => _this._saveGibes() }, 'saveGibe').name('Save position');
@@ -738,8 +738,8 @@ LayerManager.prototype.initPositions = function initPositions() {
 // ********** OBJECT MOVEMENTS **********
 
 /**
- * function for move one object on the scene with keybord
- * @param {Key} key key pressed
+ * Function to move one object on the scene with the keyboard
+ * @param {Key} key Key pressed
  */
 LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
     // moving the object after clicked on it using the keys (4,6,2,8,7,3 or a,z,q,s,w,x)
@@ -766,8 +766,8 @@ LayerManager.prototype.checkKeyPress = function checkKeyPress(key) {
 };
 
 /**
- * translat the object on its X-axis
- * @param {number} a translation value
+ * Translate the object on its X-axis
+ * @param {number} a Translation value
  */
 LayerManager.prototype._moveX = function _moveX(a) {
     if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
@@ -783,8 +783,8 @@ LayerManager.prototype._moveX = function _moveX(a) {
 };
 
 /**
- * translat the object on its Y-axis
- * @param {number} a translation value
+ * Translate the object on its Y-axis
+ * @param {number} a Translation value
  */
 LayerManager.prototype._moveY = function _moveY(a) {
     if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
@@ -800,8 +800,8 @@ LayerManager.prototype._moveY = function _moveY(a) {
 };
 
 /**
- * translat the object on its Z-axis
- * @param {number} a translation value
+ * Translate the object on its Z-axis
+ * @param {number} a Translation value
  */
 LayerManager.prototype._moveZ = function _moveZ(a) {
     if (_this.listLayers.length == 1 && _this.listLayers[0].length >= 2 && _this.listLayers[0][0].name != 'bati3D_faces') {
@@ -817,8 +817,8 @@ LayerManager.prototype._moveZ = function _moveZ(a) {
 };
 
 /**
- * function use on click
- * @param {Event} event click event
+ * Function run after a click
+ * @param {Event} event Click event
  */
 LayerManager.prototype.picking = function picking(event) {
     // Pick an object with batch id
@@ -841,7 +841,7 @@ LayerManager.prototype.picking = function picking(event) {
 // ********** UTILS FUNCTIONS **********
 
 /**
- * make a button for add the BATI3D
+ * Makes a button to add the BATI3D data
  */
 function createBati3dBtn() {
     _this.loader.loadBati3D();
@@ -860,7 +860,7 @@ function createBati3dBtn() {
 }
 
 /**
- * make a button for add the BDTopo
+ * Makes a button to add the BDTopo data
  */
 function createBdTopoBtn() {
     buttons.bdTopoBtn = _this.menu.gui.add({ bdTopo: () => {
@@ -882,7 +882,7 @@ function createBdTopoBtn() {
 }
 
 /**
- * add Camera folder and its controleurs on the menu
+ * Adds 'Camera' folder and its controllers on the menu
  */
 function manageCamera() {
     // Create a folder on the menu to manage the camera
@@ -928,11 +928,11 @@ function manageCamera() {
 }
 
 /**
- * extract the named quads group from the scene
+ * Extracts the quads of a layer from the scene
  *
- * @param {string} layerName name of the quad
+ * @param {string} layerName Name of the layer
  * @memberOf LayerManager
- * @returns {THREE.Group} named quads group
+ * @returns {THREE.Group} The quads extracted
  */
 function getQuadsByName(layerName) {
     var quadGroup = _this.view.scene.getObjectByName('quads');
@@ -948,10 +948,10 @@ function getQuadsByName(layerName) {
 }
 
 /**
- * get the parent's object if the parent is not the scene.
+ * Get the parent's object if the parent is not the scene.
  * @param {THREE.Group} obj
  * @memberOf LayerManager
- * @returns {THREE.Group} the object or this parent
+ * @returns {THREE.Group} The object or this parent
  */
 function getParent(obj) {
     if (obj.parent.parent != null) return getParent(obj.parent);
@@ -959,9 +959,9 @@ function getParent(obj) {
 }
 
 /**
- * remove en element from the given list
- * @param {[]} list list where the element will be removed
- * @param {all} elmt element will be removed
+ * Removes en element from the given list
+ * @param {[]} list List where the element will be removed
+ * @param {all} elmt Element to be removed
  * @memberOf LayerManager
  */
 function removeFromList(list, elmt) {
@@ -972,9 +972,9 @@ function removeFromList(list, elmt) {
 }
 
 /**
- * excepton for the file load
+ * Exception for the file load
  *
- * @param {string} message exception message
+ * @param {string} message Exception message
  * @memberOf LayerManager
  */
 function loadFileException(message) {
@@ -983,7 +983,7 @@ function loadFileException(message) {
 }
 
 /**
- * excepton for the layer
+ * Exception for the layer
  *
  * @param {string} message exception message
  * @memberOf LayerManager

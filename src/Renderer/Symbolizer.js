@@ -21,14 +21,14 @@ var saveData;
 /**
  * @constructor
  * @param {GlobeView} view GlobeView where the element are
- * @param {THREE.Group[]} obj list of faces
- * @param {THREE.Group[]} edges list of edges (same order than obj)
- * @param {GuiTools} menu menu use for the simbolization
- * @param {number} nb symbolizer id number
- * @param {THREE.PointLight} light light for the scene
- * @param {THREE.Mesh} plane plan for the shadow
- * @param {function} saveDataInit function to initialise the save function
- * @param {ModelLoader} [bdTopo] the loader we
+ * @param {THREE.Group[]} obj List of faces
+ * @param {THREE.Group[]} edges List of edges (same order than obj)
+ * @param {GuiTools} menu Menu used for the symbolization
+ * @param {number} nb Symbolizer id number
+ * @param {THREE.PointLight} light Light for the scene
+ * @param {THREE.Mesh} plane Plane for the shadow
+ * @param {function} saveDataInit Function to initialise the save function
+ * @param {ModelLoader} [bdTopo] The loader we used to load BD Topo
  */
 function Symbolizer(view, obj, edges, menu, nb, light, plane, saveDataInit, bdTopo) {
     // Constructor
@@ -50,9 +50,9 @@ function Symbolizer(view, obj, edges, menu, nb, light, plane, saveDataInit, bdTo
 // ******************** SAVING AND LOADING FUNCTIONALITIES ********************
 
 /**
- * Apply one style to the object
- * @param {Object} style style to apply (format .vibes)
- * @param {Dat.gui.Folder} [folder] folder of the symbolyzer
+ * Applies one style to the object
+ * @param {Object} style Style to apply (format .vibes)
+ * @param {Dat.gui.Folder} [folder] Folder of the symbolizer
  */
 Symbolizer.prototype.applyStyle = function applyStyle(style, folder = null) {
     var i;
@@ -242,10 +242,10 @@ Symbolizer.prototype.applyStyle = function applyStyle(style, folder = null) {
 };
 
 /**
- * Apply a style on a particular part
- * @param {Object} style style to apply (type .vibe)
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for the part 'j'
- * @param {number} j part position
+ * Applies a style on a particular part
+ * @param {Object} style Style to apply (type .vibe)
+ * @param {Dat.gui.Folder} folder Folder of the symbolizer for the part 'j'
+ * @param {number} j Rank of the mesh on the layer
  */
 Symbolizer.prototype.applyStylePart = function applyStylePart(style, folder, j) {
     // update controllers
@@ -285,11 +285,11 @@ Symbolizer.prototype.applyStylePart = function applyStylePart(style, folder, j) 
 };
 
 /**
- * reader for the '.vibes'
+ * Reader for the '.vibes'
  * @param {File} file
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
- * @param {number} [j] optional part number to apply the style file
- * @returns {number} return 0 is the the read no fail
+ * @param {Dat.gui.Folder} folder Folder of the symbolizer
+ * @param {number} [j] Rank of the mesh on the layer (default : -100 for all the meshes)
+ * @returns {number} return 0 if the file was read correctly
  */
 Symbolizer.prototype._readVibes = function readVibes(file, folder, j = -100) {
     var reader = new FileReader();
@@ -309,7 +309,7 @@ Symbolizer.prototype._readVibes = function readVibes(file, folder, j = -100) {
 };
 
 /**
- * save the style apply for each part
+ * Save the current style mesh by mesh
  */
 Symbolizer.prototype._saveVibes = function saveVibes() {
     // Initiate stylesheet with edge style and an empty list for face style
@@ -435,8 +435,8 @@ Symbolizer.prototype._saveVibes = function saveVibes() {
 };
 
 /**
- * save the style apply overall
- * @param {number} [target=0] part position for the reference style
+ * Save the style applied on the whole object
+ * @param {number} [target=0] Part position for the reference style
  */
 Symbolizer.prototype._saveVibesAll = function saveVibesAll(target = 0) {
     var vibes;
@@ -524,15 +524,15 @@ Symbolizer.prototype._saveVibesAll = function saveVibesAll(target = 0) {
 };
 
 /**
- * Add the save button for each part'.vibes' and '.gibes'
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * Add the 'Save style' button in the given folder
+ * @param {Dat.gui.Folder} folder Folder where the button will be added
  */
 Symbolizer.prototype._addSave = function addSave(folder) {
     folder.add({ save: () => this._saveVibes() }, 'save').name('Save style');
 };
 /**
- * Add the load button for the '.vibes'
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * Add the load button for the '.vibes' file
+ * @param {Dat.gui.Folder} folder Folder where the button will be added
  */
 Symbolizer.prototype._addLoad = function addLoad(folder) {
     folder.add({ load: () => {
@@ -545,7 +545,7 @@ Symbolizer.prototype._addLoad = function addLoad(folder) {
 
 /**
  * Add the 'Load MTL' button
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * @param {Dat.gui.Folder} folder Folder where the button will be added
  */
 Symbolizer.prototype._addLoadMTL = function addLoadMTL(folder) {
     // Create 'Load MTL' button
@@ -576,18 +576,17 @@ Symbolizer.prototype._addLoadMTL = function addLoadMTL(folder) {
 };
 
 /**
- * Add the save button for the '.gibes' and  the global style '.vibes'
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * Add the 'Save style' button
+ * @param {Dat.gui.Folder} folder Folder where the button will be added
  */
-Symbolizer.prototype._addSaveAll = function addSave(folder) {
+Symbolizer.prototype._addSaveAll = function addSaveAll(folder) {
     folder.add({ save: () => this._saveVibesAll() }, 'save').name('Save style');
-    folder.add({ saveGibe: () => this._saveGibesAll() }, 'saveGibe').name('Save position');
 };
 
 /**
  * Add the save and load '.vibes' button for one part style
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
- * @param {number} j part position
+ * @param {Dat.gui.Folder} folder Folder where the button will be added
+ * @param {number} j Rank of the mesh on the layer
  */
 Symbolizer.prototype._addSaveLoadPart = function addSaveLoadPart(folder, j) {
     folder.add({ save: () => this._saveVibesAll(j) }, 'save').name('Save part style');
@@ -604,8 +603,8 @@ Symbolizer.prototype._addSaveLoadPart = function addSaveLoadPart(folder, j) {
 // *** EDGE OPACITY ***
 
 /**
- * change the edges opacity
- * @param {number} value opacity value
+ * Changes the opacity of the edges
+ * @param {number} value New opacity value
  */
 Symbolizer.prototype._changeOpacityEdge = function changeOpacityEdge(value) {
     // Update edge opacity with selected value
@@ -632,8 +631,8 @@ Symbolizer.prototype._changeOpacityEdge = function changeOpacityEdge(value) {
 };
 
 /**
- * add the edges opacity menu controller
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * Add the 'Edge opacity' controller on the menu
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addOpacityEdgeAll = function addOpacityEdgeAll(folder) {
     var initialOpacity;
@@ -650,8 +649,8 @@ Symbolizer.prototype._addOpacityEdgeAll = function addOpacityEdgeAll(folder) {
 // *** EDGE COLOR ***
 
 /**
- * change the edges color
- * @param {HexColor} value color value
+ * Changes the color of the edges
+ * @param {HexColor} value New color value
  */
 Symbolizer.prototype._changeColorEdge = function changeColorEdge(value) {
     // Update edge color with selected value
@@ -676,8 +675,8 @@ Symbolizer.prototype._changeColorEdge = function changeColorEdge(value) {
     }
 };
 /**
- * add the edges color menu controller
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * Add the 'Edge color' controller to the menu
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addColorEdgeAll = function addColorEdgeAll(folder) {
     var initialColor;
@@ -694,8 +693,8 @@ Symbolizer.prototype._addColorEdgeAll = function addColorEdgeAll(folder) {
 // *** EDGE WIDTH ***
 
 /**
- * change the edges width
- * @param {number} value width value
+ * Change the width of the edges
+ * @param {number} value New width value
  */
 Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value) {
     // Update edge width with selected value
@@ -721,8 +720,8 @@ Symbolizer.prototype._changeWidthEdge = function changeWidthEdge(value) {
 };
 
 /**
- * add the edges width menu controller
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * Add the 'Edge width' controller to the menu
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addWidthEdgeAll = function addWidthEdgeAll(folder) {
     var initialWidth;
@@ -740,8 +739,8 @@ Symbolizer.prototype._addWidthEdgeAll = function addWidthEdgeAll(folder) {
 // *** EDGE STYLE (continuous, dashed, sketchy) ***
 
 /**
- * change the edges dash size
- * @param {number} value dash size value
+ * Changes the dash size of the edges
+ * @param {number} value New dash size value
  */
 Symbolizer.prototype._changeDashSize = function changeDashSize(value) {
     var i;
@@ -770,8 +769,8 @@ Symbolizer.prototype._changeDashSize = function changeDashSize(value) {
 };
 
 /**
- * change the edges dash gap size
- * @param {number} value dash gap size value
+ * Changes the gap size of the edges
+ * @param {number} value New gap size value
  */
 Symbolizer.prototype._changeGapSize = function changeGapSize(value) {
     var i;
@@ -800,9 +799,9 @@ Symbolizer.prototype._changeGapSize = function changeGapSize(value) {
 };
 
 /**
- * add the edges line style menu controllers
- * @param {string} value line type ['Sketchy'|'Dashed'|'Continuous']
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * Add the 'Edge style' controllers to the menu
+ * @param {string} value Type of edge ['Sketchy'|'Dashed'|'Continuous']
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, folder) {
     var k;
@@ -926,9 +925,9 @@ Symbolizer.prototype._addStyleEdgeParams = function _addStyleEdgeParams(value, f
 };
 
 /**
- * change the edges line style
- * @param {string} value line type ['Sketchy'|'Dashed'|'Continuous']
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * Change the style of the edges
+ * @param {string} value Type of edge ['Sketchy'|'Dashed'|'Continuous']
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._changeStyleEdge = function changeStyleEdge(value, folder) {
     var oldOpacity;
@@ -1043,11 +1042,11 @@ Symbolizer.prototype._changeStyleEdge = function changeStyleEdge(value, folder) 
 };
 
 /**
- * create the sketchy material
- * @param {string} stroke sketchy image name
- * @param {HexColor} color edge color
- * @param {number} width ???
- * @param {number} threshold limit width between the small and normal image apply
+ * Creates the sketchy material
+ * @param {string} stroke Sketchy stroke name
+ * @param {HexColor} color Edge color
+ * @param {number} width Edge width
+ * @param {number} threshold Limit width between the small and normal image application
  */
 Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(stroke, color, width, threshold) {
     // Initializations
@@ -1221,8 +1220,8 @@ Symbolizer.prototype._createSketchyMaterial = function createSketchyMaterial(str
 };
 
 /**
- * add the edges line style menu controller
- * @param {Dat.gui.Folder} folder folder of the symbolyzer
+ * Adds the 'Edge style' controller to the menu
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addStyleEdgeAll = function addStyleEdgeAll(folder) {
     folder.add({ style: 'Continuous' }, 'style', ['Continous', 'Dashed', 'Sketchy']).name('Edge style').onChange((value) => {
@@ -1235,10 +1234,10 @@ Symbolizer.prototype._addStyleEdgeAll = function addStyleEdgeAll(folder) {
 // *** OPACITY ***
 
 /**
- * change the face opacity
- * @param {number} value face opacity value
- * @param {number} i object place
- * @param {number} j sub-object place
+ * Change the opacity of the face
+ * @param {number} value New face opacity value
+ * @param {number} i Rank of the layer in the list
+ * @param {number} j Rank of the mesh on the layer
  */
 Symbolizer.prototype._changeOpacity = function changeOpacity(value, i, j) {
     // Update opacity with selected value
@@ -1261,9 +1260,9 @@ Symbolizer.prototype._changeOpacity = function changeOpacity(value, i, j) {
     }
 };
 /**
- * add the face opacity menu controller for one part
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
- * @param {number} j sub-object place
+ * Adds the 'Opacity' controller on the menu (for one mesh)
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
+ * @param {number} j Rank of the mesh
  */
 Symbolizer.prototype._addOpacity = function addOpacity(folder, j) {
     var initialOpacity;
@@ -1286,8 +1285,8 @@ Symbolizer.prototype._addOpacity = function addOpacity(folder, j) {
     }
 };
 /**
- * add the face opacity menu controller for overall
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ * Adds the 'Opacity' controller to the menu (for the whole object)
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
     var initialOpacity;
@@ -1317,10 +1316,10 @@ Symbolizer.prototype._addOpacityAll = function addOpacityAll(folder) {
 // *** COLOR (color, emissive, specular) ***
 
 /**
- * change the face color
- * @param {HexColor} value face color value
- * @param {number} i object place
- * @param {number} j sub-object place
+ * Change the color of the face
+ * @param {HexColor} value New color value
+ * @param {number} i Rank of the layer in the list
+ * @param {number} j Rank of the mesh in the layer
  */
 Symbolizer.prototype._changeColor = function changeColor(value, i, j) {
     // Update color with selected value
@@ -1344,8 +1343,8 @@ Symbolizer.prototype._changeColor = function changeColor(value, i, j) {
 };
 
 /**
- * add the face color menu controller for one part
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ * Add the face color menu controller for one part
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  * @param {number} j sub-object place
  */
 Symbolizer.prototype._addColor = function addColor(folder, j) {
@@ -1369,7 +1368,7 @@ Symbolizer.prototype._addColor = function addColor(folder, j) {
 
 /**
  * add the face color menu controller for overall
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addColorAll = function addColorAll(folder) {
     var initialColor;
@@ -1394,10 +1393,10 @@ Symbolizer.prototype._addColorAll = function addColorAll(folder) {
 };
 
 /**
- * change the face emissive color
- * @param {HexColor} value face emissive color value
- * @param {number} i object place
- * @param {number} j sub-object place
+ * Change the emissive color of the face
+ * @param {HexColor} value New emissive color value
+ * @param {number} i Rank of the layer in the list
+ * @param {number} j Rank of the mesh on the layer
  */
 Symbolizer.prototype._changeEmissive = function changeEmissive(value, i, j) {
     // Update edge width with selected value
@@ -1421,9 +1420,9 @@ Symbolizer.prototype._changeEmissive = function changeEmissive(value, i, j) {
 };
 
 /**
- * add the face emissive color menu controller for one part
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
- * @param {number} j sub-object place
+ * Adds the 'Emissive color' controller on the menu (mesh by mesh)
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
+ * @param {number} j Rank of the mesh on the layer
  */
 Symbolizer.prototype._addEmissive = function addEmissive(folder, j) {
     var initialEmissive;
@@ -1445,8 +1444,8 @@ Symbolizer.prototype._addEmissive = function addEmissive(folder, j) {
 };
 
 /**
- * add the face emissive color menu controller for overall
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ * Add the face 'Emissive color' controller to the menu (for the whole object)
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addEmissiveAll = function addEmissiveAll(folder) {
     var initialEmissive;
@@ -1471,10 +1470,10 @@ Symbolizer.prototype._addEmissiveAll = function addEmissiveAll(folder) {
 };
 
 /**
- * change the face specular color
- * @param {HexColor} value face specular color value
- * @param {number} i object place
- * @param {number} j sub-object place
+ * Change the specular color of the face
+ * @param {HexColor} value New specular color value
+ * @param {number} i Rank of the layer in the list
+ * @param {number} j Rank of the mesh on the layer
  */
 Symbolizer.prototype._changeSpecular = function changeSpecular(value, i, j) {
     // Update specular with selected value
@@ -1498,9 +1497,9 @@ Symbolizer.prototype._changeSpecular = function changeSpecular(value, i, j) {
 };
 
 /**
- * add the face specular color menu controller for one part
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
- * @param {number} j sub-object place
+ * Add the 'Specular color' controller to the menu (mesh by mesh)
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
+ * @param {number} j Rank of the mesh on the layer
  */
 Symbolizer.prototype._addSpecular = function addSpecular(folder, j) {
     var initialSpecular;
@@ -1523,8 +1522,8 @@ Symbolizer.prototype._addSpecular = function addSpecular(folder, j) {
 };
 
 /**
- * add the face specular color menu controller for overall
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ * Adds the 'Specular color' controller to the menu (for the whole object)
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addSpecularAll = function addSpecularAll(folder) {
     var initialSpecular;
@@ -1551,10 +1550,10 @@ Symbolizer.prototype._addSpecularAll = function addSpecularAll(folder) {
 // *** SHININESS ***
 
 /**
- * change the face shininess
- * @param {number} value face shininess value
- * @param {number} i object place
- * @param {number} j sub-object place
+ * Change the shininess of the face
+ * @param {number} value New shininess value
+ * @param {number} i Rank of the layer in the list
+ * @param {number} j Rank of the mesh on the layer
  */
 Symbolizer.prototype._changeShininess = function changeShininess(value, i, j) {
     // Update shininess with selected value
@@ -1578,9 +1577,9 @@ Symbolizer.prototype._changeShininess = function changeShininess(value, i, j) {
 };
 
 /**
- * add the face shininess menu controller for one part
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
- * @param {number} j sub-object place
+ * Add the 'Shininess' controller to the menu (mesh by mesh)
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
+ * @param {number} j Rank of the mesh on the layer
  */
 Symbolizer.prototype._addShininess = function addShininess(folder, j) {
     var initialShininess;
@@ -1602,8 +1601,8 @@ Symbolizer.prototype._addShininess = function addShininess(folder, j) {
     }
 };
 /**
- * add the face shininess menu controller for overall
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ * Add the 'Shininess' controller to the menu (for the whole object)
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addShininessAll = function addShininessAll(folder) {
     var initialShininess;
@@ -1630,9 +1629,9 @@ Symbolizer.prototype._addShininessAll = function addShininessAll(folder) {
 // *** FACE TEXTURATION ***
 
 /**
- * change the face texture reapeatition
- * @param {number} value face texture reapeatition value
- * @param {number} m sub-object place or -1 for all
+ * Change the repetition of a texture applied on a face
+ * @param {number} value New texture reapetition value
+ * @param {number} m Rank of the mesh on the layer or -1 for all
  */
 Symbolizer.prototype._changeTextureRepetition = function _changeTextureRepetition(value, m) {
     var i;
@@ -1670,9 +1669,9 @@ Symbolizer.prototype._changeTextureRepetition = function _changeTextureRepetitio
 };
 
 /**
- * add the face texture reapeatition menu controller for one part
- * @param {number} j sub-object place
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ * Adds the 'Texture reapetition' controller to the menu (mesh by mesh)
+ * @param {number} j Rank of the mesh on the layer
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addTextureRepetition = function addTextureRepetition(j, folder) {
     // Checks if a texture repetition controller already exists
@@ -1700,10 +1699,10 @@ Symbolizer.prototype._addTextureRepetition = function addTextureRepetition(j, fo
 };
 
 /**
- * change the face texture for one part
- * @param {string} chemin face texture value
- * @param {number} j sub-object place
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ * Change the texture of the face (mesh by mesh)
+ * @param {string} chemin Path of the source image of the texture
+ * @param {number} j Rank of the mesh on the layer
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._changeTexture = function changeTexture(chemin, j, folder) {
     var i;
@@ -1790,8 +1789,8 @@ Symbolizer.prototype._changeTexture = function changeTexture(chemin, j, folder) 
 };
 
 /**
- * add the face texture repetition menu controller for overall
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for all faces
+ * Add the 'Texture repetition' controller to the menu (for the whole object)
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addTextureRepetitionAll = function addTextureRepetitionAll(folder) {
     // Checks if a texture repetition controller already exists
@@ -1819,9 +1818,9 @@ Symbolizer.prototype._addTextureRepetitionAll = function addTextureRepetitionAll
 };
 
 /**
- * change the face texture for overall
- * @param {string} chemin face texture value
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
+ * Change the texture of the face (for the whole object)
+ * @param {string} chemin Path of the source image of the texture
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, folder) {
     var i;
@@ -1916,9 +1915,9 @@ Symbolizer.prototype._changeTextureAll = function changeTextureAll(chemin, folde
 };
 
 /**
- * add the face texture menu controller for one part
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for one part
- * @param {number} j sub-object place
+ * Adds the 'Texture' controller to the menu (mesh by mesh)
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
+ * @param {number} j Rank of the mesh on the layer
  */
 Symbolizer.prototype._addTexture = function addTexture(folder, j) {
     Fetcher.json('./textures/listeTexture.json').then((listTextures) => {
@@ -1932,8 +1931,8 @@ Symbolizer.prototype._addTexture = function addTexture(folder, j) {
 };
 
 /**
- * add the face texture menu controller for overall
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for all parts
+ * Adds the 'Texture' controller to the menu (for the whole object)
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
     Fetcher.json('./textures/listeTexture.json').then((listTextures) => {
@@ -1949,8 +1948,8 @@ Symbolizer.prototype._addTextureAll = function addTextureAll(folder) {
 // ******************** GUI INITIALIZATION ********************
 
 /**
- * Use for controle if we can symbolyze objects by part
- * @returns {boolean} if we can symbolyze objects by part
+ * Control if the structure of the layers are similar (if not they cannot be stylized mesh by mesh)
+ * @returns {boolean} True if the structure is similar
  */
 Symbolizer.prototype._checkStructure = function checkStructure() {
     var i;
@@ -1965,7 +1964,7 @@ Symbolizer.prototype._checkStructure = function checkStructure() {
     return true;
 };
 
-/** creat a symbolyzer menu for symbolyze each part */
+/** Creates a Symbolizer menu to symbolize mesh by mesh */
 Symbolizer.prototype.initGui = function addToGUI() {
     // We check if the objects of the list have the same structure
     if (this._checkStructure()) {
@@ -2025,7 +2024,7 @@ Symbolizer.prototype.initGui = function addToGUI() {
     }
 };
 
-/** creat a symbolyzer menu for symbolyze overall object(s) */
+/** Creat a Symbolizer menu ti symbolize the object(s) as a whole */
 Symbolizer.prototype.initGuiAll = function addToGUI() {
     // var folder = this.menu.gui.addFolder(this.obj.materialLibraries[0].substring(0, this.obj.materialLibraries[0].length - 4));
     var folder = this.menu.gui.addFolder('Symbolizer '.concat(this.nb));
@@ -2057,8 +2056,8 @@ Symbolizer.prototype.initGuiAll = function addToGUI() {
 // ******************** ENVIRONMENT ********************
 
 /**
- * add a light move menu controller
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for all parts
+ * Add 'Move light' controllers to the menu
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addMoveLight = function addMoveLight(folder) {
     var prevValueX = 0;
@@ -2088,8 +2087,8 @@ Symbolizer.prototype._addMoveLight = function addMoveLight(folder) {
 };
 
 /**
- * add a light color menu controller
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for all parts
+ * Adds a 'Light color' controller to the menu
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addColorLight = function addColorLight(folder) {
     folder.addColor({ color: 0xffffff }, 'color').name('Color').onChange((value) => {
@@ -2099,8 +2098,8 @@ Symbolizer.prototype._addColorLight = function addColorLight(folder) {
 };
 
 /**
- * add a shadow menu controller
- * @param {Dat.gui.Folder} folder folder of the symbolyzer for all parts
+ * Adds a 'Shadow' controller to the menu
+ * @param {Dat.gui.Folder} folder Folder where the controller will be added
  */
 Symbolizer.prototype._addShades = function addShades(folder) {
     folder.add({ shades: this.plane.visible }, 'shades').name('Display shades').onChange((checked) => {
@@ -2121,8 +2120,8 @@ function getRandomColor() {
 */
 
 /**
- * function for the file exception
- * @param {string} message message
+ * Function for the file exception
+ * @param {string} message Exception message
  * @memberOf Symbolizer
  */
 function loadFileException(message) {
@@ -2130,24 +2129,23 @@ function loadFileException(message) {
     this.name = 'loadFileException';
 }
 
+/**
+ * Converts the RGB color into an hexadecimal color
+ * @param {number} r The value for red 
+ * @param {number} g The value for green
+ * @param {number} b The value for blue
+ * @return {string} The hexadecimal color
+ * @memberOf Symbolizer
+ */
 function rgb2hex(r, g, b) {
     return '#'.concat(('0'.concat(r.toString(16))).slice(-2)).concat(('0'.concat(g.toString(16))).slice(-2)).concat(('0'.concat(b.toString(16))).slice(-2));
 }
 
-/*
-function getSourceSynch(url) {
-    var req = new XMLHttpRequest();
-    req.open('GET', url, false);
-    req.send();
-    return req.responseText;
-}
-*/
-
 /**
- * initialize the edges between tow point for the quad
- * @param {THREE.Vector3} pt1 first point
- * @param {THREE.Vector3} pt2 second point
- * @returns {THREE.BufferGeometry} edges between tow point for the quad
+ * Initializes the quads between two points of the edges
+ * @param {THREE.Vector3} pt1 First point
+ * @param {THREE.Vector3} pt2 Second point
+ * @returns {THREE.BufferGeometry} The geometry created
  * @memberOf Symbolizer
  */
 function createQuad(pt1, pt2) {
