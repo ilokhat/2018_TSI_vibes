@@ -345,9 +345,11 @@ VIBES also provides three different point of views : **horizon**, **bird's eye v
 
 VIBES can also bu used in your own iTowns application.
 
-You can find the documentation here (add link to generated doc).
+You can find the documentation [here](https://itownsresearch.github.io/2018_TSI_vibes/doc/index.html). Or on comande line :
 
-
+```sh
+npm run doc
+```
 
 ### Load an object
 
